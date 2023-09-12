@@ -3,6 +3,9 @@
   margin: 0;
   padding: 0;
 }
+html,body {
+  overflow: hidden;
+}
 input[type="color"] {
   position: relative;
   overflow: hidden;
