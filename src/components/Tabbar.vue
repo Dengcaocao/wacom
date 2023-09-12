@@ -1,5 +1,5 @@
 <template>
-  <header>
+  <header class="header">
     <span
       v-for="icon in icons"
       :key="icon.name"
@@ -51,31 +51,17 @@ const icons = reactive([
 ])
 </script>
 
-<style scoped lang="scss">
-header {
-  position: absolute;
-  top: 6px;
-  left: 50%;
-  transform: translateX(-50%);
-  display: grid;
-  grid-template-rows: auto;
-  grid-auto-flow: column;
-  grid-auto-columns: min-content;
-  gap: $sm-gap;
-  padding: $sm-gap;
-  border-radius: $sm-radius;
-  background-color: #fff;
-  box-shadow: $box-shadow;
+<style scoped>
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+@layer components {
+  .header {
+    transform: translateX(-50%);
+    @apply absolute top-1.5 left-1/2 grid grid-flow-col auto-cols-min gap-1 p-1 rounded shadow-design bg-white
+  }
   .item {
-    padding: $md-gap;
-    border-radius: $sm-radius;
-    font-size: 22px;
-    cursor: pointer;
-    background-color: $theme-bg-color;
-    &:hover,
-    &.checked {
-      background-color: $theme-bg-color-deep;
-    }
+    @apply text-xl leading-5 p-2 rounded cursor-pointer bg-theme-color hover:bg-theme-color-deep
   }
 }
 </style>

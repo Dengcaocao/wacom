@@ -1,10 +1,10 @@
 <template>
-  <aside>
+  <aside class="absolute top-1.5 left-1.5">
     <section class="top">
       <div class="item iconfont icon-shanchu"></div>
       <div class="item iconfont icon-tupianxiazai"></div>
-      <div class="item bg-box">
-        <input type="color" class="canvas-bg">
+      <div class="item bg-transparent hover:bg-transparent">
+        <input type="color" class="w-6 h-6">
       </div>
     </section>
     <config />
@@ -15,39 +15,16 @@
 import Config from './Config.vue'
 </script>
 
-<style scoped lang="scss">
-aside {
-  position: absolute;
-  top: 6px;
-  left: 6px;
+<style scoped>
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+@layer components {
   .top {
-    display: grid;
-    grid-template-rows: auto;
-    grid-auto-flow: column;
-    grid-auto-columns: min-content;
-    gap: $sm-gap;
-    padding: $sm-gap;
-    border-radius: $sm-radius;
-    box-shadow: $box-shadow;
-    background-color: #fff;
-    .item {
-      padding: $md-gap;
-      border-radius: $sm-radius;
-      font-size: 22px;
-      font-weight: bolder;
-      cursor: pointer;
-      background-color: $theme-bg-color;
-      &:hover {
-        background-color: $theme-bg-color-deep;
-      }
-      &.bg-box {
-        background-color: transparent;
-      }
-      .canvas-bg {
-        width: 24px;
-        height: 24px;
-      }
-    }
+    @apply grid grid-flow-col auto-cols-min gap-1 p-1 rounded shadow-design bg-white
+  }
+  .item {
+    @apply p-2 rounded text-xl font-bold leading-5 cursor-pointer bg-theme-color hover:bg-theme-color-deep
   }
 }
 </style>

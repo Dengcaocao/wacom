@@ -1,4 +1,6 @@
-@import './base.scss';
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
 * {
   margin: 0;
   padding: 0;
@@ -10,8 +12,8 @@ input[type="color"] {
   position: relative;
   overflow: hidden;
   display: block;
-  border: 1px solid $theme-bg-color;
-  border-radius: $sm-radius;
+  border: 1px solid rgba(0, 0, 0, 0.08);
+  border-radius: 4px;
   cursor: pointer;
 }
 input[type="color"]::-webkit-color-swatch {
