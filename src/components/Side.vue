@@ -7,9 +7,13 @@
         <input type="color" class="canvas-bg">
       </div>
     </section>
-    <section class="bottom"></section>
+    <config />
   </aside>
 </template>
+
+<script setup lang="ts">
+import Config from './Config.vue'
+</script>
 
 <style scoped lang="scss">
 aside {
@@ -44,14 +48,6 @@ aside {
         height: 24px;
       }
     }
-  }
-  .bottom {
-    width: 200px;
-    height: 200px;
-    margin-top: $xl-gap;
-    border-radius: $sm-radius;
-    box-shadow: $box-shadow;
-    background-color: #fff;
   }
 }
 </style>
