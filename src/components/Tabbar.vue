@@ -4,51 +4,61 @@
       v-for="icon in icons"
       :key="icon.name"
       class="item iconfont"
-      :class="icon.name"></span>
+      :class="[icon.name, icon.action === configStore.drawType && 'active']"
+      @click="handleDrawType(icon.action)">
+    </span>
   </header>
 </template>
 
 <script setup lang="ts">
-import { reactive } from 'vue';
+import { reactive } from 'vue'
+import { useConfigStore } from '@/stores/config'
+
+const configStore = useConfigStore()
 
 const icons = reactive([
   {
     name: 'icon-zhizhen',
-    action: ''
+    action: 'select'
   },
   {
     name: 'icon-dantupailie',
-    action: ''
+    action: 'rect'
   },
   {
     name: 'icon-lingxing',
-    action: ''
+    action: 'diamond'
   },
   {
     name: 'icon-luyin',
-    action: ''
+    action: 'arc'
   },
   {
     name: 'icon-xiangshangjiantoucuxiao',
-    action: ''
+    action: 'arrow'
   },
   {
     name: 'icon-xian',
-    action: ''
+    action: 'line'
   },
   {
     name: 'icon-Icon_huabi',
-    action: ''
+    action: 'pen'
   },
   {
     name: 'icon-ziti',
-    action: ''
+    action: 'font'
   },
   {
     name: 'icon-tupian',
-    action: ''
+    action: 'pic'
   }
 ])
+
+const handleDrawType = (type: string) => {
+  document.body.style.cursor = type === 'select' ? 'default' : 'crosshair'
+  configStore.updateDrawType(type)
+}
 </script>
 
 <style scoped>
@@ -62,6 +72,9 @@ const icons = reactive([
   }
   .item {
     @apply text-xl leading-5 p-2 rounded cursor-pointer bg-theme-color hover:bg-theme-color-deep
+  }
+  .active {
+    background-color: theme('colors.theme-color-deep');
   }
 }
 </style>
