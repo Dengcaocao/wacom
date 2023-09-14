@@ -73,8 +73,8 @@
     <div class="item">
       <h3 class="title">操作</h3>
       <div class="flex">
-        <div class="action iconfont icon-shanchu"></div>
-        <div class="action iconfont icon-shanchu"></div>
+        <div class="action iconfont icon-fuzhi_copy"></div>
+        <div class="action iconfont icon-weibiaoti544"></div>
       </div>
     </div>
   </main>
@@ -92,7 +92,7 @@
     @apply block w-12 bg-theme-color rounded ml-1.5 first:ml-0 p-2
   }
   .action {
-    @apply text-xl font-bold max-w-min bg-theme-color rounded ml-1.5 first:ml-0 p-2
+    @apply text-xl leading-5 max-w-min bg-theme-color rounded ml-1.5 first:ml-0 p-2
   }
 }
 </style>

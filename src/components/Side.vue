@@ -1,10 +1,10 @@
 <template>
   <aside class="absolute top-1.5 left-1.5">
     <section class="top">
-      <div class="item iconfont icon-shanchu"></div>
-      <div class="item iconfont icon-tupianxiazai"></div>
+      <div class="item iconfont icon-weibiaoti544"></div>
+      <div class="item iconfont icon-export-img"></div>
       <div class="item bg-transparent hover:bg-transparent">
-        <input type="color" class="w-6 h-6">
+        <input type="color" class="block w-5 h-5">
       </div>
     </section>
     <config />
