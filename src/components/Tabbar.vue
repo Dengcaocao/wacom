@@ -5,14 +5,14 @@
       :key="icon.name"
       class="item iconfont"
       :class="[icon.name, icon.action === configStore.drawType && 'active']"
-      @click="handleDrawType(icon.action)">
+      @click="handleDrawType(icon.action as IDrawType)">
     </span>
   </header>
 </template>
 
 <script setup lang="ts">
 import { reactive } from 'vue'
-import { useConfigStore } from '@/stores/config'
+import { useConfigStore, type IDrawType } from '@/stores/config'
 
 const configStore = useConfigStore()
 
@@ -47,7 +47,7 @@ const icons = reactive([
   },
   {
     name: 'icon-ziti',
-    action: 'font'
+    action: 'text'
   },
   {
     name: 'icon-tupian',
@@ -55,7 +55,7 @@ const icons = reactive([
   }
 ])
 
-const handleDrawType = (type: string) => {
+const handleDrawType = (type: IDrawType) => {
   document.body.style.cursor = type === 'select' ? 'default' : 'crosshair'
   configStore.updateDrawType(type)
 }
