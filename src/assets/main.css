@@ -15,6 +15,7 @@ input[type="color"] {
   border: 1px solid rgba(0, 0, 0, 0.08);
   border-radius: 4px;
   cursor: pointer;
+  background-color: transparent;
 }
 input[type="color"]::-webkit-color-swatch {
   position: absolute;
