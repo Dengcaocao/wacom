@@ -8,7 +8,7 @@ module.exports = {
     colors: ({ colors }) => ({
       ...colors,
       'theme-color': 'rgba(0, 0, 0, 0.08)',
-      'theme-color-deep': 'rgba(0, 0, 0, 0.12)'
+      'theme-color-deep': 'rgba(0, 0, 0, 0.2)'
     }),
     extend: {
       boxShadow: {
