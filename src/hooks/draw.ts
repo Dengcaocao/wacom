@@ -112,18 +112,26 @@ export const useDraw = () => {
       this.app.stage.addChild(graphics)
       return graphics
     }
-    setLineStyle () {
-      this.graphics?.lineStyle({
+    setLineStyle (graphics?: PIXI.Graphics) {
+      (graphics || this.graphics)?.lineStyle({
         width: context.value.strokeWidth,
-        color: context.value.strokeColor
+        color: context.value.strokeColor,
+        alpha: context.value.alpha,
+        cap: PIXI.LINE_CAP.ROUND
       })
     }
+    /**
+     * @description: 矩形绘制
+     * @param {number} mx 鼠标移动坐标
+     * @param {number} my 鼠标移动坐标
+     * @return {*}
+     */
     rect (mx: number, my: number) {
       this.graphics = this.graphics || this.createGraphics()
       // clear 会清除线的样式
       this.graphics.clear()
       this.setLineStyle()
-      this.graphics.beginFill(context.value.fillColor)
+      this.graphics.beginFill(context.value.fillColor, context.value.alpha)
       // drawRect 宽高不能为负数
       this.graphics.drawPolygon([
         this.startPoint.x, this.startPoint.y,
@@ -135,14 +143,19 @@ export const useDraw = () => {
       // const hitArea = new PIXI.Rectangle(this.startPoint.x, this.startPoint.y, distanceY, distanceY)
       // this.graphics.hitArea = hitArea
     }
+    /**
+     * @description: 菱形绘制
+     * @param {number} mx 鼠标移动坐标
+     * @param {number} my 鼠标移动坐标
+     * @return {*}
+     */
     diamond (mx: number, my: number) {
       this.graphics = this.graphics || this.createGraphics()
       this.graphics.clear()
       this.setLineStyle()
       const distanceX = mx - this.startPoint.x
       const distanceY = my - this.startPoint.y
-      this.graphics.beginFill(context.value.fillColor)
-      // drawRect 宽高不能为负数
+      this.graphics.beginFill(context.value.fillColor, context.value.alpha)
       this.graphics.drawPolygon([
         this.startPoint.x, this.startPoint.y,
         this.startPoint.x + distanceX, this.startPoint.y + distanceY/2,
@@ -151,6 +164,12 @@ export const useDraw = () => {
       ])
       this.graphics.endFill()
     }
+    /**
+     * @description: 圆形绘制
+     * @param {number} mx 鼠标移动坐标
+     * @param {number} my 鼠标移动坐标
+     * @return {*}
+     */
     arc (mx: number, my: number) {
       this.graphics = this.graphics || this.createGraphics()
       this.graphics.clear()
@@ -158,10 +177,16 @@ export const useDraw = () => {
       const distanceX = mx - this.startPoint.x
       const distanceY = my - this.startPoint.y
       const r = Math.pow(distanceX * distanceX + distanceY * distanceY, 1/2) / 2
-      this.graphics.beginFill(context.value.fillColor)
+      this.graphics.beginFill(context.value.fillColor, context.value.alpha)
       this.graphics.drawEllipse(this.startPoint.x + distanceX/2, this.startPoint.y + distanceY/2, r, Math.abs(distanceY)/2)
       this.graphics.endFill()
     }
+    /**
+     * @description: 箭头绘制
+     * @param {number} mx 鼠标移动坐标
+     * @param {number} my 鼠标移动坐标
+     * @return {*}
+     */
     arrow (mx: number, my: number) {
       this.graphics = this.graphics || this.createGraphics()
       this.graphics.clear()
@@ -181,10 +206,7 @@ export const useDraw = () => {
       if (direction === -1) {
         deg = distanceY < 0 ? -Math.PI + deg : Math.PI + deg
       }
-      child.lineStyle({
-        width: context.value.width,
-        color: context.value.strokeColor
-      })
+      this.setLineStyle(child)
       // 将旋转点设置为椭圆中心
       child.x = mx
       child.y = my
@@ -195,6 +217,12 @@ export const useDraw = () => {
       child.lineTo(-20 * direction, 8)
       this.graphics.addChild(child)
     }
+    /**
+     * @description: 线段绘制
+     * @param {number} mx 鼠标移动坐标
+     * @param {number} my 鼠标移动坐标
+     * @return {*}
+     */
     line (mx: number, my: number) {
       this.graphics = this.graphics || this.createGraphics()
       drawType.value !== 'pen' && this.graphics.clear()
@@ -203,15 +231,24 @@ export const useDraw = () => {
       this.graphics.lineTo(mx, my)
       drawType.value === 'pen' && (this.lastPoint = { x: mx, y: my })
     }
+    /**
+     * @description: 文本绘制
+     * @param {number} x 鼠标点击坐标
+     * @param {number} y 鼠标点击坐标
+     * @return {*}
+     */
     text (x: number, y: number) {
       updateDrawType.value('select')
+      const fontSize = context.value.fontSize
       const text = new PIXI.Text('', {
         fontFamily: 'Arial',
-        fontSize: 24,
-        fill: 0xff1010
+        fontSize: context.value.fontSize,
+        letterSpacing: 2,
+        fill: context.value.fillColor
       })
+      text.alpha = context.value.alpha
       text.x = x
-      text.y = y - 20
+      text.y = y - fontSize
       const input = document.createElement('input')
       input.style.cssText = `
         position: absolute;
@@ -220,13 +257,12 @@ export const useDraw = () => {
         width: 10px;
         outline: none;
         border: none;
-        font-size: 24px;
+        font-size: ${fontSize}px;
         text-indent: 2px;
         letter-spacing: 4px;
-        transform: translateY(-65%);
-        border: none;
+        transform: translateY(-72%);
         color: transparent;
-        caret-color: ${context.value.strokeColor};
+        caret-color: ${context.value.fillColor};
         background-color: transparent;
       `
       this.container.value.appendChild(input)

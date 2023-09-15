@@ -31,7 +31,7 @@
     </div>
     <div class="item">
       <h3 class="title">透明度</h3>
-      <input v-model="context.alpha" type="range" min="0" max="1" class="w-full">
+      <input v-model="context.alpha" step="0.1" type="range" min="0" max="1" class="w-full">
     </div>
     <div class="item">
       <h3 class="title">操作</h3>
