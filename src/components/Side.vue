@@ -3,8 +3,8 @@
     <section class="top">
       <div class="item iconfont icon-weibiaoti544"></div>
       <div class="item iconfont icon-export-img"></div>
-      <div class="item bg-transparent hover:bg-transparent">
-        <input type="color" class="block w-5 h-5">
+      <div class="item bg-transparent hover:bg-transparent text-base p-0">
+        <input-color v-model="context.bgColor" />
       </div>
     </section>
     <config />
@@ -12,7 +12,12 @@
 </template>
 
 <script setup lang="ts">
+import { toRefs } from 'vue'
+import { useConfigStore } from '@/stores/config'
+import InputColor from '@/components/InputColor.vue'
 import Config from './Config.vue'
+
+const { context } = toRefs(useConfigStore())
 </script>
 
 <style scoped>
@@ -21,10 +26,10 @@ import Config from './Config.vue'
 @tailwind utilities;
 @layer components {
   .top {
-    @apply grid grid-flow-col auto-cols-min gap-1 p-1 rounded shadow-design bg-white
+    @apply grid items-center grid-flow-col auto-cols-min gap-1 p-1 rounded shadow-design bg-white
   }
   .item {
-    @apply p-2 rounded text-xl font-bold leading-5 cursor-pointer bg-theme-color hover:bg-theme-color-deep
+    @apply p-2 rounded text-xl leading-5 cursor-pointer bg-theme-color hover:bg-theme-color-deep
   }
 }
 </style>

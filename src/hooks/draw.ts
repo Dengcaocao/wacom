@@ -114,7 +114,7 @@ export const useDraw = () => {
     }
     setLineStyle () {
       this.graphics?.lineStyle({
-        width: context.value.width,
+        width: context.value.strokeWidth,
         color: context.value.strokeColor
       })
     }
