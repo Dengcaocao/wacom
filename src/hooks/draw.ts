@@ -21,14 +21,10 @@ export const useDraw = () => {
         antialias: true,
         eventMode: 'static'
       })
-      if (this.app.view.style) {
-        this.app.view.style.width = `${width / 2}px`
-        this.app.view.style.height = `${height / 2}px`
-      }
       this.container = container
       this.isDraw = false
       this.startPoint = this.lastPoint = { x: 0, y: 0 }
-      this.app.stage.scale.set(2)
+      this.initSize(width, height)
       this.bgMesh()
       this.installEvent()
       container.value.appendChild(this.app.view)
@@ -57,25 +53,37 @@ export const useDraw = () => {
       }
       this.app.stage.addChild(mesh)
     }
+    initSize (width: number, height: number) {
+      if (this.app.view.style) {
+        this.app.view.style.width = `${width / 2}px`
+        this.app.view.style.height = `${height / 2}px`
+      }
+      this.app.stage.scale.set(2)
+      this.app.stage.x = -window.innerWidth / 2
+      this.app.stage.y = -window.innerHeight / 2
+    }
     installEvent () {
       // 添加滚动事件，超出边界值重置容器的位置
       this.app.stage.on('wheel', e => {
         this.app.stage.x += e.deltaX * -1
         this.app.stage.y += e.deltaY * -1
-        this.app.stage.children.forEach((item, index) => {
-          if (index) {
-            item.x += e.deltaX * -1
-            item.y += e.deltaY * -1
-          }
-        })
-        if (this.app.stage.x >=0 || this.app.stage.x <= -this.app.screen.width || this.app.stage.y >= 0 || this.app.stage.y <= -this.app.screen.height) {
-          this.app.stage.x = -this.app.screen.width / 2
-          this.app.stage.y = -this.app.screen.height / 2
-        }
+        // this.app.stage.children.forEach((item, index) => {
+        //   if (index) {
+        //     item.x += e.deltaX * -1
+        //     item.y += e.deltaY * -1
+        //   }
+        // })
+        // if (this.app.stage.x >=0 || this.app.stage.x <= -this.app.screen.width || this.app.stage.y >= 0 || this.app.stage.y <= -this.app.screen.height) {
+        //   this.app.stage.x = -window.innerWidth / 2
+        //   this.app.stage.y = -window.innerHeight / 2
+        // }
       })
       this.app.stage.on('pointerdown', e => {
-        if (drawType.value === 'text') return this.text(e.x, e.y)
-        this.startPoint = this.lastPoint = { x: e.x, y: e.y}
+        // 除2是因为stage容器放大了1倍
+        const x = e.x + Math.abs(this.app.stage.x) / 2
+        const y = e.y + Math.abs(this.app.stage.y) / 2
+        if (drawType.value === 'text') return this.text(x, y)
+        this.startPoint = this.lastPoint = { x, y }
         this.isDraw = true
       })
       this.app.stage.on('pointerup', () => {
@@ -85,8 +93,10 @@ export const useDraw = () => {
       })
       this.app.stage.on('pointermove', e => {
         if (!this.isDraw) return
+        const x = e.x + Math.abs(this.app.stage.x) / 2
+        const y = e.y + Math.abs(this.app.stage.y) / 2
         const actionType = drawType.value
-        this[actionType](e.x, e.y)
+        this[actionType](x, y)
       })
     }
     select () {
@@ -140,8 +150,6 @@ export const useDraw = () => {
         this.startPoint.x, my
       ])
       this.graphics.endFill()
-      // const hitArea = new PIXI.Rectangle(this.startPoint.x, this.startPoint.y, distanceY, distanceY)
-      // this.graphics.hitArea = hitArea
     }
     /**
      * @description: 菱形绘制
@@ -252,8 +260,8 @@ export const useDraw = () => {
       const input = document.createElement('input')
       input.style.cssText = `
         position: absolute;
-        top: ${y}px;
-        left: ${x}px;
+        top: ${y - Math.abs(this.app.stage.x) / 2}px;
+        left: ${x - Math.abs(this.app.stage.y) / 2}px;
         width: 10px;
         outline: none;
         border: none;
