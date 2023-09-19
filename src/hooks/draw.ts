@@ -67,16 +67,16 @@ export const useDraw = () => {
       this.app.stage.on('wheel', e => {
         this.app.stage.x += e.deltaX * -1
         this.app.stage.y += e.deltaY * -1
-        // this.app.stage.children.forEach((item, index) => {
-        //   if (index) {
-        //     item.x += e.deltaX * -1
-        //     item.y += e.deltaY * -1
-        //   }
-        // })
-        // if (this.app.stage.x >=0 || this.app.stage.x <= -this.app.screen.width || this.app.stage.y >= 0 || this.app.stage.y <= -this.app.screen.height) {
-        //   this.app.stage.x = -window.innerWidth / 2
-        //   this.app.stage.y = -window.innerHeight / 2
-        // }
+        this.app.stage.children
+          .slice(1)
+          .forEach(item => {
+            item.x += e.deltaX * -1
+            item.y += e.deltaY * -1
+          })
+        if (this.app.stage.x >=0 || this.app.stage.x <= -this.app.screen.width || this.app.stage.y >= 0 || this.app.stage.y <= -this.app.screen.height) {
+          this.app.stage.x = -window.innerWidth / 2
+          this.app.stage.y = -window.innerHeight / 2
+        }
       })
       this.app.stage.on('pointerdown', e => {
         // 除2是因为stage容器放大了1倍
@@ -118,6 +118,27 @@ export const useDraw = () => {
       graphics.on('pointerenter', () => graphics.cursor = 'move')
       graphics.on('pointerdown', () => {
         console.log('pointerdown')
+        e.stopPropagation()
+        const { minX, minY, maxX, maxY } = this.geometry.bounds
+        const skeleton = [
+          [minX - 10, minY - 10],
+          [maxX + 2, minY - 10],
+          [maxX + 2, maxY + 2],
+          [minX - 10, maxY + 2]
+        ]
+        const skeletonChild = new PIXI.Graphics()
+        this.addChild(skeletonChild)
+        skeletonChild.lineStyle({
+          width: 1,
+          color: 0x000000,
+          alpha: 0.8
+        })
+        skeletonChild.beginFill(0xffffff, 0)
+        skeletonChild.drawRect(minX - 2, minY - 2, maxX - minX + 4, maxY - minY + 4)
+        skeleton.forEach(([x, y]) => {
+          skeletonChild.beginFill(0xffffff, 0)
+          skeletonChild.drawRect(x, y, 8, 8)
+        })
       })
       this.app.stage.addChild(graphics)
       return graphics
