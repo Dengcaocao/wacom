@@ -113,12 +113,17 @@ export const useDraw = () => {
      * @return {*} graphics
      */
     createGraphics () {
-      const graphics = new PIXI.Graphics()
+      const graphics: PIXI.Graphics & { isMove?: boolean, startPoint?: { x: number, y: number } } = new PIXI.Graphics()
+      graphics.isMove = false
       graphics.cursor = 'grab'
       graphics.on('pointerenter', () => graphics.cursor = 'move')
-      graphics.on('pointerdown', () => {
-        console.log('pointerdown')
+      graphics.on('pointerdown', function (this: PIXI.Graphics, e) {
         e.stopPropagation()
+        graphics.isMove = true
+        graphics.startPoint = {
+          x: e.x,
+          y: e.y
+        }
         const { minX, minY, maxX, maxY } = this.geometry.bounds
         const skeleton = [
           [minX - 10, minY - 10],
@@ -140,9 +145,26 @@ export const useDraw = () => {
           skeletonChild.drawRect(x, y, 8, 8)
         })
       })
+      graphics.on('pointermove', e => {
+        const x = e.x - (graphics.startPoint?.x || 0)
+        const y = e.y - (graphics.startPoint?.y || 0)
+        if (!graphics.isMove) return
+        graphics.x += x
+        graphics.y += y
+        graphics.startPoint = {
+          x: e.x,
+          y: e.y
+        }
+      })
+      graphics.on('pointerup', () => graphics.isMove = false)
       this.app.stage.addChild(graphics)
       return graphics
     }
+    /**
+     * @description: 设置线条样式
+     * @param {PIXI} graphics 图形
+     * @return {*}
+     */
     setLineStyle (graphics?: PIXI.Graphics) {
       (graphics || this.graphics)?.lineStyle({
         width: context.value.strokeWidth,
