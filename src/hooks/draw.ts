@@ -87,6 +87,7 @@ export const useDraw = () => {
         this.isDraw = true
       })
       this.app.stage.on('pointerup', () => {
+        this.graphics?.removeChildren()
         this.isDraw = false
         this.graphics = undefined
         updateDrawType.value('select')
@@ -114,11 +115,14 @@ export const useDraw = () => {
      */
     createGraphics () {
       const graphics: PIXI.Graphics & { isMove?: boolean, startPoint?: { x: number, y: number } } = new PIXI.Graphics()
+      const that = this
       graphics.isMove = false
       graphics.cursor = 'grab'
       graphics.on('pointerenter', () => graphics.cursor = 'move')
       graphics.on('pointerdown', function (this: PIXI.Graphics, e) {
         e.stopPropagation()
+        that.graphics?.removeChildren()
+        that.graphics = graphics
         graphics.isMove = true
         graphics.startPoint = {
           x: e.x,
@@ -156,7 +160,10 @@ export const useDraw = () => {
           y: e.y
         }
       })
-      graphics.on('pointerup', () => graphics.isMove = false)
+      graphics.on('pointerup', e => {
+        e.stopPropagation()
+        graphics.isMove = false
+      })
       this.app.stage.addChild(graphics)
       return graphics
     }
