@@ -87,7 +87,7 @@ export const useDraw = () => {
         this.isDraw = true
       })
       this.app.stage.on('pointerup', () => {
-        this.graphics?.removeChildren()
+        drawType.value !== 'arrow' && this.graphics?.removeChildren()
         this.isDraw = false
         this.graphics = undefined
         updateDrawType.value('select')
@@ -172,8 +172,15 @@ export const useDraw = () => {
      * @param {PIXI} graphics 图形
      * @return {*}
      */
-    setLineStyle (graphics?: PIXI.Graphics) {
-      (graphics || this.graphics)?.lineStyle({
+    setLineStyle (graphics = this.graphics) {
+      if (!graphics) return
+      // clear 会清除线的样式
+      drawType.value !== 'pen' && graphics.clear()
+      graphics.beginFill(
+        context.value.fillColor,
+        context.value.fillColor === 'transparent' ? 0 : context.value.alpha
+      )
+      graphics.lineStyle({
         width: context.value.strokeWidth,
         color: context.value.strokeColor,
         alpha: context.value.alpha,
@@ -188,10 +195,7 @@ export const useDraw = () => {
      */
     rect (mx: number, my: number) {
       this.graphics = this.graphics || this.createGraphics()
-      // clear 会清除线的样式
-      this.graphics.clear()
       this.setLineStyle()
-      this.graphics.beginFill(context.value.fillColor, context.value.alpha)
       // drawRect 宽高不能为负数
       this.graphics.drawPolygon([
         this.startPoint.x, this.startPoint.y,
@@ -199,7 +203,6 @@ export const useDraw = () => {
         mx, my,
         this.startPoint.x, my
       ])
-      this.graphics.endFill()
     }
     /**
      * @description: 菱形绘制
@@ -209,18 +212,15 @@ export const useDraw = () => {
      */
     diamond (mx: number, my: number) {
       this.graphics = this.graphics || this.createGraphics()
-      this.graphics.clear()
       this.setLineStyle()
       const distanceX = mx - this.startPoint.x
       const distanceY = my - this.startPoint.y
-      this.graphics.beginFill(context.value.fillColor, context.value.alpha)
       this.graphics.drawPolygon([
         this.startPoint.x, this.startPoint.y,
         this.startPoint.x + distanceX, this.startPoint.y + distanceY/2,
         this.startPoint.x, this.startPoint.y + distanceY,
         this.startPoint.x - distanceX, this.startPoint.y + distanceY/2
       ])
-      this.graphics.endFill()
     }
     /**
      * @description: 圆形绘制
@@ -230,14 +230,11 @@ export const useDraw = () => {
      */
     arc (mx: number, my: number) {
       this.graphics = this.graphics || this.createGraphics()
-      this.graphics.clear()
       this.setLineStyle()
       const distanceX = mx - this.startPoint.x
       const distanceY = my - this.startPoint.y
       const r = Math.pow(distanceX * distanceX + distanceY * distanceY, 1/2) / 2
-      this.graphics.beginFill(context.value.fillColor, context.value.alpha)
       this.graphics.drawEllipse(this.startPoint.x + distanceX/2, this.startPoint.y + distanceY/2, r, Math.abs(distanceY)/2)
-      this.graphics.endFill()
     }
     /**
      * @description: 箭头绘制
@@ -247,14 +244,13 @@ export const useDraw = () => {
      */
     arrow (mx: number, my: number) {
       this.graphics = this.graphics || this.createGraphics()
-      this.graphics.clear()
       this.setLineStyle()
       this.graphics.moveTo(this.lastPoint.x, this.lastPoint.y)
       this.graphics.lineTo(mx, my)
       const child = this.graphics.children.length
         ? this.graphics.children[0] as PIXI.Graphics
         : this.createGraphics()
-      child.clear()
+      this.graphics.addChild(child)
       const distanceX = mx - this.startPoint.x
       const distanceY = my - this.startPoint.y
       // 箭头方向
@@ -265,7 +261,6 @@ export const useDraw = () => {
         deg = distanceY < 0 ? -Math.PI + deg : Math.PI + deg
       }
       this.setLineStyle(child)
-      // 将旋转点设置为椭圆中心
       child.x = mx
       child.y = my
       child.rotation = deg
@@ -273,7 +268,6 @@ export const useDraw = () => {
       child.lineTo(-20 * direction, -8)
       child.moveTo(0, 0)
       child.lineTo(-20 * direction, 8)
-      this.graphics.addChild(child)
     }
     /**
      * @description: 线段绘制
@@ -283,7 +277,6 @@ export const useDraw = () => {
      */
     line (mx: number, my: number) {
       this.graphics = this.graphics || this.createGraphics()
-      drawType.value !== 'pen' && this.graphics.clear()
       this.setLineStyle()
       this.graphics.moveTo(this.lastPoint.x, this.lastPoint.y)
       this.graphics.lineTo(mx, my)
