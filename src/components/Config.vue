@@ -1,5 +1,5 @@
 <template>
-  <main class="w-60 bg-white mt-4 p-2 shadow-design rounded">
+  <main class="w-full bg-white mt-4 p-2 shadow-design rounded">
     <div class="item">
       <h3 class="title mt-0">描边</h3>
       <input-color v-model="context.strokeColor" />
@@ -31,7 +31,7 @@
     </div>
     <div class="item">
       <h3 class="title">透明度</h3>
-      <input v-model="context.alpha" step="0.1" type="range" min="0" max="1" class="w-full">
+      <input v-model="context.alpha" step="0.1" type="range" min="0" max="1" class="w-10/12">
     </div>
     <div class="item">
       <h3 class="title">操作</h3>

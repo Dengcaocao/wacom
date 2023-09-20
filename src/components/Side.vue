@@ -7,7 +7,9 @@
         <input-color v-model="context.bgColor" />
       </div>
     </section>
-    <config />
+    <section class="middle w-full">
+      <config />
+    </section>
   </aside>
 </template>
 
