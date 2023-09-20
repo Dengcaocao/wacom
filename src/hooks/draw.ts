@@ -3,7 +3,7 @@ import { toRefs, type Ref } from 'vue'
 import pinia from '@/stores'
 import { useConfigStore } from '@/stores/config'
 
-const { drawType, updateDrawType, context } = toRefs(useConfigStore(pinia))
+const { drawType, updateDrawType, context, upDateContext } = toRefs(useConfigStore(pinia))
 
 export const useDraw = () => {
   class CreateSceen {
@@ -62,6 +62,10 @@ export const useDraw = () => {
       this.app.stage.x = -window.innerWidth / 2
       this.app.stage.y = -window.innerHeight / 2
     }
+    /**
+     * @description: 注册根容器事件
+     * @return {*}
+     */
     installEvent () {
       // 添加滚动事件，超出边界值重置容器的位置
       this.app.stage.on('wheel', e => {
@@ -121,6 +125,23 @@ export const useDraw = () => {
       graphics.on('pointerenter', () => graphics.cursor = 'move')
       graphics.on('pointerdown', function (this: PIXI.Graphics, e) {
         e.stopPropagation()
+        const computedColor = (num: number) => {
+          const str = num.toString(16)
+          const startIndex = 6 - str.length
+          const colorChar = new Array(6)
+            .fill(0)
+            .map((item, index) => index >= startIndex ? str[index - startIndex] : item)
+            .join('')
+          return `#${colorChar}`
+        }
+        const { width, color, alpha } = graphics.line
+        upDateContext.value({
+          strokeWidth: width,
+          strokeColor: computedColor(color),
+          fillColor: computedColor(graphics.fill.color),
+          alpha
+        })
+        // bug 箭头
         that.graphics?.removeChildren()
         that.graphics = graphics
         graphics.isMove = true
@@ -172,8 +193,9 @@ export const useDraw = () => {
      * @param {PIXI} graphics 图形
      * @return {*}
      */
-    setLineStyle (graphics = this.graphics) {
+    setLineStyle (graphics = this.graphics, isUpdate?: boolean) {
       if (!graphics) return
+      const shape = graphics.geometry.graphicsData[0]?.shape
       // clear 会清除线的样式
       drawType.value !== 'pen' && graphics.clear()
       graphics.beginFill(
@@ -186,6 +208,7 @@ export const useDraw = () => {
         alpha: context.value.alpha,
         cap: PIXI.LINE_CAP.ROUND
       })
+      isUpdate && graphics.drawShape(shape)
     }
     /**
      * @description: 矩形绘制

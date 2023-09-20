@@ -37,5 +37,9 @@ export const useConfigStore = defineStore('config', () => {
     fontSize: 14
   })
 
-  return { drawType, updateDrawType, context }
+  const upDateContext = (options: object) => {
+    Object.assign(context, options)
+  }
+
+  return { drawType, updateDrawType, context, upDateContext }
 })
