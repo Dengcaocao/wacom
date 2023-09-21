@@ -1,6 +1,6 @@
 <template>
-  <aside class="absolute top-1.5 left-1.5">
-    <section class="top">
+  <aside class="absolute mobile md:pc">
+    <section class="top md:shadow-design md:rounded">
       <div class="item iconfont icon-weibiaoti544"></div>
       <div class="item iconfont icon-export-img"></div>
       <div class="item bg-transparent hover:bg-transparent text-base p-0">
@@ -27,11 +27,18 @@ const { context } = toRefs(useConfigStore())
 @tailwind components;
 @tailwind utilities;
 @layer components {
+  .mobile {
+    max-height: 70%;
+    @apply w-full overflow-auto rounded-t-lg bottom-0 pt-1 bg-white
+  }
+  .pc {
+    @apply w-min h-min overflow-visible top-1.5 left-1.5 rounded-none pt-0 bg-transparent
+  }
   .top {
-    @apply grid items-center grid-flow-col auto-cols-min gap-1 p-1 rounded shadow-design bg-white
+    @apply grid items-center grid-flow-col auto-cols-min gap-1 p-1 bg-white
   }
   .item {
-    @apply p-2 rounded text-xl leading-5 cursor-pointer bg-theme-color hover:bg-theme-color-deep
+    @apply p-2 rounded text-base leading-none md:text-xl md:leading-none cursor-pointer bg-theme-color hover:bg-theme-color-deep
   }
 }
 </style>

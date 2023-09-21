@@ -1,5 +1,5 @@
 <template>
-  <main class="w-full bg-white mt-4 p-2 shadow-design rounded">
+  <main class="w-full bg-white md:mt-4 p-2 md:shadow-design md:rounded">
     <div class="item">
       <h3 class="title mt-0">描边</h3>
       <input-color v-model="context.strokeColor" />
@@ -155,7 +155,7 @@ const handleDel = () => {
     @apply text-2xl leading-none
   }
   .action {
-    @apply text-xl leading-5 max-w-min bg-theme-color rounded ml-1.5 first:ml-0 p-2
+    @apply text-base leading-none md:text-xl md:leading-none max-w-min bg-theme-color rounded ml-1.5 first:ml-0 p-2
   }
 }
 </style>
