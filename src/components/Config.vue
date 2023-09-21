@@ -36,8 +36,8 @@
     <div class="item">
       <h3 class="title">操作</h3>
       <div class="flex">
-        <div class="action iconfont icon-fuzhi_copy"></div>
-        <div class="action iconfont icon-weibiaoti544"></div>
+        <div @click="handleCopy" class="action iconfont icon-fuzhi_copy cursor-pointer hover:bg-theme-color-deep"></div>
+        <div @click="handleDel" class="action iconfont icon-weibiaoti544 cursor-pointer hover:bg-theme-color-deep"></div>
       </div>
     </div>
   </main>
@@ -48,7 +48,7 @@ import { reactive, toRefs } from 'vue'
 import { useConfigStore } from '@/stores/config'
 import InputColor from '@/components/InputColor.vue'
 
-const { context } = toRefs(useConfigStore())
+const { drawInstance, context } = toRefs(useConfigStore())
 
 const configList = reactive([
   {
@@ -127,6 +127,14 @@ const configList = reactive([
     ]
   }
 ])
+
+const handleCopy = () => {
+  drawInstance.value.copy()
+}
+
+const handleDel = () => {
+  drawInstance.value.delGraphics()
+}
 </script>
 
 <style scoped>

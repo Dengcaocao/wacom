@@ -11,7 +11,7 @@
 </template>
 
 <script setup lang="ts">
-import { reactive } from 'vue'
+import { reactive, watch } from 'vue'
 import { useConfigStore, type IDrawType } from '@/stores/config'
 
 const configStore = useConfigStore()
@@ -55,8 +55,11 @@ const icons = reactive([
   }
 ])
 
+watch(() => configStore.drawType, (value) => {
+  document.body.style.cursor = value === 'select' ? 'default' : 'crosshair'
+})
+
 const handleDrawType = (type: IDrawType) => {
-  document.body.style.cursor = type === 'select' ? 'default' : 'crosshair'
   configStore.updateDrawType(type)
 }
 </script>

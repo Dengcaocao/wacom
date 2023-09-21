@@ -1,5 +1,5 @@
 import * as PIXI from 'pixi.js'
-import { toRefs, type Ref } from 'vue'
+import { toRefs, type Ref, toRaw } from 'vue'
 import pinia from '@/stores'
 import { useConfigStore } from '@/stores/config'
 
@@ -117,8 +117,10 @@ export const useDraw = () => {
      * @description: 创建图形对象实例&监听事件
      * @return {*} graphics
      */
-    createGraphics () {
-      const graphics: PIXI.Graphics & { isMove?: boolean, startPoint?: { x: number, y: number } } = new PIXI.Graphics()
+    createGraphics (geometry?: PIXI.GraphicsGeometry) {
+      const graphics: PIXI.Graphics & { isMove?: boolean, startPoint?: { x: number, y: number } } = new PIXI.Graphics(geometry)
+      this.app.stage.addChild(graphics)
+      geometry && this.setLineStyle(graphics, true)
       const that = this
       graphics.isMove = false
       graphics.cursor = 'grab'
@@ -185,7 +187,6 @@ export const useDraw = () => {
         e.stopPropagation()
         graphics.isMove = false
       })
-      this.app.stage.addChild(graphics)
       return graphics
     }
     /**
@@ -209,6 +210,16 @@ export const useDraw = () => {
         cap: PIXI.LINE_CAP.ROUND
       })
       isUpdate && graphics.drawShape(shape)
+    }
+    copy () {
+      const geometry = toRaw((this.graphics as PIXI.Graphics).geometry)
+      this.graphics = this.createGraphics(geometry)
+      this.graphics.parent = toRaw(this.graphics.parent)
+      this.graphics.position.set(10, 10)
+    }
+    delGraphics () {
+      const index = this.app.stage.getChildIndex(this.graphics as PIXI.DisplayObject)
+      this.app.stage.removeChildAt(index)
     }
     /**
      * @description: 矩形绘制
@@ -318,7 +329,7 @@ export const useDraw = () => {
         fontFamily: 'Arial',
         fontSize: context.value.fontSize,
         letterSpacing: 2,
-        fill: context.value.fillColor
+        fill: context.value.strokeColor
       })
       text.alpha = context.value.alpha
       text.x = x
@@ -326,8 +337,8 @@ export const useDraw = () => {
       const input = document.createElement('input')
       input.style.cssText = `
         position: absolute;
-        top: ${y - Math.abs(this.app.stage.x) / 2}px;
-        left: ${x - Math.abs(this.app.stage.y) / 2}px;
+        top: ${y - Math.abs(this.app.stage.y) / 2}px;
+        left: ${x - Math.abs(this.app.stage.x) / 2}px;
         width: 10px;
         outline: none;
         border: none;
@@ -336,7 +347,7 @@ export const useDraw = () => {
         letter-spacing: 4px;
         transform: translateY(-72%);
         color: transparent;
-        caret-color: ${context.value.fillColor};
+        caret-color: ${context.value.strokeColor};
         background-color: transparent;
       `
       this.container.value.appendChild(input)
