@@ -19,6 +19,9 @@ export interface IContext {
 
 export const useConfigStore = defineStore('config', () => {
 
+  // 实例
+  const drawInstance = ref()
+
   const scale = ref(1)
   
   const drawType = ref<IDrawType>('select')
@@ -26,7 +29,7 @@ export const useConfigStore = defineStore('config', () => {
 
   const context = reactive<IContext>({
     bgColor: '#ffffff',
-    strokeColor: '#ff0000',
+    strokeColor: '#000000',
     fillColor: 'transparent',
     fillStyle: 'fill',
     strokeWidth: 1,
@@ -41,5 +44,5 @@ export const useConfigStore = defineStore('config', () => {
     Object.assign(context, options)
   }
 
-  return { drawType, updateDrawType, context, upDateContext }
+  return { drawInstance, drawType, updateDrawType, context, upDateContext }
 })

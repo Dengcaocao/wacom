@@ -20,13 +20,12 @@ const configStore = useConfigStore()
 const { CreateSceen } = useDraw()
 
 const container = ref<HTMLElement>()
-let draw: any = null
 
 watch(configStore.context, () => {
-  draw.setLineStyle(undefined, true)
+  configStore.drawInstance.setLineStyle(undefined, true)
 })
  
 onMounted(() => {
-  draw = new CreateSceen(container, window.innerWidth * 2, window.innerHeight * 2)
+  configStore.drawInstance = new CreateSceen(container, window.innerWidth * 2, window.innerHeight * 2)
 })
 </script>
