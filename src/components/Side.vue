@@ -1,5 +1,5 @@
 <template>
-  <aside class="absolute mobile md:pc">
+  <aside class="absolute mobile md:pc" :class="[isCollapsed && 'active']">
     <section class="top md:shadow-design md:rounded">
       <div class="item iconfont icon-weibiaoti544"></div>
       <div class="item iconfont icon-export-img"></div>
@@ -19,7 +19,7 @@ import { useConfigStore } from '@/stores/config'
 import InputColor from '@/components/InputColor.vue'
 import Config from './Config.vue'
 
-const { context } = toRefs(useConfigStore())
+const { isCollapsed, context } = toRefs(useConfigStore())
 </script>
 
 <style scoped>
@@ -29,10 +29,17 @@ const { context } = toRefs(useConfigStore())
 @layer components {
   .mobile {
     max-height: 70%;
-    @apply w-full overflow-auto rounded-t-lg bottom-0 pt-1 bg-white
+    @apply w-full overflow-auto rounded-t-lg bottom-0 pt-1 bg-white transition-all translate-y-full
   }
   .pc {
+    transform: translate(-100%, 0);
     @apply w-min h-min overflow-visible top-1.5 left-1.5 rounded-none pt-0 bg-transparent
+  }
+  .mobile.active {
+    @apply translate-y-0
+  }
+  .pc.active {
+    @apply translate-x-0
   }
   .top {
     @apply grid items-center grid-flow-col auto-cols-min gap-1 p-1 bg-white

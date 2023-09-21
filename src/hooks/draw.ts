@@ -3,7 +3,7 @@ import { toRefs, type Ref, toRaw } from 'vue'
 import pinia from '@/stores'
 import { useConfigStore } from '@/stores/config'
 
-const { drawType, updateDrawType, context, upDateContext } = toRefs(useConfigStore(pinia))
+const { isCollapsed, drawType, updateDrawType, context, upDateContext } = toRefs(useConfigStore(pinia))
 
 export const useDraw = () => {
   class CreateSceen {
@@ -83,6 +83,7 @@ export const useDraw = () => {
         }
       })
       this.app.stage.on('pointerdown', e => {
+        isCollapsed.value = false
         // 除2是因为stage容器放大了1倍
         const x = e.x + Math.abs(this.app.stage.x) / 2
         const y = e.y + Math.abs(this.app.stage.y) / 2
@@ -93,6 +94,7 @@ export const useDraw = () => {
       this.app.stage.on('pointerup', () => {
         drawType.value !== 'arrow' && this.graphics?.removeChildren()
         this.isDraw = false
+        this.graphics && (isCollapsed.value = true)
         this.graphics = undefined
         updateDrawType.value('select')
       })
@@ -127,6 +129,7 @@ export const useDraw = () => {
       graphics.on('pointerenter', () => graphics.cursor = 'move')
       graphics.on('pointerdown', function (this: PIXI.Graphics, e) {
         e.stopPropagation()
+        isCollapsed.value = true
         const computedColor = (num: number) => {
           const str = num.toString(16)
           const startIndex = 6 - str.length

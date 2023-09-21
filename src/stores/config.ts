@@ -23,6 +23,8 @@ export const useConfigStore = defineStore('config', () => {
   const drawInstance = ref()
 
   const scale = ref(1)
+
+  const isCollapsed = ref(true)
   
   const drawType = ref<IDrawType>('select')
   const updateDrawType = (type: IDrawType) => drawType.value = type
@@ -44,5 +46,5 @@ export const useConfigStore = defineStore('config', () => {
     Object.assign(context, options)
   }
 
-  return { drawInstance, drawType, updateDrawType, context, upDateContext }
+  return { drawInstance, isCollapsed, drawType, updateDrawType, context, upDateContext }
 })
