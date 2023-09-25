@@ -125,16 +125,16 @@ export const useDraw = () => {
      * @description: 创建图形对象实例&监听事件
      * @return {*} graphics
      */
-    createGraphics (geometry?: PIXI.GraphicsGeometry) {
-      const graphics: PIXI.Graphics & { isMove?: boolean, startPoint?: { x: number, y: number } } = new PIXI.Graphics(geometry)
+    createGraphics () {
+      const graphics: PIXI.Graphics & { isMove?: boolean, startPoint?: { x: number, y: number } } = new PIXI.Graphics()
       this.app.stage.addChild(graphics)
-      geometry && this.setLineStyle(graphics, true)
       graphics.isMove = false
       graphics.cursor = 'grab'
       graphics.on('pointerenter', () => graphics.cursor = 'move')
       graphics.on('pointerdown', (e) => {
         e.stopPropagation()
         isCollapsed.value = true
+        this.graphics?.removeChildren()
         const computedColor = (num: number) => {
           const str = num.toString(16)
           const startIndex = 6 - str.length
@@ -157,7 +157,7 @@ export const useDraw = () => {
           x: e.x,
           y: e.y
         }
-        this.drawSkeleton(graphics, graphics.geometry.bounds)
+        !graphics.children.length && this.drawSkeleton(graphics, graphics.geometry.bounds)
       })
       graphics.on('pointermove', e => {
         const x = e.x - (graphics.startPoint?.x || 0)
@@ -227,10 +227,16 @@ export const useDraw = () => {
       isUpdate && graphics.drawShape(shape)
     }
     copy () {
-      const geometry = toRaw((this.graphics as PIXI.Graphics).geometry)
-      this.graphics = this.createGraphics(geometry)
-      this.graphics.parent = toRaw(this.graphics.parent)
-      this.graphics.position.set(10, 10)
+      if (!this.graphics) return
+      const shape = this.graphics.geometry.graphicsData[0]?.shape
+      this.graphics.removeChildren()
+      const copyGraphics = this.createGraphics()
+      this.graphics = copyGraphics
+      this.setLineStyle(copyGraphics)
+      copyGraphics.drawShape(toRaw(shape))
+      this.drawSkeleton(copyGraphics, copyGraphics.geometry.bounds)
+      copyGraphics.parent = toRaw(copyGraphics.parent)
+      copyGraphics.position.set(10, 10)
     }
     delGraphics () {
       const index = this.app.stage.getChildIndex(this.graphics as PIXI.DisplayObject)
