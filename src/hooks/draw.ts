@@ -90,12 +90,17 @@ export const useDraw = () => {
         if (drawType.value === 'text') return this.text(x, y)
         this.startPoint = this.lastPoint = { x, y }
         this.isDraw = true
+        // 保留箭头第一child
+        if (this.graphics) {
+          this.graphics.children.length > 1
+            ? this.graphics.removeChildren(1, this.graphics.children.length)
+            :this.graphics.removeChildren()
+          this.graphics = undefined
+        }
       })
       this.app.stage.on('pointerup', () => {
-        drawType.value !== 'arrow' && this.graphics?.removeChildren()
         this.isDraw = false
         this.graphics && (isCollapsed.value = true)
-        this.graphics = undefined
         updateDrawType.value('select')
       })
       this.app.stage.on('pointermove', e => {
@@ -103,6 +108,7 @@ export const useDraw = () => {
         const x = e.x + Math.abs(this.app.stage.x) / 2
         const y = e.y + Math.abs(this.app.stage.y) / 2
         const actionType = drawType.value
+        this.graphics?.removeChildren()
         this[actionType](x, y)
       })
     }
@@ -123,11 +129,10 @@ export const useDraw = () => {
       const graphics: PIXI.Graphics & { isMove?: boolean, startPoint?: { x: number, y: number } } = new PIXI.Graphics(geometry)
       this.app.stage.addChild(graphics)
       geometry && this.setLineStyle(graphics, true)
-      const that = this
       graphics.isMove = false
       graphics.cursor = 'grab'
       graphics.on('pointerenter', () => graphics.cursor = 'move')
-      graphics.on('pointerdown', function (this: PIXI.Graphics, e) {
+      graphics.on('pointerdown', (e) => {
         e.stopPropagation()
         isCollapsed.value = true
         const computedColor = (num: number) => {
@@ -146,34 +151,13 @@ export const useDraw = () => {
           fillColor: computedColor(graphics.fill.color),
           alpha
         })
-        // bug 箭头
-        that.graphics?.removeChildren()
-        that.graphics = graphics
+        this.graphics = graphics
         graphics.isMove = true
         graphics.startPoint = {
           x: e.x,
           y: e.y
         }
-        const { minX, minY, maxX, maxY } = this.geometry.bounds
-        const skeleton = [
-          [minX - 10, minY - 10],
-          [maxX + 2, minY - 10],
-          [maxX + 2, maxY + 2],
-          [minX - 10, maxY + 2]
-        ]
-        const skeletonChild = new PIXI.Graphics()
-        this.addChild(skeletonChild)
-        skeletonChild.lineStyle({
-          width: 1,
-          color: 0x000000,
-          alpha: 0.8
-        })
-        skeletonChild.beginFill(0xffffff, 0)
-        skeletonChild.drawRect(minX - 2, minY - 2, maxX - minX + 4, maxY - minY + 4)
-        skeleton.forEach(([x, y]) => {
-          skeletonChild.beginFill(0xffffff, 0)
-          skeletonChild.drawRect(x, y, 8, 8)
-        })
+        this.drawSkeleton(graphics, graphics.geometry.bounds)
       })
       graphics.on('pointermove', e => {
         const x = e.x - (graphics.startPoint?.x || 0)
@@ -191,6 +175,34 @@ export const useDraw = () => {
         graphics.isMove = false
       })
       return graphics
+    }
+    /**
+     * @description: 绘制图形选中效果
+     * @param {PIXI} graphics 图形
+     * @param {any} bounds 图形顶点
+     * @return {*}
+     */    
+    drawSkeleton (graphics: PIXI.Graphics, bounds: any) {
+      const { minX, minY, maxX, maxY } = bounds
+      const skeletonPoint = [
+        [minX - 10, minY - 10],
+        [maxX + 2, minY - 10],
+        [maxX + 2, maxY + 2],
+        [minX - 10, maxY + 2]
+      ]
+      const skeleton = new PIXI.Graphics()
+      graphics.addChild(skeleton)
+      skeleton.lineStyle({
+        width: 1,
+        color: 0x000000,
+        alpha: 0.8
+      })
+      skeleton.beginFill(0xffffff, 0)
+      skeleton.drawRect(minX - 2, minY - 2, maxX - minX + 4, maxY - minY + 4)
+      skeletonPoint.forEach(([x, y]) => {
+        skeleton.beginFill(0xffffff, 0)
+        skeleton.drawRect(x, y, 8, 8)
+      })
     }
     /**
      * @description: 设置线条样式
@@ -240,6 +252,7 @@ export const useDraw = () => {
         mx, my,
         this.startPoint.x, my
       ])
+      this.drawSkeleton(this.graphics, this.graphics.geometry.bounds)
     }
     /**
      * @description: 菱形绘制
@@ -258,6 +271,7 @@ export const useDraw = () => {
         this.startPoint.x, this.startPoint.y + distanceY,
         this.startPoint.x - distanceX, this.startPoint.y + distanceY/2
       ])
+      this.drawSkeleton(this.graphics, this.graphics.geometry.bounds)
     }
     /**
      * @description: 圆形绘制
@@ -272,6 +286,7 @@ export const useDraw = () => {
       const distanceY = my - this.startPoint.y
       const r = Math.pow(distanceX * distanceX + distanceY * distanceY, 1/2) / 2
       this.graphics.drawEllipse(this.startPoint.x + distanceX/2, this.startPoint.y + distanceY/2, r, Math.abs(distanceY)/2)
+      this.drawSkeleton(this.graphics, this.graphics.geometry.bounds)
     }
     /**
      * @description: 箭头绘制
@@ -284,9 +299,7 @@ export const useDraw = () => {
       this.setLineStyle()
       this.graphics.moveTo(this.lastPoint.x, this.lastPoint.y)
       this.graphics.lineTo(mx, my)
-      const child = this.graphics.children.length
-        ? this.graphics.children[0] as PIXI.Graphics
-        : this.createGraphics()
+      const child = this.createGraphics()
       this.graphics.addChild(child)
       const distanceX = mx - this.startPoint.x
       const distanceY = my - this.startPoint.y
@@ -305,6 +318,7 @@ export const useDraw = () => {
       child.lineTo(-20 * direction, -8)
       child.moveTo(0, 0)
       child.lineTo(-20 * direction, 8)
+      this.drawSkeleton(this.graphics, this.graphics.geometry.bounds)
     }
     /**
      * @description: 线段绘制
