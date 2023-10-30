@@ -148,8 +148,11 @@ export const useDraw = () => {
         upDateContext.value({
           strokeWidth: width,
           strokeColor: computedColor(color),
-          fillColor: computedColor(graphics.fill.color),
+          // fillColor: computedColor(graphics.fill.color),
           alpha
+        })
+        graphics.fill.visible && upDateContext.value({
+          fillColor: computedColor(graphics.fill.color)
         })
         this.graphics = graphics
         graphics.isMove = true
@@ -258,6 +261,9 @@ export const useDraw = () => {
         mx, my,
         this.startPoint.x, my
       ])
+      this.app.renderer.render(this.graphics)
+      const points = this.graphics.geometry.points
+      this.graphics.hitArea = new PIXI.Polygon(points)
       this.drawSkeleton(this.graphics, this.graphics.geometry.bounds)
     }
     /**
