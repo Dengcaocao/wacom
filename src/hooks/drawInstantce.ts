@@ -5,12 +5,16 @@ export const usePixiApp = () => {
   class CreateSceen {
     app: PIXI.Application<PIXI.ICanvas>
     container: Ref
-    // isDraw: boolean
     width: number
     height: number
+    // 是否允许绘制
+    isDraw: boolean
+    // 鼠标按下的坐标
     downPoint: { x: number; y: number}
+    // 鼠标抬起的坐标
     upPoint: { x: number; y: number}
     graphics: PIXI.Graphics | undefined
+    // drawRect: ((mx: number, my: number) => void) | undefined
     constructor (container: Ref, width: number, height: number) {
       this.app = new PIXI.Application({
         width: width * 2,
@@ -23,7 +27,7 @@ export const usePixiApp = () => {
       this.container = container
       this.width = width
       this.height = height
-      // this.isDraw = false
+      this.isDraw = false
       this.downPoint = this.upPoint = { x: 0, y: 0 }
       this.initCanvasSize(width, height)
       this.createBgMesh()
@@ -104,8 +108,28 @@ export const usePixiApp = () => {
         }
     }
 
+    _handlePointerdown (e: PointerEvent) {
+      const { x, y } = e
+      this.isDraw = true
+      this.downPoint = { x, y }
+    }
+
+    _handlePointerup (e: PointerEvent) {
+      const { x, y } = e
+      this.isDraw = false
+    }
+
+    _handlePointermove (e: PointerEvent) {
+      if (!this.isDraw) return
+      console.log(33, this.drawRect)
+      this.drawRect && this.drawRect(e.x, e.y)
+    }
+
     installEventListener () {
       this.container.value.addEventListener('wheel', (e: WheelEvent) => this._handleWheel(e))
+      this.container.value.addEventListener('pointerdown', (e: PointerEvent) => this._handlePointerdown(e))
+      this.container.value.addEventListener('pointerup', (e: PointerEvent) => this._handlePointerup(e))
+      this.container.value.addEventListener('pointermove', (e: PointerEvent) => this._handlePointermove(e))
     }
   }
   return {

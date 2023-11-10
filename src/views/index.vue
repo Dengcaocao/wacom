@@ -11,15 +11,15 @@
 <script setup lang="ts">
 import { onMounted, ref, watch } from 'vue'
 import { useConfigStore } from '@/stores/config'
-import { useDraw } from '@/hooks/draw'
 import { usePixiApp } from '@/hooks/drawInstantce'
+import { useDrawRect } from '@/hooks/drawRect'
 import Tabbar from '@/components/Tabbar.vue'
 import Side from '@/components/Side.vue'
 
 const configStore = useConfigStore()
 
-// const { CreateSceen } = useDraw()
 const { CreateSceen } = usePixiApp()
+useDrawRect()
 
 const container = ref<HTMLElement>()
 
