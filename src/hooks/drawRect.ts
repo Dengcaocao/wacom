@@ -1,19 +1,20 @@
 import * as PIXI from 'pixi.js'
-import { usePixiApp } from './drawInstantce'
-const { CreateSceen } = usePixiApp()
-console.log(CreateSceen.prototype)
 
-export const useDrawRect = () => {
+const computedScalePoint = (arr: number[]) => arr.map(item => item)
+
+export const useDrawRect = (CreateSceen: any) => {
   CreateSceen.prototype.drawRect = function (mx: number, my: number) {
+    this.ghContainer.removeChildren()
     const graphics = new PIXI.Graphics()
-    this.app.stage.addChild(graphics)
+    this.ghContainer.addChild(graphics)
+    graphics.beginFill(0xff0000, 1)
     const { x, y } = this.downPoint
-    graphics.drawPolygon([
+    graphics.drawPolygon(computedScalePoint([
       x, y,
       mx, y,
       mx, my,
       x, my
-    ])
+    ]))
+    graphics.endFill()
   }
-  return {}
 }

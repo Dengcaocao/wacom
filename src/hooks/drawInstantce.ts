@@ -1,10 +1,12 @@
 import * as PIXI from 'pixi.js'
 import type { Ref } from 'vue'
+import { useDrawRect } from '@/hooks/drawRect'
 
 export const usePixiApp = () => {
   class CreateSceen {
     app: PIXI.Application<PIXI.ICanvas>
     container: Ref
+    ghContainer: PIXI.Container | undefined
     width: number
     height: number
     // 是否允许绘制
@@ -31,6 +33,7 @@ export const usePixiApp = () => {
       this.downPoint = this.upPoint = { x: 0, y: 0 }
       this.initCanvasSize(width, height)
       this.createBgMesh()
+      this.installDrawMehtds()
       this.installEventListener()
     }
     // setBgColor () {
@@ -45,11 +48,6 @@ export const usePixiApp = () => {
       this.app.stage.addChild(mesh)
       const width = this.app.screen.width
       const height = this.app.screen.height
-      mesh.beginFill('#ffffff', 0)
-      mesh.drawRect(0, 0, width, height)
-      mesh.endFill()
-      const hitArea = new PIXI.Rectangle(0, 0, width, height)
-      mesh.hitArea = hitArea
       mesh.lineStyle(1, 0x000000, 0.1)
       // 垂直线条
       for (let i = 0; i < width; i += 20) {
@@ -83,6 +81,10 @@ export const usePixiApp = () => {
       mesh.endFill()
     }
 
+    installDrawMehtds () {
+      useDrawRect(CreateSceen)
+    }
+
     /**
      * 滚动事件处理
      * @param e 事件对象
@@ -102,7 +104,7 @@ export const usePixiApp = () => {
           this.app.stage.children
             .slice(0, 1)
             .forEach(item => {
-              item.y = item.y + this.width / 2 * (e.deltaY < 0 ? 1 : -1)
+              item.y = item.y + this.height / 2 * (e.deltaY < 0 ? 1 : -1)
             })
           this.app.stage.y = -this.height
         }
@@ -111,18 +113,25 @@ export const usePixiApp = () => {
     _handlePointerdown (e: PointerEvent) {
       const { x, y } = e
       this.isDraw = true
-      this.downPoint = { x, y }
+      this.downPoint = {
+        x: x + Math.abs(this.app.stage.x) / 2,
+        y: y + Math.abs(this.app.stage.y) / 2
+      }
     }
 
     _handlePointerup (e: PointerEvent) {
       const { x, y } = e
       this.isDraw = false
+      this.ghContainer = undefined
     }
 
     _handlePointermove (e: PointerEvent) {
       if (!this.isDraw) return
-      console.log(33, this.drawRect)
-      this.drawRect && this.drawRect(e.x, e.y)
+      this.ghContainer = this.ghContainer || new PIXI.Container()
+      this.app.stage.addChild(this.ghContainer)
+      const x = e.x + Math.abs(this.app.stage.x) / 2
+      const y = e.y + Math.abs(this.app.stage.y) / 2;
+      (this as any).drawRect(x, y)
     }
 
     installEventListener () {

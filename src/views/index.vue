@@ -12,14 +12,12 @@
 import { onMounted, ref, watch } from 'vue'
 import { useConfigStore } from '@/stores/config'
 import { usePixiApp } from '@/hooks/drawInstantce'
-import { useDrawRect } from '@/hooks/drawRect'
 import Tabbar from '@/components/Tabbar.vue'
 import Side from '@/components/Side.vue'
 
 const configStore = useConfigStore()
 
-const { CreateSceen } = usePixiApp()
-useDrawRect()
+const { CreateSceen } = usePixiApp();
 
 const container = ref<HTMLElement>()
 
@@ -28,6 +26,7 @@ watch(configStore.context, () => {
 })
  
 onMounted(() => {
-  configStore.drawInstance = new CreateSceen(container, window.innerWidth, window.innerHeight)
+  const sceen = new CreateSceen(container, window.innerWidth, window.innerHeight)
+  configStore.drawInstance = sceen
 })
 </script>
