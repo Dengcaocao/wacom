@@ -1,28 +1,29 @@
 import * as PIXI from 'pixi.js'
+import pinia from '@/stores'
+import { useConfigStore } from '@/stores/config'
 
-interface IPoint {
-  x: number
-  y: number
-}
+const config = useConfigStore(pinia)
 
 export const useFillBgColor = (CreateSceen: any) => {
-  CreateSceen.prototype.fillBgColor = function (movePoint: IPoint) {
-    const graphics = new PIXI.Graphics()
-    this.ghContainer.addChild(graphics)
+  CreateSceen.prototype.fillBgColor = function (graphics: PIXI.Graphics) {
+    if (
+      config.context.fillColor === 'transparent' ||
+      config.context.fillStyle === 'fill'
+    ) return
     graphics.lineStyle({
       width: 1,
-      color: 0xff0000,
-      alpha: 1
+      color: config.context.fillColor,
+      alpha: config.context.alpha
     })
-    const { x: sX, y: sY } = this.downPoint
-    const { x: mX, y: mY } = movePoint
-    const width = Math.abs(mX - sX)
-    const height = Math.abs(mY - sY)
+    const { minX, minY, maxX, maxY } = graphics.geometry.bounds
+    const width = maxX - minX, height = maxY - minY
     const arr = []
-    for (let i = 10; i < width; i+=10) {
+    const getRandomNum = () => Math.random() * 8 + 4
+    // 生成线段点
+    for (let i = getRandomNum(); i < width; i+=getRandomNum()) {
       const y = i / width * height
-      arr.push(sX + i, sY, sX, sY + y)
-      arr.push(mX - i, mY, mX, mY - y)
+      arr.push(minX + i, minY, minX, minY + y)
+      arr.push(maxX - i, maxY, maxX, maxY - y)
     }
     for (let i = 0; i < arr.length; i+=4) {
       const [x, y, toX, toY] = arr.slice(i, i+4)

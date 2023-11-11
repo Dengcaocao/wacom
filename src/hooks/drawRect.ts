@@ -17,7 +17,6 @@ export const useDrawRect = (CreateSceen: any) => {
       mx, my,
       x, my
     ])
-    graphics.endFill()
     if (config.context.lineStyle === 'stroke') {
       graphics.lineStyle({
         width: config.context.strokeWidth,
@@ -30,6 +29,7 @@ export const useDrawRect = (CreateSceen: any) => {
         graphics.quadraticCurveTo(cpX, cpY, toX, toY)
       }
     }
-    this.fillBgColor({ x: mx, y: my })
+    graphics.endFill()
+    this.fillBgColor(graphics)
   }
 }
