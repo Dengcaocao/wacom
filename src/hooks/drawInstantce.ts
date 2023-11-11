@@ -1,5 +1,6 @@
 import * as PIXI from 'pixi.js'
 import type { Ref } from 'vue'
+import { useFillBgColor } from '@/hooks/fillBgColor'
 import { useDrawRect } from '@/hooks/drawRect'
 
 export const usePixiApp = () => {
@@ -10,11 +11,12 @@ export const usePixiApp = () => {
     width: number
     height: number
     // 是否允许绘制
-    isDraw: boolean
+    isDraw: boolean = false
     // 鼠标按下的坐标
-    downPoint: { x: number; y: number}
+    downPoint: { x: number; y: number} = { x: 0, y: 0 }
     // 鼠标抬起的坐标
-    upPoint: { x: number; y: number}
+    upPoint: { x: number; y: number} = { x: 0, y: 0 }
+    points: number[] = []
     graphics: PIXI.Graphics | undefined
     // drawRect: ((mx: number, my: number) => void) | undefined
     constructor (container: Ref, width: number, height: number) {
@@ -29,8 +31,6 @@ export const usePixiApp = () => {
       this.container = container
       this.width = width
       this.height = height
-      this.isDraw = false
-      this.downPoint = this.upPoint = { x: 0, y: 0 }
       this.initCanvasSize(width, height)
       this.createBgMesh()
       this.installDrawMehtds()
@@ -83,6 +83,23 @@ export const usePixiApp = () => {
 
     installDrawMehtds () {
       useDrawRect(CreateSceen)
+      useFillBgColor(CreateSceen)
+    }
+
+    /**
+     * 创建一个偏移量数组
+     * @param num 边的数量
+     * @param maxOffset 最大偏移量
+     */
+    createOffsetArr (num: number, maxOffset = 5) {
+      /**
+       * 一条线由开始点(x,y)、移动点(x,y)和控制点(x,y)组成，共6个
+       */
+      const createRandomNum = () => Math.random() * (maxOffset * 2) - maxOffset
+      // *2绘制两次
+      return new Array(num * 6 * 2)
+        .fill(0)
+        .map(createRandomNum)
     }
 
     /**
@@ -113,6 +130,7 @@ export const usePixiApp = () => {
     _handlePointerdown (e: PointerEvent) {
       const { x, y } = e
       this.isDraw = true
+      this.points = this.createOffsetArr(4)
       this.downPoint = {
         x: x + Math.abs(this.app.stage.x) / 2,
         y: y + Math.abs(this.app.stage.y) / 2
@@ -120,8 +138,8 @@ export const usePixiApp = () => {
     }
 
     _handlePointerup (e: PointerEvent) {
-      const { x, y } = e
       this.isDraw = false
+      this.points = []
       this.ghContainer = undefined
     }
 
@@ -129,9 +147,24 @@ export const usePixiApp = () => {
       if (!this.isDraw) return
       this.ghContainer = this.ghContainer || new PIXI.Container()
       this.app.stage.addChild(this.ghContainer)
-      const x = e.x + Math.abs(this.app.stage.x) / 2
-      const y = e.y + Math.abs(this.app.stage.y) / 2;
-      (this as any).drawRect(x, y)
+      const { x: sX, y: sY} = this.downPoint
+      const mX = e.x + Math.abs(this.app.stage.x) / 2
+      const mY = e.y + Math.abs(this.app.stage.y) / 2
+      const width = mX - sX
+      const height = mY - sY
+      // 顶点信息
+      const vertex = [
+        sX, sY, sX + width / 2, sY, mX, sY,
+        mX, sY, mX, sY + height / 2, mX, mY,
+        mX, mY, sX + width / 2, mY, sX, mY,
+        sX, mY, sX, sY + height / 2, sX, sY
+      ]
+      this.points = this.createOffsetArr(4)
+        .map((item, index) => {
+          const vertexIndex = index % vertex.length
+          return item + vertex[vertexIndex]
+        });
+      (this as any).drawRect(mX, mY)
     }
 
     installEventListener () {

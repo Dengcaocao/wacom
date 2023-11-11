@@ -5,8 +5,6 @@ interface IPoint {
   y: number
 }
 
-const offset = () => Math.random() * 10 - 5
-
 /**
  * 朴素风格
  * @param graphics 图形对象 
@@ -32,35 +30,17 @@ const simpleStyle = (graphics: PIXI.Graphics, downPoint: IPoint, movePoint: IPoi
  * @param downPoint 
  * @param movePoint 
  */
-const handDrawnStyle = (graphics: PIXI.Graphics, downPoint: IPoint, movePoint: IPoint) => {
-  const { x, y } = downPoint
-  const { x: mx, y: my } = movePoint
-  const width = mx - x
-  const height = my - y
+const handDrawnStyle = (graphics: PIXI.Graphics, points: number[]) => {
   graphics.lineStyle({
     width: 1,
     color: 0x000000,
     alpha: 1
   })
-  graphics.moveTo(x + offset(), y + offset())
-  graphics.quadraticCurveTo(x + width/2, y + offset(), mx, y)
-  graphics.moveTo(x + offset(), y + offset())
-  graphics.quadraticCurveTo(x + width/2, y + offset(), mx, y)
-
-  graphics.moveTo(mx + offset(), y + offset())
-  graphics.quadraticCurveTo(mx, y + height/2, mx + offset(), my + offset())
-  graphics.moveTo(mx + offset(), y + offset())
-  graphics.quadraticCurveTo(mx, y + height/2, mx + offset(), my + offset())
-
-  graphics.moveTo(mx + offset(), my + offset())
-  graphics.quadraticCurveTo(x + width/2, my + offset(), x, my)
-  graphics.moveTo(mx + offset(), my + offset())
-  graphics.quadraticCurveTo(x + width/2, my + offset(), x, my)
-
-  graphics.moveTo(x + offset(), my + offset())
-  graphics.quadraticCurveTo(x, y + height/2, x + offset(), y + offset())
-  graphics.moveTo(x + offset(), my + offset())
-  graphics.quadraticCurveTo(x, y + height/2, x + offset(), y + offset())
+  for (let i = 0; i < points.length; i+=6) {
+    const [x, y, cpX, cpY, toX, toY] = points.slice(i, i+6)
+    graphics.moveTo(x, y)
+    graphics.quadraticCurveTo(cpX, cpY, toX, toY)
+  }
 }
 
 export const useDrawRect = (CreateSceen: any) => {
@@ -69,7 +49,8 @@ export const useDrawRect = (CreateSceen: any) => {
     const graphics = new PIXI.Graphics()
     this.ghContainer.addChild(graphics)
     // simpleStyle(graphics, this.downPoint, {x: mx, y: my})
-    handDrawnStyle(graphics, this.downPoint, {x: mx, y: my})
+    handDrawnStyle(graphics, this.points)
+    this.fillBgColor({ x: mx, y: my })
     // this.ghContainer.x = x
     // this.ghContainer.y = y
   }
