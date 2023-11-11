@@ -7,10 +7,10 @@ export interface IContext {
   bgColor: string
   strokeColor: string
   fillColor: string
-  fillStyle: 'fill' | 'texture'
+  fillStyle: 'fill' | 'line' | 'grid'
   strokeWidth: 1 | 2 | 4
   line: 'solid' | 'dashed'
-  lineStyle: 'simple' | 'texture'
+  lineStyle: 'simple' | 'stroke'
   horn: 'right' | 'round'
   alpha: number
   fontSize: number,

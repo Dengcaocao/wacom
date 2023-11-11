@@ -59,6 +59,16 @@ const configList = reactive([
         title: '实心',
         type: 'fill',
         classes: 'icon-yuanjiaochangfangxing'
+      },
+      {
+        title: '线条',
+        type: 'line',
+        classes: 'icon-legend-45'
+      },
+      {
+        title: '网格',
+        type: 'grid',
+        classes: 'icon-xian1'
       }
     ]
   },
@@ -107,6 +117,11 @@ const configList = reactive([
         title: '朴素',
         type: 'simple',
         classes: 'icon-jurassic_curve'
+      },
+      {
+        title: '手绘',
+        type: 'stroke',
+        classes: 'icon-duoquxianqiehuan'
       }
     ]
   },
