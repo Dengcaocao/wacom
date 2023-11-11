@@ -1,7 +1,11 @@
 import * as PIXI from 'pixi.js'
 import type { Ref } from 'vue'
+import pinia from '@/stores'
+import { useConfigStore } from '@/stores/config'
 import { useFillBgColor } from '@/hooks/fillBgColor'
 import { useDrawRect } from '@/hooks/drawRect'
+
+const config = useConfigStore(pinia)
 
 export const usePixiApp = () => {
   class CreateSceen {
@@ -103,6 +107,29 @@ export const usePixiApp = () => {
     }
 
     /**
+     * 设置图形绘制样式
+     * @param graphics 图形对象
+     */
+    setGraphicsStyle (graphics: PIXI.Graphics) {
+      graphics.lineStyle({
+        width: config.context.strokeWidth,
+        color: config.context.strokeColor,
+        alpha: config.context.lineStyle === 'simple'
+          ? config.context.alpha
+          : 0
+      })
+      graphics.beginFill(
+        config.context.fillStyle === 'fill'
+          ? config.context.fillColor
+          : 'transparent',
+        config.context.fillColor === 'transparent' ||
+        config.context.fillStyle !== 'fill'
+          ? 0
+          : config.context.alpha
+      )
+    }
+
+    /**
      * 滚动事件处理
      * @param e 事件对象
      */
@@ -128,6 +155,7 @@ export const usePixiApp = () => {
     }
 
     _handlePointerdown (e: PointerEvent) {
+      if (['select', 'text', 'pic'].includes(config.drawType)) return
       const { x, y } = e
       this.isDraw = true
       this.points = this.createOffsetArr(4)
@@ -163,8 +191,11 @@ export const usePixiApp = () => {
         .map((item, index) => {
           const vertexIndex = index % vertex.length
           return item + vertex[vertexIndex]
-        });
-      (this as any).drawRect(mX, mY)
+        })
+      const type: any = {
+        rect: () => (this as any).drawRect(mX, mY)
+      }
+      type[config.drawType]()
     }
 
     installEventListener () {
