@@ -11,6 +11,7 @@ export const useStroke = () => {
    * @param points 顶点信息
    */
   const stroke = (graphics: PIXI.Graphics, points: number[]) => {
+    if (config.context.lineStyle !== 'stroke') return
     graphics.lineStyle({
       width: config.context.strokeWidth,
       color: config.context.strokeColor,

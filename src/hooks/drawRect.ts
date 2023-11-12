@@ -1,9 +1,6 @@
 import * as PIXI from 'pixi.js'
-import pinia from '@/stores'
-import { useConfigStore } from '@/stores/config'
 import { useStroke } from '@/hooks/stroke'
 
-const config = useConfigStore(pinia)
 const { stroke } = useStroke()
 
 export const useDrawRect = (CreateSceen: any) => {
@@ -33,7 +30,7 @@ export const useDrawRect = (CreateSceen: any) => {
       mx, my,
       x, my
     ])
-    config.context.lineStyle === 'stroke' && stroke(graphics, this.ghContainer.points)
+    stroke(graphics, this.ghContainer.points)
     this.fillBgColor(graphics)
     graphics.endFill()
   }
