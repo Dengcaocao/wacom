@@ -6,6 +6,7 @@ import { useFillBgColor } from '@/hooks/fillBgColor'
 import { useDrawRect } from '@/hooks/drawRect'
 import { useDrawDiamond } from '@/hooks/drawDiamond'
 import { useDrawArc } from '@/hooks/drawArc'
+import { useDrawLine } from '@/hooks/drawLine'
 import { useStroke } from '@/hooks/stroke'
 
 interface IExtendThis {
@@ -97,6 +98,7 @@ export const usePixiApp = () => {
       useFillBgColor(CreateSceen)
       useDrawDiamond(CreateSceen)
       useDrawArc(CreateSceen)
+      useDrawLine(CreateSceen)
     }
 
     /**
@@ -193,7 +195,10 @@ export const usePixiApp = () => {
       const _this = this
       const { x, y } = e
       this.isDraw = true
-      this.points = this.createOffsetArr(4, config.drawType === 'arc' ? 3 : 5)
+      this.points = this.createOffsetArr(
+        ['arrow', 'pen'].includes(config.drawType) ? 1 : 4,
+        config.drawType === 'arc' ? 3 : 5
+      )
       this.downPoint = {
         x: x + Math.abs(this.app.stage.x) / 2,
         y: y + Math.abs(this.app.stage.y) / 2
@@ -237,7 +242,8 @@ export const usePixiApp = () => {
       const type: any = {
         rect: () => (this as any).drawRect(mX, mY),
         diamond: () => (this as any).drawDiamond(mX, mY),
-        arc: () => (this as any).drawArc(mX, mY)
+        arc: () => (this as any).drawArc(mX, mY),
+        arrow: () => (this as any).drawLine(mX, mY)
       }
       type[config.drawType]()
     }
