@@ -4,6 +4,7 @@ import pinia from '@/stores'
 import { useConfigStore } from '@/stores/config'
 import { useFillBgColor } from '@/hooks/fillBgColor'
 import { useDrawRect } from '@/hooks/drawRect'
+import { useDrawDiamond } from '@/hooks/drawDiamond'
 import { useStroke } from '@/hooks/stroke'
 
 interface IExtendThis {
@@ -93,6 +94,7 @@ export const usePixiApp = () => {
     installDrawMehtds () {
       useDrawRect(CreateSceen)
       useFillBgColor(CreateSceen)
+      useDrawDiamond(CreateSceen)
     }
 
     /**
@@ -228,26 +230,11 @@ export const usePixiApp = () => {
     _handlePointermove (e: PointerEvent) {
       if (!this.isDraw) return
       this.app.stage.addChild(this.ghContainer as PIXI.Container)
-      const { x: sX, y: sY} = this.downPoint
       const mX = e.x + Math.abs(this.app.stage.x) / 2
       const mY = e.y + Math.abs(this.app.stage.y) / 2
-      const width = mX - sX
-      const height = mY - sY
-      // 顶点信息
-      const vertex = [
-        sX, sY, sX + width / 2, sY, mX, sY,
-        mX, sY, mX, sY + height / 2, mX, mY,
-        mX, mY, sX + width / 2, mY, sX, mY,
-        sX, mY, sX, sY + height / 2, sX, sY
-      ]
-      this.points = this.createOffsetArr(4)
-        .map((item, index) => {
-          const vertexIndex = index % vertex.length
-          return item + vertex[vertexIndex]
-        });
-      (this.ghContainer as any).points = this.points
       const type: any = {
-        rect: () => (this as any).drawRect(mX, mY)
+        rect: () => (this as any).drawRect(mX, mY),
+        diamond: () => (this as any).drawDiamond(mX, mY)
       }
       type[config.drawType]()
     }
