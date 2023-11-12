@@ -88,12 +88,6 @@ export const usePixiApp = () => {
       }
       this.app.stage.scale.set(this.app.screen.width / width)
       this.app.stage.position = { x: -width, y: -height }
-
-      const mesh = new PIXI.Graphics()
-      this.app.stage.addChild(mesh)
-      mesh.beginFill('#ff0000', 1)
-      mesh.drawCircle(width, height, 8)
-      mesh.endFill()
     }
 
     installDrawMehtds () {
@@ -174,7 +168,7 @@ export const usePixiApp = () => {
         this.app.stage.y += e.deltaY * -1
         if (this.app.stage.x >= 0 || this.app.stage.x <= -this.app.screen.width) {
           this.app.stage.children
-            .slice(0, 1)
+            .slice(1)
             .forEach(item => {
               item.x = item.x + this.width / 2 * (e.deltaX < 0 ? 1 : -1)
             })
@@ -182,7 +176,7 @@ export const usePixiApp = () => {
         }
         if (this.app.stage.y >= 0 || this.app.stage.y <= -this.app.screen.height) {
           this.app.stage.children
-            .slice(0, 1)
+            .slice(1)
             .forEach(item => {
               item.y = item.y + this.height / 2 * (e.deltaY < 0 ? 1 : -1)
             })
