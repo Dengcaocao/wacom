@@ -196,7 +196,7 @@ export const usePixiApp = () => {
       const { x, y } = e
       this.isDraw = true
       this.points = this.createOffsetArr(
-        ['arrow', 'pen'].includes(config.drawType) ? 1 : 4,
+        ['arrow', 'line'].includes(config.drawType) ? 1 : 4,
         config.drawType === 'arc' ? 3 : 5
       )
       this.downPoint = {
@@ -243,7 +243,8 @@ export const usePixiApp = () => {
         rect: () => (this as any).drawRect(mX, mY),
         diamond: () => (this as any).drawDiamond(mX, mY),
         arc: () => (this as any).drawArc(mX, mY),
-        arrow: () => (this as any).drawLine(mX, mY)
+        arrow: () => (this as any).drawLine(mX, mY, 'arrow'),
+        line: () => (this as any).drawLine(mX, mY)
       }
       type[config.drawType]()
     }

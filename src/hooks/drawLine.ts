@@ -5,7 +5,7 @@ const { stroke } = useStroke()
 
 export const useDrawLine = (CreateSceen: any) => {
 
-  CreateSceen.prototype.drawLine = function (mx: number, my: number) {
+  CreateSceen.prototype.drawLine = function (mx: number, my: number, type: string = 'line') {
     this.ghContainer.removeChildren()
     const graphics = new PIXI.Graphics()
     this.ghContainer.addChild(graphics)
@@ -23,6 +23,20 @@ export const useDrawLine = (CreateSceen: any) => {
       });
     graphics.moveTo(x, y)
     graphics.lineTo(mx, my)
+    if (type === 'arrow') {
+      // 箭头方向
+      const direction = width < 0 ? -1 : 1
+      // 旋转角度
+      let deg = Math.atan2(height, height)
+      if (direction === -1) {
+        deg = height < 0 ? -Math.PI + deg : Math.PI + deg
+      }
+      graphics.rotation = deg
+      graphics.moveTo(mx, my)
+      graphics.lineTo(mx - 20, my - 8)
+      graphics.moveTo(mx, my)
+      graphics.lineTo(mx - 20, my + 8)
+    }
     stroke(graphics, this.ghContainer.points)
     this.fillBgColor(graphics)
     graphics.endFill()
