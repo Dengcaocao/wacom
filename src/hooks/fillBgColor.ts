@@ -15,6 +15,7 @@ export const useFillBgColor = (CreateSceen: any) => {
       color: config.context.fillColor,
       alpha: config.context.alpha
     })
+    // BUG 当图形透明时，获取不到bounds
     const { minX, minY, maxX, maxY } = graphics.geometry.bounds
     const width = maxX - minX, height = maxY - minY
     const arr = []

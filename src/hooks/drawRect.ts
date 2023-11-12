@@ -1,10 +1,13 @@
 import * as PIXI from 'pixi.js'
 import pinia from '@/stores'
 import { useConfigStore } from '@/stores/config'
+import { useStroke } from '@/hooks/stroke'
 
 const config = useConfigStore(pinia)
+const { stroke } = useStroke()
 
 export const useDrawRect = (CreateSceen: any) => {
+
   CreateSceen.prototype.drawRect = function (mx: number, my: number) {
     this.ghContainer.removeChildren()
     const graphics = new PIXI.Graphics()
@@ -17,19 +20,8 @@ export const useDrawRect = (CreateSceen: any) => {
       mx, my,
       x, my
     ])
-    if (config.context.lineStyle === 'stroke') {
-      graphics.lineStyle({
-        width: config.context.strokeWidth,
-        color: config.context.strokeColor,
-        alpha: config.context.alpha
-      })
-      for (let i = 0; i < this.points.length; i+=6) {
-        const [x, y, cpX, cpY, toX, toY] = this.points.slice(i, i+6)
-        graphics.moveTo(x, y)
-        graphics.quadraticCurveTo(cpX, cpY, toX, toY)
-      }
-    }
-    graphics.endFill()
+    config.context.lineStyle === 'stroke' && stroke(graphics, this.points)
     this.fillBgColor(graphics)
+    graphics.endFill()
   }
 }
