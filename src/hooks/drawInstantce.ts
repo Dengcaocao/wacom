@@ -1,9 +1,10 @@
 import * as PIXI from 'pixi.js'
-import type { Ref } from 'vue'
+import { toRaw, type Ref } from 'vue'
 import pinia from '@/stores'
 import { useConfigStore } from '@/stores/config'
 import { useFillBgColor } from '@/hooks/fillBgColor'
 import { useDrawRect } from '@/hooks/drawRect'
+import { useStroke } from '@/hooks/stroke'
 
 interface IExtendThis {
   isMove: boolean,
@@ -14,6 +15,7 @@ interface IExtendThis {
 }
 
 const config = useConfigStore(pinia)
+const { stroke } = useStroke()
 
 export const usePixiApp = () => {
   class CreateSceen {
@@ -138,6 +140,29 @@ export const usePixiApp = () => {
           ? 0
           : config.context.alpha
       );
+    }
+
+    /**
+     * 重写渲染
+     */
+    reRenderer () {
+      const shapeArr = this.ghContainer?.children
+        .map((graphics: any) =>
+          toRaw(graphics).geometry.graphicsData[0].shape
+        )
+      this.ghContainer?.removeChildren()
+      shapeArr?.forEach((shape: PIXI.IShape) => {
+        const graphics = new PIXI.Graphics()
+        this.ghContainer?.addChild(graphics)
+        this.setGraphicsStyle(graphics)
+        graphics.drawShape(shape)
+        if (config.context.fillStyle !== 'fill') {
+          config.drawInstance.fillBgColor(graphics)
+        }
+        if (config.context.lineStyle === 'stroke') {
+          stroke(graphics, (this.ghContainer as any)?.points)
+        }
+      })
     }
 
     /**

@@ -17,12 +17,12 @@ import Side from '@/components/Side.vue'
 
 const configStore = useConfigStore()
 
-const { CreateSceen } = usePixiApp();
+const { CreateSceen } = usePixiApp()
 
 const container = ref<HTMLElement>()
 
 watch(configStore.context, () => {
-  configStore.drawInstance.setLineStyle(undefined, true)
+  configStore.drawInstance.reRenderer()
 })
  
 onMounted(() => {
