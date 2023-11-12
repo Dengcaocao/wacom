@@ -5,6 +5,14 @@ import { useConfigStore } from '@/stores/config'
 import { useFillBgColor } from '@/hooks/fillBgColor'
 import { useDrawRect } from '@/hooks/drawRect'
 
+interface IExtendThis {
+  isMove: boolean,
+  startPoint: {
+    x: number
+    y: number
+  }
+}
+
 const config = useConfigStore(pinia)
 
 export const usePixiApp = () => {
@@ -22,7 +30,6 @@ export const usePixiApp = () => {
     upPoint: { x: number; y: number} = { x: 0, y: 0 }
     points: number[] = []
     graphics: PIXI.Graphics | undefined
-    // drawRect: ((mx: number, my: number) => void) | undefined
     constructor (container: Ref, width: number, height: number) {
       this.app = new PIXI.Application({
         width: width * 2,
@@ -51,7 +58,9 @@ export const usePixiApp = () => {
       const mesh = new PIXI.Graphics()
       this.app.stage.addChild(mesh)
       const width = this.app.screen.width
+      // 添加可交互区域
       const height = this.app.screen.height
+      mesh.hitArea = new PIXI.Rectangle(0, 0, width, height)
       mesh.lineStyle(1, 0x000000, 0.1)
       // 垂直线条
       for (let i = 0; i < width; i += 20) {
@@ -111,12 +120,14 @@ export const usePixiApp = () => {
      * @param graphics 图形对象
      */
     setGraphicsStyle (graphics: PIXI.Graphics) {
+      if (!graphics) return
       graphics.lineStyle({
         width: config.context.strokeWidth,
         color: config.context.strokeColor,
         alpha: config.context.lineStyle === 'simple'
           ? config.context.alpha
-          : 0
+          : 0,
+        cap: PIXI.LINE_CAP.ROUND
       })
       graphics.beginFill(
         config.context.fillStyle === 'fill'
@@ -126,7 +137,7 @@ export const usePixiApp = () => {
         config.context.fillStyle !== 'fill'
           ? 0
           : config.context.alpha
-      )
+      );
     }
 
     /**
@@ -156,6 +167,7 @@ export const usePixiApp = () => {
 
     _handlePointerdown (e: PointerEvent) {
       if (['select', 'text', 'pic'].includes(config.drawType)) return
+      const _this = this
       const { x, y } = e
       this.isDraw = true
       this.points = this.createOffsetArr(4)
@@ -163,18 +175,40 @@ export const usePixiApp = () => {
         x: x + Math.abs(this.app.stage.x) / 2,
         y: y + Math.abs(this.app.stage.y) / 2
       }
+      this.ghContainer = new PIXI.Container()
+      this.ghContainer.on('pointerenter', function (this: PIXI.Container) {
+        this.children[0].cursor = 'move'
+      })
+      this.ghContainer.on('pointerdown', function (this: PIXI.Container & IExtendThis, e) {
+        e.stopPropagation()
+        this.isMove = true
+        this.startPoint = { x: e.x, y: e.y}
+        _this.ghContainer = this
+      })
+      this.ghContainer.on('pointerup', function (this: PIXI.Container & IExtendThis, e) {
+        e.stopPropagation()
+        this.isMove = false
+      })
+      this.ghContainer.on('pointermove', function (this: PIXI.Container & IExtendThis, e) {
+        if (!this.isMove) return
+        const mX = e.x - this.startPoint.x,
+              mY = e.y - this.startPoint.y
+        this.startPoint = { x: e.x, y: e.y }
+        this.x += mX
+        this.y += mY
+      })
     }
 
     _handlePointerup (e: PointerEvent) {
       this.isDraw = false
       this.points = []
       this.ghContainer = undefined
+      config.drawType = 'select'
     }
 
     _handlePointermove (e: PointerEvent) {
       if (!this.isDraw) return
-      this.ghContainer = this.ghContainer || new PIXI.Container()
-      this.app.stage.addChild(this.ghContainer)
+      this.app.stage.addChild(this.ghContainer as PIXI.Container)
       const { x: sX, y: sY} = this.downPoint
       const mX = e.x + Math.abs(this.app.stage.x) / 2
       const mY = e.y + Math.abs(this.app.stage.y) / 2
@@ -191,7 +225,8 @@ export const usePixiApp = () => {
         .map((item, index) => {
           const vertexIndex = index % vertex.length
           return item + vertex[vertexIndex]
-        })
+        });
+      (this.ghContainer as any).points = this.points
       const type: any = {
         rect: () => (this as any).drawRect(mX, mY)
       }
@@ -199,10 +234,10 @@ export const usePixiApp = () => {
     }
 
     installEventListener () {
-      this.container.value.addEventListener('wheel', (e: WheelEvent) => this._handleWheel(e))
-      this.container.value.addEventListener('pointerdown', (e: PointerEvent) => this._handlePointerdown(e))
-      this.container.value.addEventListener('pointerup', (e: PointerEvent) => this._handlePointerup(e))
-      this.container.value.addEventListener('pointermove', (e: PointerEvent) => this._handlePointermove(e))
+      this.app.stage.on('wheel', (e: WheelEvent) => this._handleWheel(e))
+      this.app.stage.on('pointerdown', (e: PointerEvent) => this._handlePointerdown(e))
+      this.app.stage.on('pointerup', (e: PointerEvent) => this._handlePointerup(e))
+      this.app.stage.on('pointermove', (e: PointerEvent) => this._handlePointermove(e))
     }
   }
   return {
