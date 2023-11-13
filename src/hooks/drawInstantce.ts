@@ -7,6 +7,7 @@ import { useDrawRect } from '@/hooks/drawRect'
 import { useDrawDiamond } from '@/hooks/drawDiamond'
 import { useDrawArc } from '@/hooks/drawArc'
 import { useDrawLineSegment } from '@/hooks/drawLineSegment'
+import { useSetExtremePoint } from '@/hooks/setExtremePoint'
 import { useDrawLine } from '@/hooks/drawLine'
 import { useStroke } from '@/hooks/stroke'
 
@@ -111,6 +112,7 @@ export const usePixiApp = () => {
       useDrawDiamond(CreateSceen)
       useDrawArc(CreateSceen)
       useDrawLineSegment(CreateSceen)
+      useSetExtremePoint(CreateSceen)
       useDrawLine(CreateSceen)
     }
 
