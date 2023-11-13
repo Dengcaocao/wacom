@@ -2,7 +2,7 @@ import { reactive, ref } from 'vue'
 import { defineStore } from 'pinia'
 
 export type IDrawType = 'select' | 'rect' | 'diamond' | 'arc' | 'arrow' | 'line' | 'pen' | 'text' | 'pic'
-
+export type LineSegmentType = 'none' | 'arrow' | 'lineSegment'
 export interface IContext {
   bgColor: string
   strokeColor: string
@@ -11,8 +11,8 @@ export interface IContext {
   strokeWidth: 1 | 2 | 4
   line: 'solid' | 'dashed'
   lineStyle: 'simple' | 'stroke'
-  extremePoint_left: 'none' | 'arrow' | 'lineSegment'
-  extremePoint_right: 'none' | 'arrow' | 'lineSegment'
+  extremePoint_left: LineSegmentType
+  extremePoint_right: LineSegmentType
   horn: 'right' | 'round'
   alpha: number
   fontSize: number,

@@ -1,7 +1,10 @@
 import * as PIXI from 'pixi.js'
+import pinia from '@/stores'
+import { useConfigStore } from '@/stores/config'
 import { useStroke } from '@/hooks/stroke'
 import { createOffsetArr } from '@/utils/utils'
 
+const config = useConfigStore(pinia)
 const { stroke } = useStroke()
 
 export const useDrawLineSegment = (CreateSceen: any) => {
@@ -23,9 +26,34 @@ export const useDrawLineSegment = (CreateSceen: any) => {
     const vertex = [
       x, y, x + width / 2, y + height / 2, mx, my
     ]
+    // 箭头方向&旋转角度
+    const direction = width < 0 ? -1 : 1
+    let deg = Math.atan2(height, width)
+    if (direction === -1) {
+      deg = height < 0 ? -Math.PI + deg : Math.PI + deg
+    }
     graphics.moveTo(x, y)
     graphics.lineTo(mx, my)
-    type === 'arrow' && this.setExtremePoint(mx, my)
+    if (type === 'arrow') {
+      this.setExtremePoint(
+        { x, y },
+        width, height,
+        deg,
+        { 
+          direction: 'left',
+          type: config.context.extremePoint_left
+        }
+      )
+      this.setExtremePoint(
+        { x: mx, y: my },
+        width, height,
+        deg,
+        { 
+          direction: 'right',
+          type: config.context.extremePoint_right
+        }
+      )
+    }
     stroke(graphics, vertex, this.ghContainer.offsetPoints[index])
     graphics.endFill()
   }
