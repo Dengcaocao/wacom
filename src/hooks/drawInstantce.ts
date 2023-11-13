@@ -18,6 +18,18 @@ interface IExtendThis {
   }
 }
 
+interface IExtendContainer {
+  offsetPoints?: number[]
+}
+
+interface IExtendGraphics {
+  qcPoints?: number[]
+}
+
+export type ExtendContainer = PIXI.Container & IExtendContainer
+
+export type ExtendGraphics = PIXI.Graphics & IExtendGraphics
+
 const config = useConfigStore(pinia)
 const { stroke } = useStroke()
 
@@ -25,7 +37,7 @@ export const usePixiApp = () => {
   class CreateSceen {
     app: PIXI.Application<PIXI.ICanvas>
     container: Ref
-    ghContainer: PIXI.Container | undefined
+    ghContainer: ExtendContainer | undefined
     width: number
     height: number
     // 是否允许绘制
@@ -34,8 +46,6 @@ export const usePixiApp = () => {
     downPoint: { x: number; y: number} = { x: 0, y: 0 }
     // 鼠标抬起的坐标
     upPoint: { x: number; y: number} = { x: 0, y: 0 }
-    // 二次贝塞尔控制点
-    offsetPoints: number[] = []
     graphics: PIXI.Graphics | undefined
     constructor (container: Ref, width: number, height: number) {
       this.app = new PIXI.Application({
@@ -142,7 +152,7 @@ export const usePixiApp = () => {
         )
       this.ghContainer?.removeChildren()
       graphicsInfo?.forEach(info => {
-        const graphics: PIXI.Graphics & { qcPoints?: number[] } = new PIXI.Graphics()
+        const graphics: ExtendGraphics = new PIXI.Graphics()
         this.ghContainer?.addChild(graphics)
         this.setGraphicsStyle(graphics)
         graphics.qcPoints = info.qcPoints
@@ -184,15 +194,13 @@ export const usePixiApp = () => {
       const _this = this
       const { x, y } = e
       this.isDraw = true
-      this.offsetPoints = this.createOffsetArr(
-        ['arrow', 'line'].includes(config.drawType) ? 1 : 4,
-        config.drawType === 'arc' ? 3 : 5
-      )
       this.downPoint = {
         x: x + Math.abs(this.app.stage.x) / 2,
         y: y + Math.abs(this.app.stage.y) / 2
       }
       this.ghContainer = new PIXI.Container()
+      // 保存每个图形的随机偏移点
+      this.ghContainer.offsetPoints = []
       this.ghContainer.on('pointerenter', function (this: PIXI.Container) {
         this.children[0].cursor = 'move'
       })
@@ -216,9 +224,8 @@ export const usePixiApp = () => {
       })
     }
 
-    _handlePointerup (e: PointerEvent) {
+    _handlePointerup () {
       this.isDraw = false
-      this.offsetPoints = []
       this.ghContainer = undefined
       config.drawType = 'select'
     }
@@ -242,7 +249,7 @@ export const usePixiApp = () => {
     installEventListener () {
       this.app.stage.on('wheel', (e: WheelEvent) => this._handleWheel(e))
       this.app.stage.on('pointerdown', (e: PointerEvent) => this._handlePointerdown(e))
-      this.app.stage.on('pointerup', (e: PointerEvent) => this._handlePointerup(e))
+      this.app.stage.on('pointerup', () => this._handlePointerup())
       this.app.stage.on('pointermove', (e: PointerEvent) => this._handlePointermove(e))
     }
   }

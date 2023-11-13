@@ -1,5 +1,5 @@
-import * as PIXI from 'pixi.js'
 import pinia from '@/stores'
+import { type ExtendGraphics } from '@/hooks/drawInstantce'
 import { useConfigStore } from '@/stores/config'
 
 const config = useConfigStore(pinia)
@@ -12,7 +12,7 @@ export const useStroke = () => {
    * @param offset 随机偏移大小
    */
   const stroke = (
-    graphics: PIXI.Graphics & { qcPoints?: number[] },
+    graphics: ExtendGraphics,
     vertex: number[] = [],
     offset: number[] = []
   ) => {

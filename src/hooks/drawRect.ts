@@ -1,5 +1,7 @@
 import * as PIXI from 'pixi.js'
+import { type ExtendGraphics } from '@/hooks/drawInstantce'
 import { useStroke } from '@/hooks/stroke'
+import { createOffsetArr } from '@/utils/utils'
 
 const { stroke } = useStroke()
 
@@ -7,8 +9,11 @@ export const useDrawRect = (CreateSceen: any) => {
 
   CreateSceen.prototype.drawRect = function (mx: number, my: number) {
     this.ghContainer.removeChildren()
-    const graphics = new PIXI.Graphics()
+    const graphics: ExtendGraphics = new PIXI.Graphics()
     this.ghContainer.addChild(graphics)
+    // 获取图形在容器中位置，并设置随机偏移点
+    const index = this.ghContainer.getChildIndex(graphics)
+    this.ghContainer.offsetPoints[index] = this.ghContainer.offsetPoints[index] || createOffsetArr(4)
     this.setGraphicsStyle(graphics)
     const { x, y } = this.downPoint
     const width = mx - x, height = my - y
@@ -25,7 +30,7 @@ export const useDrawRect = (CreateSceen: any) => {
       mx, my,
       x, my
     ])
-    stroke(graphics, vertex, this.offsetPoints)
+    stroke(graphics, vertex, this.ghContainer.offsetPoints[index])
     this.fillBgColor(graphics)
     graphics.endFill()
   }
