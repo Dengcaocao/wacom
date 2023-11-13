@@ -33,18 +33,16 @@ const arrow = function (
   const vertex = [
     0, 0, size.x / 2, -size.y / 2, size.x, -size.y,
     0, 0, size.x / 2, size.y / 2, size.x, size.y
-  ];
-  (graphics as any).points = this.points
-    .concat(this.points)
-    .map((item: any, index: number) => {
-      const vertexIndex = index % vertex.length
-      return Math.random() * 4 - 2 + vertex[vertexIndex]
-    })
-  stroke(graphics, (graphics as any).points)
+  ]
+  stroke(graphics, vertex, this.offsetPoints)
 }
 
 export const useDrawLineSegment = (CreateSceen: any) => {
-  CreateSceen.prototype.drawLineSegment = function (mx: number, my: number, type: string = 'line') {
+  CreateSceen.prototype.drawLineSegment = function (
+    mx: number,
+    my: number,
+    type: string = 'line'
+  ) {
     this.ghContainer.removeChildren()
     const graphics = new PIXI.Graphics()
     this.ghContainer.addChild(graphics)
@@ -54,18 +52,11 @@ export const useDrawLineSegment = (CreateSceen: any) => {
     // 贝塞尔曲线点位信息 x, y, cpX, cpY, toX, toY
     const vertex = [
       x, y, x + width / 2, y + height / 2, mx, my
-    ];
-    (this.ghContainer as any).points = this.points
-      .map((item: any, index: number) => {
-        const vertexIndex = index % vertex.length
-        return item + vertex[vertexIndex]
-      });
+    ]
     graphics.moveTo(x, y)
     graphics.lineTo(mx, my)
-    if (type === 'arrow') {
-      arrow.call(this, mx, my)
-    }
-    stroke(graphics, this.ghContainer.points)
+    type === 'arrow' && arrow.call(this, mx, my)
+    stroke(graphics, vertex, this.offsetPoints)
     graphics.endFill()
   }
 }

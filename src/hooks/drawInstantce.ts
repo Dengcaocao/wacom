@@ -34,7 +34,8 @@ export const usePixiApp = () => {
     downPoint: { x: number; y: number} = { x: 0, y: 0 }
     // 鼠标抬起的坐标
     upPoint: { x: number; y: number} = { x: 0, y: 0 }
-    points: number[] = []
+    // 二次贝塞尔控制点
+    offsetPoints: number[] = []
     graphics: PIXI.Graphics | undefined
     constructor (container: Ref, width: number, height: number) {
       this.app = new PIXI.Application({
@@ -148,22 +149,24 @@ export const usePixiApp = () => {
      * 重写渲染
      */
     reRenderer () {
-      const shapeArr = this.ghContainer?.children
+      const graphicsInfo = this.ghContainer?.children
         .map((graphics: any) =>
-          toRaw(graphics).geometry.graphicsData[0].shape
+          ({
+            shape: toRaw(graphics).geometry.graphicsData[0].shape,
+            qcPoints: toRaw(graphics.qcPoints)
+          })
         )
       this.ghContainer?.removeChildren()
-      shapeArr?.forEach((shape: PIXI.IShape) => {
-        const graphics = new PIXI.Graphics()
+      graphicsInfo?.forEach(info => {
+        const graphics: PIXI.Graphics & { qcPoints?: number[] } = new PIXI.Graphics()
         this.ghContainer?.addChild(graphics)
         this.setGraphicsStyle(graphics)
-        graphics.drawShape(shape)
+        graphics.qcPoints = info.qcPoints
+        graphics.drawShape(info.shape)
         if (config.context.fillStyle !== 'fill') {
           config.drawInstance.fillBgColor(graphics)
         }
-        if (config.context.lineStyle === 'stroke') {
-          stroke(graphics, (this.ghContainer as any)?.points)
-        }
+        stroke(graphics)
       })
     }
 
@@ -197,7 +200,7 @@ export const usePixiApp = () => {
       const _this = this
       const { x, y } = e
       this.isDraw = true
-      this.points = this.createOffsetArr(
+      this.offsetPoints = this.createOffsetArr(
         ['arrow', 'line'].includes(config.drawType) ? 1 : 4,
         config.drawType === 'arc' ? 3 : 5
       )
@@ -231,7 +234,7 @@ export const usePixiApp = () => {
 
     _handlePointerup (e: PointerEvent) {
       this.isDraw = false
-      this.points = []
+      this.offsetPoints = []
       this.ghContainer = undefined
       config.drawType = 'select'
     }

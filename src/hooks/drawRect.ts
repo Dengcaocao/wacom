@@ -18,19 +18,14 @@ export const useDrawRect = (CreateSceen: any) => {
       mx, y, mx, y + height / 2, mx, my,
       mx, my, x + width / 2, my, x, my,
       x, my, x, y + height / 2, x, y
-    ];
-    (this.ghContainer as any).points = this.points
-      .map((item: any, index: number) => {
-        const vertexIndex = index % vertex.length
-        return item + vertex[vertexIndex]
-      });
+    ]
     graphics.drawPolygon([
       x, y,
       mx, y,
       mx, my,
       x, my
     ])
-    stroke(graphics, this.ghContainer.points)
+    stroke(graphics, vertex, this.offsetPoints)
     this.fillBgColor(graphics)
     graphics.endFill()
   }

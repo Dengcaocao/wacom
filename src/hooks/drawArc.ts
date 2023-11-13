@@ -18,19 +18,14 @@ export const useDrawArc = (CreateSceen: any) => {
       mx, y + height / 2, mx, my, x + width / 2, my,
       x + width / 2, my, x, my, x, y + height / 2,
       x, y + height / 2, x, y, x + width / 2, y
-    ];
-    (this.ghContainer as any).points = this.points
-      .map((item: any, index: number) => {
-        const vertexIndex = index % vertex.length
-        return item + vertex[vertexIndex]
-      });
+    ]
     graphics.drawEllipse(
       x + width / 2,
       y + height / 2,
       width / 2,
       height / 2
     )
-    stroke(graphics, this.ghContainer.points)
+    stroke(graphics, vertex, this.offsetPoints)
     this.fillBgColor(graphics)
     graphics.endFill()
   }
