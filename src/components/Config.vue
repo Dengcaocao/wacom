@@ -126,6 +126,48 @@ const configList = reactive([
     ]
   },
   {
+    title: '端点左',
+    model: 'extremePoint_left',
+    radioGroup: [
+      {
+        title: '无',
+        type: 'none',
+        classes: 'icon-toubuduandian'
+      },
+      {
+        title: '箭头',
+        type: 'arrow',
+        classes: 'icon-jiantou-copy-copy'
+      },
+      {
+        title: '线段',
+        type: 'lineSegment',
+        classes: 'icon-icon_07'
+      }
+    ]
+  },
+  {
+    title: '端点右',
+    model: 'extremePoint_right',
+    radioGroup: [
+      {
+        title: '无',
+        type: 'none',
+        classes: 'icon-toubuduandian'
+      },
+      {
+        title: '箭头',
+        type: 'arrow',
+        classes: 'icon-jiantou-copy'
+      },
+      {
+        title: '线段',
+        type: 'lineSegment',
+        classes: 'icon-icon_-1'
+      }
+    ]
+  },
+  {
     title: '边角',
     model: 'horn',
     radioGroup: [

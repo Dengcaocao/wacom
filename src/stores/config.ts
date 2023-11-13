@@ -11,6 +11,8 @@ export interface IContext {
   strokeWidth: 1 | 2 | 4
   line: 'solid' | 'dashed'
   lineStyle: 'simple' | 'stroke'
+  extremePoint_left: 'none' | 'arrow' | 'lineSegment'
+  extremePoint_right: 'none' | 'arrow' | 'lineSegment'
   horn: 'right' | 'round'
   alpha: number
   fontSize: number,
@@ -37,6 +39,8 @@ export const useConfigStore = defineStore('config', () => {
     strokeWidth: 1,
     line: 'solid',
     lineStyle: 'simple',
+    extremePoint_left: 'none',
+    extremePoint_right: 'arrow',
     horn: 'right',
     alpha: 1,
     fontSize: 14
