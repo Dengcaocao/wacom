@@ -6,6 +6,7 @@ import { useFillBgColor } from '@/hooks/fillBgColor'
 import { useDrawRect } from '@/hooks/drawRect'
 import { useDrawDiamond } from '@/hooks/drawDiamond'
 import { useDrawArc } from '@/hooks/drawArc'
+import { useDrawLineSegment } from '@/hooks/drawLineSegment'
 import { useDrawLine } from '@/hooks/drawLine'
 import { useStroke } from '@/hooks/stroke'
 
@@ -98,6 +99,7 @@ export const usePixiApp = () => {
       useFillBgColor(CreateSceen)
       useDrawDiamond(CreateSceen)
       useDrawArc(CreateSceen)
+      useDrawLineSegment(CreateSceen)
       useDrawLine(CreateSceen)
     }
 
@@ -243,8 +245,8 @@ export const usePixiApp = () => {
         rect: () => (this as any).drawRect(mX, mY),
         diamond: () => (this as any).drawDiamond(mX, mY),
         arc: () => (this as any).drawArc(mX, mY),
-        arrow: () => (this as any).drawLine(mX, mY, 'arrow'),
-        line: () => (this as any).drawLine(mX, mY)
+        arrow: () => (this as any).drawLineSegment(mX, mY, 'arrow'),
+        line: () => (this as any).drawLineSegment(mX, mY),
       }
       type[config.drawType]()
     }
