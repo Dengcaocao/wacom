@@ -247,6 +247,7 @@ export const usePixiApp = () => {
         arc: () => (this as any).drawArc(mX, mY),
         arrow: () => (this as any).drawLineSegment(mX, mY, 'arrow'),
         line: () => (this as any).drawLineSegment(mX, mY),
+        pen: () => (this as any).drawLine(mX, mY)
       }
       type[config.drawType]()
     }
