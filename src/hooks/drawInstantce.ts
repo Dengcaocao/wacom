@@ -1,5 +1,5 @@
 import * as PIXI from 'pixi.js'
-import { toRaw, type Ref, watch } from 'vue'
+import { toRaw, type Ref } from 'vue'
 import pinia from '@/stores'
 import { useConfigStore } from '@/stores/config'
 import { useFillBgColor } from '@/hooks/fillBgColor'
@@ -147,25 +147,19 @@ export const usePixiApp = () => {
      * 重写渲染
      */
     reRenderer () {
-      const graphicsInfo = this.ghContainer?.children
-        .map((graphics: any) =>
-          ({
-            shape: toRaw(graphics).geometry.graphicsData[0].shape,
-            qcPoints: toRaw(graphics.qcPoints)
-          })
-        )
-      this.ghContainer?.removeChildren()
-      graphicsInfo?.forEach(info => {
-        const graphics: ExtendGraphics = new PIXI.Graphics()
-        this.ghContainer?.addChild(graphics)
-        this.setGraphicsStyle(graphics)
-        graphics.qcPoints = info.qcPoints
-        graphics.drawShape(info.shape)
-        if (config.context.fillStyle !== 'fill') {
-          config.drawInstance.fillBgColor(graphics)
-        }
-        stroke(graphics)
-      })
+      this.ghContainer?.children
+        .forEach((graphics: any) => {
+          const shape = toRaw(graphics).geometry.graphicsData[0].shape
+          const qcPoints = toRaw(graphics.qcPoints)
+          graphics.clear()
+          this.setGraphicsStyle(graphics)
+          graphics.qcPoints = qcPoints
+          graphics.drawShape(shape)
+          if (config.context.fillStyle !== 'fill') {
+            config.drawInstance.fillBgColor(graphics)
+          }
+          stroke(graphics)
+        })
     }
 
     /**
@@ -219,6 +213,7 @@ export const usePixiApp = () => {
         _this.ghContainer = this
       })
       this.ghContainer.on('pointerup', function (this: PIXI.Container & IExtendThis, e) {
+        e.stopPropagation()
         this.isMove = false
       })
       this.ghContainer.on('pointermove', function (this: PIXI.Container & IExtendThis, e) {
