@@ -31,7 +31,7 @@ export const useDrawRect = (CreateSceen: any) => {
       x, my
     ])
     stroke(graphics, vertex, this.ghContainer.offsetPoints[index])
-    this.fillBgColor(graphics)
+    this.fillBgColor(graphics, vertex)
     graphics.endFill()
   }
 }

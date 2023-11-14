@@ -4,8 +4,21 @@ import { useConfigStore } from '@/stores/config'
 
 const config = useConfigStore(pinia)
 
+const getMaximum = (vertex: number[]) => {
+  // 6 ==> (x, y, cpX, cpY, toX, toY)
+  const points = vertex.filter((_, index) => [0, 1].includes(index % 6))
+  const xArr = points.filter((_, index) => index % 2 === 0)
+  const yArr = points.filter((_, index) => index % 2 === 1)
+  return {
+    minX: Math.min(...xArr),
+    minY: Math.min(...yArr),
+    maxX: Math.max(...xArr),
+    maxY: Math.max(...yArr)
+  }
+}
+
 export const useFillBgColor = (CreateSceen: any) => {
-  CreateSceen.prototype.fillBgColor = function (graphics: PIXI.Graphics) {
+  CreateSceen.prototype.fillBgColor = function (graphics: PIXI.Graphics, vertex: number[]) {
     if (
       config.context.fillColor === 'transparent' ||
       config.context.fillStyle === 'fill'
@@ -16,7 +29,8 @@ export const useFillBgColor = (CreateSceen: any) => {
       alpha: config.context.alpha
     })
     // BUG 当图形透明时，获取不到bounds
-    const { minX, minY, maxX, maxY } = graphics.geometry.bounds
+    
+    const { minX, minY, maxX, maxY } = getMaximum(vertex)
     const width = maxX - minX, height = maxY - minY
     const arr = []
     const getRandomNum = () => Math.random() * 8 + 4

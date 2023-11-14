@@ -156,7 +156,8 @@ export const usePixiApp = () => {
           graphics.qcPoints = qcPoints
           graphics.drawShape(shape)
           if (config.context.fillStyle !== 'fill') {
-            config.drawInstance.fillBgColor(graphics)
+            // 除2是因为createOffsetArr函数返回了2倍
+            config.drawInstance.fillBgColor(graphics, qcPoints.slice(0, qcPoints.length / 2))
           }
           stroke(graphics)
         })

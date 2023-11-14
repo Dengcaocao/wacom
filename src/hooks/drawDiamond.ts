@@ -30,7 +30,7 @@ export const useDrawDiamond = (CreateSceen: any) => {
       x, y + height / 2
     ])
     stroke(graphics, vertex, this.ghContainer.offsetPoints[index])
-    this.fillBgColor(graphics)
+    this.fillBgColor(graphics, vertex)
     graphics.endFill()
   }
 }

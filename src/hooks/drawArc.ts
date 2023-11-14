@@ -18,10 +18,10 @@ export const useDrawArc = (CreateSceen: any) => {
     const width = mx - x, height = my - y
     // 贝塞尔曲线点位信息 x, y, cpX, cpY, toX, toY
     const vertex = [
+      x, y + height / 2, x, y, x + width / 2, y,
       x + width / 2, y, mx, y, mx, y + height / 2,
       mx, y + height / 2, mx, my, x + width / 2, my,
-      x + width / 2, my, x, my, x, y + height / 2,
-      x, y + height / 2, x, y, x + width / 2, y
+      x + width / 2, my, x, my, x, y + height / 2
     ]
     graphics.drawEllipse(
       x + width / 2,
@@ -30,7 +30,7 @@ export const useDrawArc = (CreateSceen: any) => {
       height / 2
     )
     stroke(graphics, vertex, this.ghContainer.offsetPoints[index])
-    this.fillBgColor(graphics)
+    this.fillBgColor(graphics, vertex)
     graphics.endFill()
   }
 }
