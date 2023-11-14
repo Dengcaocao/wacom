@@ -9,6 +9,7 @@ import { useDrawArc } from '@/hooks/drawArc'
 import { useDrawLineSegment } from '@/hooks/drawLineSegment'
 import { useSetExtremePoint } from '@/hooks/setExtremePoint'
 import { useDrawLine } from '@/hooks/drawLine'
+import { useDrawText } from '@/hooks/drawText'
 import { useStroke } from '@/hooks/stroke'
 
 interface IExtendThis {
@@ -114,6 +115,7 @@ export const usePixiApp = () => {
       useDrawLineSegment(CreateSceen)
       useSetExtremePoint(CreateSceen)
       useDrawLine(CreateSceen)
+      useDrawText(CreateSceen)
     }
 
     /**
@@ -192,7 +194,7 @@ export const usePixiApp = () => {
     }
 
     _handlePointerdown (e: PointerEvent) {
-      if (['select', 'text', 'pic'].includes(config.drawType)) return
+      if (['select', 'pic'].includes(config.drawType)) return
       const _this = this
       const { x, y } = e
       this.isDraw = true
@@ -201,6 +203,7 @@ export const usePixiApp = () => {
         y: y + Math.abs(this.app.stage.y) / 2
       }
       this.ghContainer = new PIXI.Container()
+      this.app.stage.addChild(this.ghContainer)
       // 保存每个图形的随机偏移点
       this.ghContainer.offsetPoints = []
       this.ghContainer.on('pointerenter', function (this: PIXI.Container) {
@@ -213,7 +216,6 @@ export const usePixiApp = () => {
         _this.ghContainer = this
       })
       this.ghContainer.on('pointerup', function (this: PIXI.Container & IExtendThis, e) {
-        e.stopPropagation()
         this.isMove = false
       })
       this.ghContainer.on('pointermove', function (this: PIXI.Container & IExtendThis, e) {
@@ -224,6 +226,10 @@ export const usePixiApp = () => {
         this.x += mX
         this.y += mY
       })
+      if (config.drawType === 'text') {
+        (this as any).drawText(this.downPoint)
+        return this.isDraw = false
+      }
     }
 
     _handlePointerup () {
@@ -234,7 +240,6 @@ export const usePixiApp = () => {
 
     _handlePointermove (e: PointerEvent) {
       if (!this.isDraw) return
-      this.app.stage.addChild(this.ghContainer as PIXI.Container)
       const mX = e.x + Math.abs(this.app.stage.x) / 2
       const mY = e.y + Math.abs(this.app.stage.y) / 2
       const type: any = {
