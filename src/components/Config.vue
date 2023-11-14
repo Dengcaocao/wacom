@@ -4,31 +4,33 @@
       <h3 class="title mt-0">描边</h3>
       <input-color v-model="context.strokeColor" />
     </div>
-    <div class="item">
+    <div class="item" v-if="['rect', 'diamond', 'arc'].includes(drawType)">
       <h3 class="title">背景</h3>
       <input-color v-model="context.fillColor" />
     </div>
-    <div class="item" v-for="item in configList" :key="item.model">
-      <h3 class="title">{{item.title}}</h3>
-      <div class="flex">
-        <label
-          v-for="(radioItem, index) in item.radioGroup"
-          :key="index"
-          :for="item.model + index"
-          :title="radioItem.title"
-          class="label"
-          :class="context[item.model] === radioItem.type && 'active'">
-          <input
-            v-model="context[item.model]"
-            type="radio"
-            :value="radioItem.type"
-            :name="item.model"
-            :id="item.model + index"
-            class="hidden">
-          <div class="iconfont" :class="radioItem.classes"></div>
-        </label>
+    <template v-for="item in configList" :key="item.model">
+      <div class="item" v-if="!item.display || item.display.includes(drawType)">
+        <h3 class="title">{{item.title}}</h3>
+        <div class="flex">
+          <label
+            v-for="(radioItem, index) in item.radioGroup"
+            :key="index"
+            :for="item.model + index"
+            :title="radioItem.title"
+            class="label"
+            :class="context[item.model] === radioItem.type && 'active'">
+            <input
+              v-model="context[item.model]"
+              type="radio"
+              :value="radioItem.type"
+              :name="item.model"
+              :id="item.model + index"
+              class="hidden">
+            <div class="iconfont" :class="radioItem.classes"></div>
+          </label>
+        </div>
       </div>
-    </div>
+    </template>
     <div class="item">
       <h3 class="title">透明度</h3>
       <input v-model="context.alpha" step="0.1" type="range" min="0" max="1" class="w-10/12">
@@ -48,12 +50,13 @@ import { reactive, toRefs } from 'vue'
 import { useConfigStore } from '@/stores/config'
 import InputColor from '@/components/InputColor.vue'
 
-const { drawInstance, context } = toRefs(useConfigStore())
+const { drawInstance, drawType, context } = toRefs(useConfigStore())
 
 const configList = reactive([
   {
     title: '填充',
     model: 'fillStyle',
+    display: ['rect', 'diamond', 'arc'],
     radioGroup: [
       {
         title: '实心',
@@ -112,6 +115,7 @@ const configList = reactive([
   {
     title: '线条风格',
     model: 'lineStyle',
+    display: ['rect', 'diamond', 'arc', 'arrow', 'line'],
     radioGroup: [
       {
         title: '朴素',
@@ -128,6 +132,7 @@ const configList = reactive([
   {
     title: '端点左',
     model: 'extremePoint_left',
+    display: ['arrow'],
     radioGroup: [
       {
         title: '无',
@@ -149,6 +154,7 @@ const configList = reactive([
   {
     title: '端点右',
     model: 'extremePoint_right',
+    display: ['arrow'],
     radioGroup: [
       {
         title: '无',
@@ -170,6 +176,7 @@ const configList = reactive([
   {
     title: '边角',
     model: 'horn',
+    display: ['rect'],
     radioGroup: [
       {
         title: '直角',
