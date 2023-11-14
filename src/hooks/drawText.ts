@@ -2,6 +2,13 @@ import * as PIXI from 'pixi.js'
 import pinia from '@/stores'
 import { useConfigStore } from '@/stores/config'
 
+/**
+ * 创建dom
+ * @param tag 标签
+ * @param position 位置
+ * @returns elm
+ */
+const fontSize = 28
 const createElm = (tag: string, position: { x: number, y: number }) => {
   const elm = document.createElement(tag)
   elm.style.cssText = `
@@ -9,10 +16,10 @@ const createElm = (tag: string, position: { x: number, y: number }) => {
     top: ${position.y}px;
     left: ${position.x}px;
     transform: translateY(-50%);
-    height: 24px;
+    height: ${fontSize}px;
     line-height: 1;
-    font-family: 'Arial';
-    font-size: 24px;
+    font-family: LongCang-Regular;
+    font-size: ${fontSize}px;
     resize: none;
     box-sizing: content-box;
     border: none;
@@ -45,14 +52,16 @@ export const useDrawText = (CreateSceen: any) => {
       this.ghContainer.removeChildren()
       PIXI.Text.defaultAutoResolution = false
       const text = new PIXI.Text(e.target.value, {
-        fontFamily: 'Arial',
-        fontSize: 24,
+        fontFamily: 'LongCang-Regular',
+        fontSize: fontSize,
         fill: config.context.strokeColor
       })
       text.position = {
         ...point,
         y: point.y - text.height / 2
       }
+      elm.style.width = text.width + 'px'
+      elm.style.height = text.height + 'px'
       this.ghContainer.addChild(text)
     }
     config.drawType = 'select'

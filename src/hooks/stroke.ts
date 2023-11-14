@@ -1,3 +1,4 @@
+import * as PIXI from 'pixi.js'
 import pinia from '@/stores'
 import { type ExtendGraphics } from '@/hooks/drawInstantce'
 import { useConfigStore } from '@/stores/config'
@@ -29,7 +30,9 @@ export const useStroke = () => {
     graphics.lineStyle({
       width: config.context.strokeWidth,
       color: config.context.strokeColor,
-      alpha: config.context.alpha
+      alpha: config.context.alpha,
+      cap: PIXI.LINE_CAP.ROUND,
+      join: PIXI.LINE_JOIN.ROUND
     })
     for (let i = 0; i < (graphics.qcPoints as number[]).length; i+=6) {
       const [x, y, cpX, cpY, toX, toY] = (graphics.qcPoints as number[]).slice(i, i+6)
