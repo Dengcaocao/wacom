@@ -1,5 +1,5 @@
 import * as PIXI from 'pixi.js'
-import { toRaw, type Ref } from 'vue'
+import { toRaw, type Ref, watch } from 'vue'
 import pinia from '@/stores'
 import { useConfigStore } from '@/stores/config'
 import { useFillBgColor } from '@/hooks/fillBgColor'
@@ -173,24 +173,27 @@ export const usePixiApp = () => {
      * @param e 事件对象
      */
     _handleWheel (e: WheelEvent) {
+      // 输入时禁止滚动
+      const textareaList = document.querySelectorAll('textarea')
+      if (textareaList.length) return
       this.app.stage.x += e.deltaX * -1
-        this.app.stage.y += e.deltaY * -1
-        if (this.app.stage.x >= 0 || this.app.stage.x <= -this.app.screen.width) {
-          this.app.stage.children
-            .slice(1)
-            .forEach(item => {
-              item.x = item.x + this.width / 2 * (e.deltaX < 0 ? 1 : -1)
-            })
-          this.app.stage.x = -this.width
-        }
-        if (this.app.stage.y >= 0 || this.app.stage.y <= -this.app.screen.height) {
-          this.app.stage.children
-            .slice(1)
-            .forEach(item => {
-              item.y = item.y + this.height / 2 * (e.deltaY < 0 ? 1 : -1)
-            })
-          this.app.stage.y = -this.height
-        }
+      this.app.stage.y += e.deltaY * -1
+      if (this.app.stage.x >= 0 || this.app.stage.x <= -this.app.screen.width) {
+        this.app.stage.children
+          .slice(1)
+          .forEach(item => {
+            item.x = item.x + this.width / 2 * (e.deltaX < 0 ? 1 : -1)
+          })
+        this.app.stage.x = -this.width
+      }
+      if (this.app.stage.y >= 0 || this.app.stage.y <= -this.app.screen.height) {
+        this.app.stage.children
+          .slice(1)
+          .forEach(item => {
+            item.y = item.y + this.height / 2 * (e.deltaY < 0 ? 1 : -1)
+          })
+        this.app.stage.y = -this.height
+      }
     }
 
     _handlePointerdown (e: PointerEvent) {
