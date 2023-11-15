@@ -34,11 +34,30 @@ export const useFillBgColor = (CreateSceen: any) => {
     const width = maxX - minX, height = maxY - minY
     const arr = []
     const getRandomNum = () => Math.random() * 8 + 4
+    const baseType: any = {
+      rect: 1,
+      diamond: 1/2,
+      arc: 3/4
+    }
     // 生成线段点
-    for (let i = getRandomNum(); i < width; i+=getRandomNum()) {
-      const y = i / width * height
-      arr.push(minX + i, minY, minX, minY + y)
-      arr.push(maxX - i, maxY, maxX, maxY - y)
+    const base = baseType[config.drawType]
+    const endX = base * width
+    for (let i = width - endX + getRandomNum(); i < width * 2; i+=getRandomNum()) {
+      let options = {
+        x: minX + i,
+        y: minY,
+        toX: minX,
+        toY: minY + i / (width * base) * (height * base)
+      }
+      // if (i > endX) {
+      //   options = {
+      //     x: config.drawType === 'rect' ? minX + endX : options.x,
+      //     y: (i - endX) / (width * base) * (height * base) + options.y,
+      //     toX: minX + (i - endX),
+      //     toY: config.drawType === 'rect' ? maxY : options.toY,
+      //   } 
+      // }
+      arr.push(options.x, options.y, options.toX, options.toY)
     }
     for (let i = 0; i < arr.length; i+=4) {
       const [x, y, toX, toY] = arr.slice(i, i+4)
