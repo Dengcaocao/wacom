@@ -4,6 +4,11 @@ import { useConfigStore } from '@/stores/config'
 
 const config = useConfigStore(pinia)
 
+/**
+ * 获取最值
+ * @param vertex 控制点或顶点信息
+ * @returns 
+ */
 const getMaximum = (vertex: number[]) => {
   // 6 ==> (x, y, cpX, cpY, toX, toY)
   const points = vertex.filter((_, index) => [0, 1].includes(index % 6))
@@ -28,8 +33,6 @@ export const useFillBgColor = (CreateSceen: any) => {
       color: config.context.fillColor,
       alpha: config.context.alpha
     })
-    // BUG 当图形透明时，获取不到bounds
-    
     const { minX, minY, maxX, maxY } = getMaximum(vertex)
     const width = maxX - minX, height = maxY - minY
     const arr = []
@@ -42,21 +45,29 @@ export const useFillBgColor = (CreateSceen: any) => {
     // 生成线段点
     const base = baseType[config.drawType]
     const endX = base * width
-    for (let i = width - endX + getRandomNum(); i < width * 2; i+=getRandomNum()) {
+    // 循环结束值
+    const endValue = 2 * width - (1 - base) * width
+    for (let i = width - endX + getRandomNum(); i < endValue; i+=getRandomNum()) {
       let options = {
         x: minX + i,
         y: minY,
         toX: minX,
-        toY: minY + i / (width * base) * (height * base)
+        toY: minY + i / endX * (height * base)
       }
-      // if (i > endX) {
-      //   options = {
-      //     x: config.drawType === 'rect' ? minX + endX : options.x,
-      //     y: (i - endX) / (width * base) * (height * base) + options.y,
-      //     toX: minX + (i - endX),
-      //     toY: config.drawType === 'rect' ? maxY : options.toY,
-      //   } 
-      // }
+      if (i > endX) {
+        // 溢出图形宽高的距离
+        const benefitX = (i - endX) * base
+        const benefitY = benefitX / endX * (height * base)
+        // 最终计算得到的x 和 toY
+        const finalX = minX + endX + benefitX
+        const finalToY = minY + height * base + benefitY
+        options = {
+          x: finalX > maxX ? maxX : finalX,
+          y: options.y + benefitY,
+          toX: minX + benefitX,
+          toY: finalToY > maxY ? maxY : finalToY
+        } 
+      }
       arr.push(options.x, options.y, options.toX, options.toY)
     }
     for (let i = 0; i < arr.length; i+=4) {
