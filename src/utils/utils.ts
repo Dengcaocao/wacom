@@ -21,7 +21,7 @@ export const createOffsetArr = (num: number, maxOffset = 5) => {
  */
 export const getMaximum = (vertex: number[]) => {
   // 6 ==> (x, y, cpX, cpY, toX, toY)
-  const points = vertex.filter((_, index) => [0, 1].includes(index % 6))
+  const points = vertex.filter((_, index) => [0, 1, 4, 5].includes(index % 6))
   const xArr = points.filter((_, index) => index % 2 === 0)
   const yArr = points.filter((_, index) => index % 2 === 1)
   return {
@@ -29,5 +29,31 @@ export const getMaximum = (vertex: number[]) => {
     minY: Math.min(...yArr),
     maxX: Math.max(...xArr),
     maxY: Math.max(...yArr)
+  }
+}
+
+/**
+ * 根据两点计算返回宽度、高度、倾斜角度和距离
+ * @param p1 
+ * @param p2 
+ * @returns 
+ */
+export const getAngle = (
+  p1: { x: number, y: number },
+  p2: { x: number, y: number }
+) => {
+  const width = p2.x - p1.x, height = p2.y - p1.y
+  // 箭头方向&旋转角度
+  const direction = width < 0 ? -1 : 1
+  const distance = Math.pow(width * width + height * height, 1/2) * direction
+  let angle = Math.atan2(height, width)
+  if (direction === -1) {
+    angle = height < 0 ? -Math.PI + angle : Math.PI + angle
+  }
+  return {
+    width,
+    height,
+    distance,
+    angle
   }
 }
