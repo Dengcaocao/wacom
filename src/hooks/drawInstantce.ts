@@ -1,6 +1,7 @@
 import * as PIXI from 'pixi.js'
 import { toRaw, type Ref } from 'vue'
 import pinia from '@/stores'
+import installInteractiveEvent from '@/event/interactive'
 import { useConfigStore } from '@/stores/config'
 import { useFillBgColor } from '@/hooks/fillBgColor'
 import { useDrawRect } from '@/hooks/drawRect'
@@ -12,13 +13,13 @@ import { useDrawLine } from '@/hooks/drawLine'
 import { useDrawText } from '@/hooks/drawText'
 import { useStroke } from '@/hooks/stroke'
 
-interface IExtendThis {
-  isMove: boolean,
-  startPoint: {
-    x: number
-    y: number
-  }
-}
+// interface IExtendThis {
+//   isMove: boolean,
+//   startPoint: {
+//     x: number
+//     y: number
+//   }
+// }
 
 interface IExtendContainer {
   offsetPoints?: number[]
@@ -46,8 +47,6 @@ export const usePixiApp = () => {
     isDraw: boolean = false
     // 鼠标按下的坐标
     downPoint: { x: number; y: number} = { x: 0, y: 0 }
-    // 鼠标抬起的坐标
-    upPoint: { x: number; y: number} = { x: 0, y: 0 }
     graphics: PIXI.Graphics | undefined
     constructor (container: Ref, width: number, height: number) {
       this.app = new PIXI.Application({
@@ -204,28 +203,7 @@ export const usePixiApp = () => {
       this.app.stage.addChild(this.ghContainer)
       // 保存每个图形的随机偏移点
       this.ghContainer.offsetPoints = []
-      this.ghContainer.on('pointerenter', function (this: PIXI.Container) {
-        this.children.forEach(graphics => graphics.cursor = 'move')
-      })
-      this.ghContainer.on('pointerdown', function (this: PIXI.Container & IExtendThis, e) {
-        e.stopPropagation()
-        this.isMove = true
-        this.startPoint = { x: e.x, y: e.y}
-        _this.ghContainer = this
-      })
-      this.ghContainer.on('pointerup', function (this: PIXI.Container & IExtendThis, e) {
-        e.stopPropagation()
-        this.isMove = false
-        config.drawType = 'select'
-      })
-      this.ghContainer.on('pointermove', function (this: PIXI.Container & IExtendThis, e) {
-        if (!this.isMove) return
-        const mX = e.x - this.startPoint.x,
-              mY = e.y - this.startPoint.y
-        this.startPoint = { x: e.x, y: e.y }
-        this.x += mX
-        this.y += mY
-      })
+      installInteractiveEvent(_this, this.ghContainer)
       if (config.drawType === 'text') {
         (this as any).drawText(this.downPoint)
         return this.isDraw = false
