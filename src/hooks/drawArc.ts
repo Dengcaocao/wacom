@@ -29,8 +29,8 @@ export const useDrawArc = (CreateSceen: any) => {
       Math.abs(width / 2),
       Math.abs(height / 2)
     )
-    stroke(graphics, vertex, this.ghContainer.offsetPoints[index])
     this.fillBgColor(graphics, vertex)
+    stroke(graphics, vertex, this.ghContainer.offsetPoints[index])
     graphics.endFill()
   }
 }
