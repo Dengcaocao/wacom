@@ -1,7 +1,7 @@
 import * as PIXI from 'pixi.js'
 import pinia from '@/stores'
 import { useConfigStore } from '@/stores/config'
-
+import skeleton from '@/actions/skeleton'
 
 interface IExtendThis {
   isMove: boolean,
@@ -22,6 +22,7 @@ export default (_this: any, container: PIXI.Container) => {
     this.isMove = true
     this.startPoint = { x: e.x, y: e.y}
     _this.ghContainer = this
+    skeleton(this)
   })
   container.on('pointerup', function (this: PIXI.Container & IExtendThis, e) {
     e.stopPropagation()
