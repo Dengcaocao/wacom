@@ -23,14 +23,10 @@ export const useDrawDiamond = (CreateSceen: any) => {
       x + width / 2, my, x + width / 4, y + height / 4 * 3, x, y + height / 2,
       x, y + height / 2, x + width / 4, y + height / 4, x + width / 2, y
     ]
-    graphics.drawPolygon([
-      x + width / 2, y,
-      mx, y + height / 2,
-      x + width / 2, my,
-      x, y + height / 2
-    ])
+    graphics.drawPolygon(vertex)
     this.fillBgColor(graphics, vertex)
     stroke(graphics, vertex, this.ghContainer.offsetPoints[index])
+    graphics.hitArea = new PIXI.Polygon(vertex)
     graphics.endFill()
   }
 }

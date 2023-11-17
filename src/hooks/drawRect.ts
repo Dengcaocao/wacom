@@ -24,14 +24,10 @@ export const useDrawRect = (CreateSceen: any) => {
       mx, my, x + width / 2, my, x, my,
       x, my, x, y + height / 2, x, y
     ]
-    graphics.drawPolygon([
-      x, y,
-      mx, y,
-      mx, my,
-      x, my
-    ])
+    graphics.drawPolygon(vertex)
     this.fillBgColor(graphics, vertex)
     stroke(graphics, vertex, this.ghContainer.offsetPoints[index])
+    graphics.hitArea = new PIXI.Polygon(vertex)
     graphics.endFill()
   }
 }

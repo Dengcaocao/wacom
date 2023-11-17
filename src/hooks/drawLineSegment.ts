@@ -48,7 +48,19 @@ export const useDrawLineSegment = (CreateSceen: any) => {
         }
       )
     }
+    const { minX, minY, maxX, maxY } = getMaximum(vertex)
+    // const g2 = new PIXI.Graphics()
+    // this.setGraphicsStyle(g2)
+    // g2.x = x
+    // g2.y = y
+    // g2.rotation = angle
+    // g2.drawPolygon(0, 8, distance, 8, distance, -8, 0, -8)
+    // this.ghContainer.addChild(g2)
     stroke(graphics, vertex, this.ghContainer.offsetPoints[index])
+    // BUG 旋转后区域发生改变
+    graphics.hitArea = new PIXI.Polygon([
+      minX, minY + 8, maxX, maxY + 8, maxX, maxY - 8, minX, minY - 8
+    ])
     graphics.endFill()
   }
 }

@@ -23,14 +23,11 @@ export const useDrawArc = (CreateSceen: any) => {
       mx, y + height / 2, mx, my, x + width / 2, my,
       x + width / 2, my, x, my, x, y + height / 2
     ]
-    graphics.drawEllipse(
-      x + width / 2,
-      y + height / 2,
-      Math.abs(width / 2),
-      Math.abs(height / 2)
-    )
+    const path = [x + width / 2, y + height / 2, Math.abs(width / 2), Math.abs(height / 2)]
+    graphics.drawEllipse(...path)
     this.fillBgColor(graphics, vertex)
     stroke(graphics, vertex, this.ghContainer.offsetPoints[index])
+    graphics.hitArea = new PIXI.Ellipse(...path)
     graphics.endFill()
   }
 }

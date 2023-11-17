@@ -205,7 +205,7 @@ export const usePixiApp = () => {
       // 保存每个图形的随机偏移点
       this.ghContainer.offsetPoints = []
       this.ghContainer.on('pointerenter', function (this: PIXI.Container) {
-        this.children[0].cursor = 'move'
+        this.children.forEach(graphics => graphics.cursor = 'move')
       })
       this.ghContainer.on('pointerdown', function (this: PIXI.Container & IExtendThis, e) {
         e.stopPropagation()
@@ -216,6 +216,7 @@ export const usePixiApp = () => {
       this.ghContainer.on('pointerup', function (this: PIXI.Container & IExtendThis, e) {
         e.stopPropagation()
         this.isMove = false
+        config.drawType = 'select'
       })
       this.ghContainer.on('pointermove', function (this: PIXI.Container & IExtendThis, e) {
         if (!this.isMove) return
@@ -249,7 +250,7 @@ export const usePixiApp = () => {
         line: () => (this as any).drawLineSegment(mX, mY),
         pen: () => (this as any).drawLine(mX, mY)
       }
-      type[config.drawType]()
+      type[config.drawType] && type[config.drawType]()
     }
 
     installEventListener () {
