@@ -13,3 +13,21 @@ export const createOffsetArr = (num: number, maxOffset = 5) => {
     .fill(0)
     .map(createRandomNum)
 }
+
+/**
+ * 获取最值
+ * @param vertex 控制点或顶点信息
+ * @returns 
+ */
+export const getMaximum = (vertex: number[]) => {
+  // 6 ==> (x, y, cpX, cpY, toX, toY)
+  const points = vertex.filter((_, index) => [0, 1].includes(index % 6))
+  const xArr = points.filter((_, index) => index % 2 === 0)
+  const yArr = points.filter((_, index) => index % 2 === 1)
+  return {
+    minX: Math.min(...xArr),
+    minY: Math.min(...yArr),
+    maxX: Math.max(...xArr),
+    maxY: Math.max(...yArr)
+  }
+}
