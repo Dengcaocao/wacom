@@ -158,6 +158,7 @@ export const usePixiApp = () => {
             // 除2是因为createOffsetArr函数返回了2倍
             config.drawInstance.fillBgColor(graphics, qcPoints.slice(0, qcPoints.length / 2))
           }
+          // BUG 会取到骨骼图形，没有qcPoints
           stroke(graphics)
         })
     }
