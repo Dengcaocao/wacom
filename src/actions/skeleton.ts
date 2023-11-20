@@ -1,4 +1,28 @@
 import * as PIXI from 'pixi.js'
+import createDashedTexture from '@/texture/dashed'
+
+/**
+ * 设置鼠标样式
+ * @param graphics 
+ * @param index 
+ * @returns 
+ */
+const setCursor = (graphics: PIXI.Graphics, index: number) => {
+  switch (true) {
+    case [0, 4].includes(index): {
+      return graphics.cursor = 'ew-resize'
+    }
+    case [2, 6].includes(index): {
+      return graphics.cursor = 'ns-resize'
+    }
+    case [1, 5].includes(index): {
+      return graphics.cursor = 'nwse-resize'
+    }
+    case [3, 7].includes(index): {
+      return graphics.cursor = 'nesw-resize'
+    }
+  }
+}
 
 const controlPoint = (
   container: PIXI.Graphics,
@@ -21,6 +45,7 @@ const controlPoint = (
     .forEach((_, index: number) => {
       const child = new PIXI.Graphics()
       container.addChild(child)
+      setCursor(child, index)
       const baseAngle = index % 4 <= 1 ? radian : residueRadian // 1)
       sumRadian += baseAngle
       const r = Math.pow(width * width + height * height, 1/2)
