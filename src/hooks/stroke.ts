@@ -1,6 +1,6 @@
 import * as PIXI from 'pixi.js'
 import pinia from '@/stores'
-import { type ExtendGraphics } from '@/hooks/drawInstantce'
+import { type ExtendGraphics } from '@/types/types'
 import { useConfigStore } from '@/stores/config'
 
 const config = useConfigStore(pinia)

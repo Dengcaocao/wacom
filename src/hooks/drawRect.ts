@@ -1,5 +1,5 @@
 import * as PIXI from 'pixi.js'
-import { type ExtendGraphics } from '@/hooks/drawInstantce'
+import { type ExtendGraphics } from '@/types/types'
 import { useStroke } from '@/hooks/stroke'
 import { createOffsetArr } from '@/utils/utils'
 

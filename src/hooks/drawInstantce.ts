@@ -12,26 +12,7 @@ import { useSetExtremePoint } from '@/hooks/setExtremePoint'
 import { useDrawLine } from '@/hooks/drawLine'
 import { useDrawText } from '@/hooks/drawText'
 import { useStroke } from '@/hooks/stroke'
-
-// interface IExtendThis {
-//   isMove: boolean,
-//   startPoint: {
-//     x: number
-//     y: number
-//   }
-// }
-
-interface IExtendContainer {
-  offsetPoints?: number[]
-}
-
-interface IExtendGraphics {
-  qcPoints?: number[]
-}
-
-export type ExtendContainer = PIXI.Container & IExtendContainer
-
-export type ExtendGraphics = PIXI.Graphics & IExtendGraphics
+import { type ExtendContainer } from '@/types/types'
 
 const config = useConfigStore(pinia)
 const { stroke } = useStroke()
