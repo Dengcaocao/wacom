@@ -54,9 +54,9 @@ export default (pixiContainer: PIXI.Container) => {
   const graphics = new PIXI.Graphics()
   pixiContainer.addChild(graphics)
   graphics.beginFill(0, 0)
-  graphics.lineStyle({
+  graphics.lineTextureStyle({
     width: 1,
-    color: 0x000000
+    texture: createDashedTexture(width, height)
   })
   graphics.position.set(minX + halfWidth, minY + halfHeight)
   graphics.scale.set(1.1)
