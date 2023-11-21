@@ -22,6 +22,11 @@ export default (_this: any, container: PIXI.Container) => {
     this.isMove = false
     config.drawType = 'select'
   })
+  container.on('pointerleave', function (this: ExtendContainer, e) {
+    e.stopPropagation()
+    this.isMove = false
+    config.drawType = 'select'
+  })
   container.on('pointermove', function (this: ExtendContainer, e) {
     if (!this.isMove) return
     const mX = e.x - (this.startPoint as IPoint).x,

@@ -24,6 +24,12 @@ const setCursor = (graphics: PIXI.Graphics, index: number) => {
   }
 }
 
+/**
+ * 创建控制点
+ * @param container 图形装载器
+ * @param width 图形宽度一半
+ * @param height ...
+ */
 const controlPoint = (
   container: PIXI.Graphics,
   width: number,
