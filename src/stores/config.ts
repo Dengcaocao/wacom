@@ -1,54 +1,33 @@
 import { reactive, ref } from 'vue'
 import { defineStore } from 'pinia'
-
-export type IDrawType = 'select' | 'rect' | 'diamond' | 'arc' | 'arrow' | 'line' | 'pen' | 'text' | 'pic'
-export type LineSegmentType = 'none' | 'arrow' | 'lineSegment'
-export interface IContext {
-  bgColor: string
-  strokeColor: string
-  fillColor: string
-  fillStyle: 'fill' | 'line' | 'grid'
-  strokeWidth: 1 | 2 | 4
-  line: 'solid' | 'dashed'
-  lineStyle: 'simple' | 'stroke'
-  extremePoint_left: LineSegmentType
-  extremePoint_right: LineSegmentType
-  horn: 'right' | 'round'
-  alpha: number
-  fontSize: number,
-  [key: string]: any
-}
+import type { IDrawType, IElementStyle } from './types'
 
 export const useConfigStore = defineStore('config', () => {
-
-  // 实例
-  const drawInstance = ref()
-
-  const scale = ref(1)
-
+  // 绘制实例
+  const pixiApp = ref()
+  // 缩放
+  const scale = ref(2)
+  // 是否折叠
   const isCollapsed = ref(true)
-  
+  // 绘制类型
   const drawType = ref<IDrawType>('select')
-  const updateDrawType = (type: IDrawType) => drawType.value = type
-
-  const context = reactive<IContext>({
-    bgColor: '#ffffff',
-    strokeColor: '#000000',
+  // 画布背景
+  const bgColor = ref('#ffffff')
+  // 元素样式
+  const styleConfig = reactive<IElementStyle>({
+    width: 1,
+    color: '#000000',
+    style: 'solid',
+    alpha: 1,
+    type: 'stroke',
     fillColor: 'transparent',
-    fillStyle: 'fill',
-    strokeWidth: 1,
-    line: 'solid',
-    lineStyle: 'simple',
+    fillStyle: 'simple',
     extremePoint_left: 'none',
     extremePoint_right: 'arrow',
-    horn: 'right',
-    alpha: 1,
-    fontSize: 14
+    horn: 'right'
   })
 
-  const upDateContext = (options: object) => {
-    Object.assign(context, options)
-  }
+  const updateDrawType = (type: IDrawType) => drawType.value = type
 
-  return { drawInstance, isCollapsed, drawType, updateDrawType, context, upDateContext }
+  return { pixiApp, scale, isCollapsed, drawType, bgColor, styleConfig, updateDrawType }
 })
