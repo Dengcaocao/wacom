@@ -1,13 +1,14 @@
 <template>
-  <aside class="absolute mobile md:pc" :class="[isCollapsed && 'active']">
-    <section class="top md:shadow-design md:rounded">
+  <aside class="mobile md:pc" :class="[isCollapsed && 'active']">
+    <section class="top">
       <div class="item iconfont icon-weibiaoti544"></div>
       <div class="item iconfont icon-export-img"></div>
+      <div class="item iconfont icon-dongtaitiaosepan md:hidden" @click="isCollapsed = !isCollapsed"></div>
       <div class="item bg-transparent hover:bg-transparent text-base p-0">
         <input-color v-model="context.bgColor" />
       </div>
     </section>
-    <section class="middle w-full">
+    <section class="middle" :class="[isCollapsed && 'active']">
       <config />
     </section>
   </aside>
@@ -29,20 +30,28 @@ const { isCollapsed, context } = toRefs(useConfigStore())
 @layer components {
   .mobile {
     max-height: 70%;
-    @apply w-full overflow-auto rounded-t-lg bottom-0 pt-1 bg-white transition-all translate-y-full
-  }
-  .pc {
-    transform: translate(-100%, 0);
-    @apply w-min h-min overflow-visible top-1.5 left-1.5 rounded-none pt-0 bg-transparent
+    @apply absolute right-1/2 translate-x-1/2 bottom-5 overflow-hidden
+           w-11/12 shadow-design rounded-md p-1 bg-white;
   }
   .mobile.active {
-    @apply translate-y-0
+    @apply overflow-visible
   }
-  .pc.active {
-    @apply translate-x-0
+  .pc {
+    @apply overflow-visible top-1.5 left-1.5 translate-x-0
+           w-min h-min rounded-none p-0 bg-transparent;
   }
   .top {
-    @apply grid items-center grid-flow-col auto-cols-min gap-1 p-1 bg-white
+    @apply relative z-10
+           grid items-center grid-flow-col auto-cols-min gap-1 p-1
+           w-full bg-white
+           md:z-0 md:shadow-design md:rounded;
+  }
+  .middle {
+    @apply absolute bottom-0 z-0 w-full transition-all
+           md:right-80 md:bottom-auto;
+  }
+  .middle.active {
+    @apply bottom-14 md:bottom-auto md:right-0;
   }
   .item {
     @apply p-2 rounded text-base leading-none md:text-xl md:leading-none cursor-pointer bg-theme-color hover:bg-theme-color-deep

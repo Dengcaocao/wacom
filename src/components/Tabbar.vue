@@ -71,7 +71,9 @@ const handleDrawType = (type: IDrawType) => {
 @layer components {
   .header {
     transform: translateX(-50%);
-    @apply absolute top-1.5 left-1/2 grid grid-flow-col auto-cols-min gap-1 p-1 rounded shadow-design bg-white
+    @apply absolute top-1.5 left-1/2 z-10
+           grid grid-flow-col auto-cols-min gap-1
+           p-1 rounded shadow-design bg-white;
   }
   .item {
     @apply text-base leading-none md:text-xl md:leading-none p-2 rounded cursor-pointer bg-theme-color hover:bg-theme-color-deep
