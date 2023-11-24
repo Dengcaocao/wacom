@@ -9,24 +9,22 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref, watch } from 'vue'
+import { onMounted, ref } from 'vue'
 import { useConfigStore } from '@/stores/config'
-import { usePixiApp } from '@/hooks/drawInstantce'
 import Tabbar from '@/components/Tabbar.vue'
 import Side from '@/components/Side.vue'
+import Application from '@/actions/application'
 
 const configStore = useConfigStore()
 
-const { CreateSceen } = usePixiApp()
-
 const container = ref<HTMLElement>()
-
-watch(configStore.context, () => {
-  configStore.drawInstance.reRenderer()
-})
  
 onMounted(() => {
-  const sceen = new CreateSceen(container, window.innerWidth, window.innerHeight)
-  configStore.drawInstance = sceen
+  configStore.pixiApp = new Application({
+    width: window.innerWidth,
+    height: window.innerHeight,
+    styleConfig: configStore.styleConfig,
+    dom: container.value as HTMLElement
+  })
 })
 </script>

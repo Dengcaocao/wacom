@@ -2,11 +2,11 @@
   <main class="w-full bg-white p-2 md:mt-4 shadow-design rounded">
     <div class="item">
       <h3 class="title mt-0">描边</h3>
-      <input-color v-model="context.strokeColor" />
+      <input-color v-model="styleConfig.color" />
     </div>
     <div class="item" v-if="['rect', 'diamond', 'arc'].includes(drawType)">
       <h3 class="title">背景</h3>
-      <input-color v-model="context.fillColor" />
+      <input-color v-model="styleConfig.fillColor" />
     </div>
     <template v-for="item in configList" :key="item.model">
       <div class="item" v-if="!item.display || item.display.includes(drawType)">
@@ -18,9 +18,9 @@
             :for="item.model + index"
             :title="radioItem.title"
             class="label"
-            :class="context[item.model] === radioItem.type && 'active'">
+            :class="styleConfig[item.model] === radioItem.type && 'active'">
             <input
-              v-model="context[item.model]"
+              v-model="styleConfig[item.model]"
               type="radio"
               :value="radioItem.type"
               :name="item.model"
@@ -33,7 +33,7 @@
     </template>
     <div class="item">
       <h3 class="title">透明度</h3>
-      <input v-model="context.alpha" step="0.1" type="range" min="0" max="1" class="w-10/12">
+      <input v-model="styleConfig.alpha" step="0.1" type="range" min="0" max="1" class="w-10/12">
     </div>
     <div class="item">
       <h3 class="title">操作</h3>
@@ -50,7 +50,7 @@ import { reactive, toRefs } from 'vue'
 import { useConfigStore } from '@/stores/config'
 import InputColor from '@/components/InputColor.vue'
 
-const { drawInstance, drawType, context } = toRefs(useConfigStore())
+const { pixiApp, drawType, styleConfig } = toRefs(useConfigStore())
 
 const configList = reactive([
   {
@@ -60,7 +60,7 @@ const configList = reactive([
     radioGroup: [
       {
         title: '实心',
-        type: 'fill',
+        type: 'simple',
         classes: 'icon-yuanjiaochangfangxing'
       },
       {
@@ -77,7 +77,7 @@ const configList = reactive([
   },
   {
     title: '描边宽度',
-    model: 'strokeWidth',
+    model: 'width',
     radioGroup: [
       {
         title: '细',
@@ -98,7 +98,7 @@ const configList = reactive([
   },
   {
     title: '描边样式',
-    model: 'line',
+    model: 'style',
     radioGroup: [
       {
         title: '实线',
@@ -114,7 +114,7 @@ const configList = reactive([
   },
   {
     title: '线条风格',
-    model: 'lineStyle',
+    model: 'type',
     display: ['rect', 'diamond', 'arc', 'arrow', 'line'],
     radioGroup: [
       {
@@ -146,7 +146,7 @@ const configList = reactive([
       },
       {
         title: '线段',
-        type: 'lineSegment',
+        type: 'line',
         classes: 'icon-icon_07'
       }
     ]
@@ -168,7 +168,7 @@ const configList = reactive([
       },
       {
         title: '线段',
-        type: 'lineSegment',
+        type: 'line',
         classes: 'icon-icon_-1'
       }
     ]
@@ -193,11 +193,11 @@ const configList = reactive([
 ])
 
 const handleCopy = () => {
-  drawInstance.value.copy()
+  pixiApp.value.copy()
 }
 
 const handleDel = () => {
-  drawInstance.value.delGraphics()
+  pixiApp.value.delGraphics()
 }
 </script>
 

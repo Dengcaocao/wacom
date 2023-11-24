@@ -12,7 +12,8 @@
 
 <script setup lang="ts">
 import { reactive, watch } from 'vue'
-import { useConfigStore, type IDrawType } from '@/stores/config'
+import type { IDrawType } from '@/stores/types'
+import { useConfigStore } from '@/stores/config'
 
 const configStore = useConfigStore()
 
@@ -35,15 +36,15 @@ const icons = reactive([
   },
   {
     name: 'icon-xiangshangjiantoucuxiao',
-    action: 'arrow'
+    action: 'mark'
   },
   {
     name: 'icon-xian',
-    action: 'line'
+    action: 'straightLine'
   },
   {
     name: 'icon-Icon_huabi',
-    action: 'pen'
+    action: 'paintingBrush'
   },
   {
     name: 'icon-ziti',
@@ -51,7 +52,7 @@ const icons = reactive([
   },
   {
     name: 'icon-tupian',
-    action: 'pic'
+    action: 'image'
   }
 ])
 
@@ -59,9 +60,7 @@ watch(() => configStore.drawType, (value) => {
   document.body.style.cursor = value === 'select' ? 'default' : 'crosshair'
 })
 
-const handleDrawType = (type: IDrawType) => {
-  configStore.updateDrawType(type)
-}
+const handleDrawType = (type: IDrawType) => configStore.updateDrawType(type)
 </script>
 
 <style scoped>

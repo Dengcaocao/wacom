@@ -5,7 +5,7 @@
       <div class="item iconfont icon-export-img"></div>
       <div class="item iconfont icon-dongtaitiaosepan md:hidden" @click="isCollapsed = !isCollapsed"></div>
       <div class="item bg-transparent hover:bg-transparent text-base p-0">
-        <input-color v-model="context.bgColor" />
+        <input-color v-model="bgColor" />
       </div>
     </section>
     <section class="middle" :class="[isCollapsed && 'active']">
@@ -20,7 +20,7 @@ import { useConfigStore } from '@/stores/config'
 import InputColor from '@/components/InputColor.vue'
 import Config from './Config.vue'
 
-const { isCollapsed, context } = toRefs(useConfigStore())
+const { isCollapsed, bgColor } = toRefs(useConfigStore())
 </script>
 
 <style scoped>
