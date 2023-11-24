@@ -1,7 +1,13 @@
 import * as PIXI from 'pixi.js'
 import Rect from './rect'
 import createDashedTexture from '@/texture/dashed'
-import type { ExtendContainer } from '@/actions/types'
+import installControlElmEvent from '@/event/controlElmEvent'
+import type { ExtendContainer, ExtendGraphics } from '@/actions/types'
+
+// 绘制选中效果的间隙大小
+const gapSize = 12
+// 控制点的大小
+const controlSize = 8
 
 /**
  * 设置鼠标样式
@@ -32,15 +38,14 @@ const setCursor = (childElm: PIXI.Graphics, index: number) => {
  * @param width 图形宽度一半
  * @param height ...
  */
-const controlPoint = (
-  elm: PIXI.Graphics,
+function controlPoint (
+  this: Selected,
+  elm: ExtendGraphics,
   width: number,
   height: number
-) => {
-  // 操控点大小
-  const size = 8
-  width += size / 2
-  height += size / 2
+) {
+  width += controlSize / 2
+  height += controlSize / 2
   // 原点到顶点的弧度
   const radian = Math.atan(height / width)
   // 剩余的弧度
@@ -48,63 +53,71 @@ const controlPoint = (
   // 从负 radian 开始，没两个切换增加的弧度 1)
   let sumRadian = -radian
   // 绘制操控点
-  new Array(8)
-    .fill(8)
-    .forEach((_, index: number) => {
-      const childElm = new PIXI.Graphics()
-      elm.addChild(childElm)
-      setCursor(childElm, index)
-      const baseAngle = index % 4 <= 1 ? radian : residueRadian // 1)
-      sumRadian += baseAngle
-      const r = Math.pow(width * width + height * height, 1/2)
-      let x = Math.cos(sumRadian) * r
-      let y = Math.sin(sumRadian) * r
-      // 边界值判断
-      if (x < -width || x > width) {
-        x = x < 0 ? -width : width
-      }      
-      if (y < -height || y > height) {
-        y = y < 0 ? -height : height
-      }
-      childElm.position.set(x, y)
-      childElm.beginFill(0xffffff, 0.8)
-      childElm.lineStyle({
-        width: 1,
-        color: 0x000000
-      })
-      childElm.drawRect(-size / 2, -size / 2, size, size)
+  const isNewCreate = !elm.children.length
+  const controlElms = isNewCreate
+    ? new Array(8).fill(8).map(() => new PIXI.Graphics)
+    : elm.children as PIXI.Graphics[]
+  controlElms.forEach((controlElm, index) => {
+    const baseAngle = index % 4 <= 1 ? radian : residueRadian // 1)
+    sumRadian += baseAngle
+    const r = Math.pow(width * width + height * height, 1/2)
+    let x = Math.cos(sumRadian) * r
+    let y = Math.sin(sumRadian) * r
+    // 边界值判断
+    if (x < -width || x > width) {
+      x = x < 0 ? -width : width
+    }      
+    if (y < -height || y > height) {
+      y = y < 0 ? -height : height
+    }
+    if (isNewCreate) {
+      elm.addChild(controlElm)
+      setCursor(controlElm, index)
+      installControlElmEvent.call(this, controlElm)
+    }
+    controlElm.position.set(x, y)
+    controlElm.beginFill(0xffffff, 0.8)
+    controlElm.lineStyle({
+      width: 1,
+      color: 0x000000
     })
+    controlElm.drawRect(-controlSize / 2, -controlSize / 2, controlSize, controlSize)
+  })
 }
 
 class Selected extends Rect {
   drawSelected () {
     const elm = this.container as ExtendContainer
-    const selectedElm = elm.getChildByName('selected') as PIXI.Graphics
-    elm.removeChild(selectedElm)
-    elm.getBounds()
     const main_graphics = elm.getChildByName('main_graphics') as PIXI.Graphics
+    const selectedElm = elm.getChildByName('selected') as PIXI.Graphics
+    const selectedGraphics: ExtendGraphics = selectedElm || new PIXI.Graphics()
     const { minX, minY, maxX, maxY } = main_graphics.geometry.bounds
-    const width = maxX - minX,
-          height = maxY - minY,
+    const width = maxX - minX + gapSize,
+          height = maxY - minY + gapSize,
           halfWidth = width / 2,
           halfHeight = height / 2
-    const selectedGraphics = new PIXI.Graphics()
-    selectedGraphics.name = 'selected'
-    elm.addChild(selectedGraphics)
+    if (!selectedElm) {
+      selectedGraphics.name = 'selected'
+      elm.addChild(selectedGraphics)
+    } else {
+      selectedGraphics.clear()
+    }
     selectedGraphics.beginFill(0, 0)
     selectedGraphics.lineTextureStyle({
       width: 1,
       texture: createDashedTexture(width, height)
     })
-    selectedGraphics.position.set(minX + halfWidth, minY + halfHeight)
-    selectedGraphics.scale.set(1.1)
+    selectedGraphics.position.set(
+      main_graphics.x + minX + halfWidth - gapSize / 2,
+      main_graphics.y + minY + halfHeight - gapSize / 2
+    )
     selectedGraphics.drawPolygon([
       -halfWidth, -halfHeight,
       halfWidth, -halfHeight,
       halfWidth, halfHeight,
       -halfWidth, halfHeight
     ])
-    controlPoint(selectedGraphics, halfWidth, halfHeight)
+    controlPoint.call(this, selectedGraphics, halfWidth, halfHeight)
   }
 }
 

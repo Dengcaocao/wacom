@@ -147,6 +147,7 @@ class Base {
     this.container.removeChildren()
     this.app.stage.addChild(this.container)
     const graphics = new PIXI.Graphics()
+    graphics.cursor = 'move'
     graphics.name = 'main_graphics'
     this.container.addChild(graphics)
     installElmEvent.call(this as any, graphics)
