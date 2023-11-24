@@ -1,5 +1,6 @@
 import * as PIXI from 'pixi.js'
 import Application from '@/actions/application'
+import type { ExtendGraphics } from '@/actions/types'
 
 /**
  * 处理场景滚动
@@ -37,7 +38,7 @@ function handleWheel (this: Application, stage: PIXI.Container, { deltaX, deltaY
 function handlePointerdown (this: Application, { x, y }: MouseEvent) {
   // 绘制之前删除选中效果
   if (this.container) {
-    const selectedElm = this.container.getChildByName('selected') as PIXI.Graphics
+    const selectedElm = this.container.getChildByName('selected') as ExtendGraphics
     this.container.removeChild(selectedElm)
   }
   this.container = undefined

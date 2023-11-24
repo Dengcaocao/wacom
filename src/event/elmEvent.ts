@@ -2,10 +2,6 @@ import * as PIXI from 'pixi.js'
 import Application from '@/actions/application'
 import type { ExtendGraphics, IPoint } from '@/actions/types'
 
-function handlePointerenter (this: ExtendGraphics) {
-  this.cursor = 'move'
-}
-
 function handlePointerdown (
   this: ExtendGraphics,
   rootThis: Application,
@@ -19,15 +15,14 @@ function handlePointerdown (
   if (rootThis.container && this.parent !== rootThis.container) {
     const selectedElm = rootThis.container.getChildByName('selected') as PIXI.Graphics
     rootThis.container.removeChild(selectedElm)
-    rootThis.container = this.parent
-    rootThis.drawSelected()
   }
+  rootThis.container = this.parent
+  rootThis.drawSelected()
   this.isMove = true
   this.startPoint = { x: e.x, y: e.y}
 }
 
-function handleActionEnd (this: ExtendGraphics, e: MouseEvent) {
-  e.stopPropagation()
+function handleActionEnd (this: ExtendGraphics) {
   this.isMove = false
 }
 
@@ -41,7 +36,6 @@ function handlePointermove (this: ExtendGraphics, e: MouseEvent) {
 }
 
 function installElmEvent (this: Application, elm: ExtendGraphics) {
-  elm.on('pointerenter', handlePointerenter)
   elm.on('pointerdown', (e) => {
     handlePointerdown.call(elm, this, e)
   })

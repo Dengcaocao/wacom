@@ -5,7 +5,7 @@ import installControlElmEvent from '@/event/controlElmEvent'
 import type { ExtendContainer, ExtendGraphics } from '@/actions/types'
 
 // 绘制选中效果的间隙大小
-const gapSize = 12
+export const gapSize = 12
 // 控制点的大小
 const controlSize = 8
 
@@ -73,7 +73,7 @@ function controlPoint (
     if (isNewCreate) {
       elm.addChild(controlElm)
       setCursor(controlElm, index)
-      installControlElmEvent.call(this, controlElm)
+      installControlElmEvent.call(this, controlElm, index)
     }
     controlElm.position.set(x, y)
     controlElm.beginFill(0xffffff, 0.8)
