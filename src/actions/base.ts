@@ -83,26 +83,6 @@ class Base {
   }
 
   /**
-   * 初始化元素样式
-   * @param elm 元素
-   * @param config 样式配置
-   */
-  initElementStyle (elm: ExtendGraphics, styleConfig: IElementStyle) {
-    elm.styleConfig = styleConfig
-    const { width, color, alpha, type, fillStyle, fillColor } = styleConfig
-    type === 'simple' && elm.lineStyle({
-      width,
-      color,
-      alpha,
-      cap: PIXI.LINE_CAP.ROUND,
-      join: PIXI.LINE_JOIN.ROUND
-    })
-    fillStyle === 'simple' &&
-    fillColor !== 'transparent' &&
-    elm.beginFill(fillColor, alpha)
-  }
-
-  /**
    * 手绘描边
    * @param elm 元素
    * @param vertex 顶点信息
@@ -112,7 +92,6 @@ class Base {
     elm: ExtendGraphics,
     vertex: number[] = []
   ) {
-    if (elm.styleConfig?.type !== 'stroke') return
     elm.beginFill(0, 0)
     elm.lineStyle({
       ...elm.styleConfig,
@@ -122,33 +101,42 @@ class Base {
     // 记录点位消息
     const index = (this.container as ExtendContainer).getChildIndex(elm)
     const offsetPoints = (this.container as ExtendContainer).offsetPoints || []
-    const qcPoints = offsetPoints[index]
-      .map((item, index) => {
-        const vertexIndex = index % vertex.length
-        return item + vertex[vertexIndex]
-      })
+    const qcPoints = (elm.styleConfig as IElementStyle).type === 'simple'
+      ? vertex
+      : offsetPoints[index]
+        .map((item, index) => {
+          const vertexIndex = index % vertex.length
+          return item + vertex[vertexIndex]
+        })
     elm.qcPoints = qcPoints.length
       ? qcPoints
       : elm.qcPoints
     for (let i = 0; i < (elm.qcPoints as number[]).length; i+=6) {
       const [x, y, cpX, cpY, toX, toY] = (elm.qcPoints as number[]).slice(i, i+6)
       elm.moveTo(x, y)
+      // 都使用贝塞尔曲线能拿到图形上每个点的信息
       elm.quadraticCurveTo(cpX, cpY, toX, toY)
     }
   }
 
   /**
    * 创建一个主元素，并添加事件监听
+   * @param vertex 顶点信息
    * @param maxNum 随机值的最大数
    * @returns 
    */
-  createElement (maxNum: number) {
+  createElement (
+    vertex: number[] = [],
+    maxNum: number
+  ) {
     this.container = this.container || new PIXI.Container()
     this.container.removeChildren()
     this.app.stage.addChild(this.container)
-    const graphics = new PIXI.Graphics()
+    const graphics: ExtendGraphics = new PIXI.Graphics()
     graphics.cursor = 'move'
     graphics.name = 'main_graphics'
+    graphics.styleConfig = this.styleConfig
+    graphics.position.set(this.startPoints.x, this.startPoints.y)
     this.container.addChild(graphics)
     installElmEvent.call(this as any, graphics)
     // 获取图形在容器中位置，并设置随机偏移点
@@ -158,7 +146,61 @@ class Base {
     } else {
       this.container.offsetPoints[index] = this.container.offsetPoints[index] || createOffsetArr(4)
     }
+    this.handDrawStroke(graphics, vertex)
+    this.drawBackground(graphics, vertex)
     return graphics
+  }
+
+  /**
+   * 背景绘制
+   * @param elm 绘制背景的元素
+   * @param vertex 顶点信息
+   * @returns 
+   */
+  drawBackground (elm: ExtendGraphics, vertex: number[] = []) {
+    const { alpha, fillColor, fillStyle } = elm.styleConfig as IElementStyle
+    if (fillColor === 'transparent') return
+    // 绘制背景图形
+    const backgroundElm = new PIXI.Graphics()
+    elm.addChild(backgroundElm)
+    elm.setChildIndex(backgroundElm, elm.children.length - 1)
+    fillStyle === 'simple' && backgroundElm.beginFill(fillColor, alpha)
+    backgroundElm.lineStyle({
+      ...elm.styleConfig,
+      width: 1,
+      color: fillColor,
+      cap: PIXI.LINE_CAP.ROUND,
+      join: PIXI.LINE_JOIN.ROUND
+    })
+    if (fillStyle === 'simple') return backgroundElm.drawPolygon(vertex)
+    backgroundElm.line.alpha = 0
+    for (let i = 0; i < vertex.length; i+=6) {
+      const [x, y, cpX, cpY, toX, toY] = vertex.slice(i, i+6)
+      // 使用贝塞尔曲线绘制获取图形上的每个点
+      backgroundElm.moveTo(x, y)
+      backgroundElm.quadraticCurveTo(cpX, cpY, toX, toY)
+    }
+    // 调用后才能获取到points
+    backgroundElm.getBounds()
+    const points = backgroundElm.geometry.points
+    let arr: number[][] = []
+    for (let i = 0; i < points.length; i += 2) {
+      arr.push([points[i], points[i + 1]])
+    }
+    if (fillStyle === 'grid') {
+      // 添加反向绘制
+      const count = arr.length / 4
+      const left = [...arr.slice(0, count).reverse(), ...arr.slice(-count)]
+      const right = [...arr.slice(count * 2, -count), ...arr.slice(count, count * 2).reverse()]
+      arr = [...arr.slice(0, count * 2), ...left, ...right, ...arr.slice(-count * 2)]
+    }
+    backgroundElm.line.alpha = alpha
+    for (let i = 0; i < arr.length/2; i++) {
+      const [x, y] = arr[i]
+      const [toX, toY] = arr[arr.length - 1 - i]
+      backgroundElm.moveTo(x, y)
+      backgroundElm.lineTo(toX, toY)
+    }
   }
 }
 

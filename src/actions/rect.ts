@@ -11,11 +11,7 @@ class Rect extends Base {
       w, h, w / 2, h, 0, h,
       0, h, 0, h / 2, 0, 0
     ]
-    const rectElm = this.createElement(4)
-    rectElm.position.set(x, y)
-    this.initElementStyle(rectElm, this.styleConfig)
-    rectElm.drawPolygon(vertex)
-    this.handDrawStroke(rectElm, vertex)
+    const rectElm = this.createElement(vertex, 4)
     rectElm.hitArea = new Polygon(vertex)
   }
 }
