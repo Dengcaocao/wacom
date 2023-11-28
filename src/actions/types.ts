@@ -26,3 +26,12 @@ export type ExtendContainer = PIXI.Container & IExtendAttribute
 
 export type ExtendGraphics = PIXI.Graphics & IExtendAttribute
 
+export interface IExtremePoint {
+  elm: ExtendGraphics
+  type: string
+  point: IPoint
+  direction: string
+  angle: number
+  distance: number
+}
+

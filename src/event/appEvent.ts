@@ -54,7 +54,9 @@ function handlePointermove (this: Application, { x, y }: MouseEvent) {
   const methods: any = {
     rect: this.drawRect.bind(this),
     diamond: this.drawDiamond.bind(this),
-    arc: this.drawArc.bind(this)
+    arc: this.drawArc.bind(this),
+    mark: this.drawMark.bind(this),
+    straightLine: this.drawMark.bind(this)
   }
   methods[type](point.x, point.y)
 }

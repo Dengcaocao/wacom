@@ -132,7 +132,7 @@ const configList = reactive([
   {
     title: '端点左',
     model: 'extremePoint_left',
-    display: ['arrow'],
+    display: ['mark'],
     radioGroup: [
       {
         title: '无',
@@ -154,7 +154,7 @@ const configList = reactive([
   {
     title: '端点右',
     model: 'extremePoint_right',
-    display: ['arrow'],
+    display: ['mark'],
     radioGroup: [
       {
         title: '无',

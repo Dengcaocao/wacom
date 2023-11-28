@@ -84,28 +84,29 @@ class Base {
 
   /**
    * 手绘描边
-   * @param elm 元素
+   * @param elm 描边元素
+   * @param index 控制点索引
    * @param vertex 顶点信息
    * @returns 
    */
-  handDrawStroke (
+  drawStroke (
     elm: ExtendGraphics,
+    index: number,
     vertex: number[] = []
   ) {
     elm.beginFill(0, 0)
     elm.lineStyle({
-      ...elm.styleConfig,
+      ...this.styleConfig,
       cap: PIXI.LINE_CAP.ROUND,
       join: PIXI.LINE_JOIN.ROUND
     })
-    const { drawType, type } = elm.styleConfig as IElementStyle
+    const { drawType, type } = this.styleConfig as IElementStyle
     if (drawType === 'arc' && type === 'simple' ) {
       return
     }
     // 记录点位消息
-    const index = (this.container as ExtendContainer).getChildIndex(elm)
     const offsetPoints = (this.container as ExtendContainer).offsetPoints || []
-    const qcPoints = (elm.styleConfig as IElementStyle).type === 'simple'
+    const qcPoints = (this.styleConfig as IElementStyle).type === 'simple'
       ? vertex
       : offsetPoints[index]
         .map((item, index) => {
@@ -150,7 +151,7 @@ class Base {
     } else {
       this.container.offsetPoints[index] = this.container.offsetPoints[index] || createOffsetArr(4)
     }
-    this.handDrawStroke(graphics, vertex)
+    this.drawStroke(graphics, index, vertex,)
     this.drawBackground(graphics, vertex)
     return graphics
   }
