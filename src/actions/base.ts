@@ -98,6 +98,10 @@ class Base {
       cap: PIXI.LINE_CAP.ROUND,
       join: PIXI.LINE_JOIN.ROUND
     })
+    const { drawType, type } = elm.styleConfig as IElementStyle
+    if (drawType === 'arc' && type === 'simple' ) {
+      return
+    }
     // 记录点位消息
     const index = (this.container as ExtendContainer).getChildIndex(elm)
     const offsetPoints = (this.container as ExtendContainer).offsetPoints || []
@@ -158,13 +162,13 @@ class Base {
    * @returns 
    */
   drawBackground (elm: ExtendGraphics, vertex: number[] = []) {
-    const { alpha, fillColor, fillStyle } = elm.styleConfig as IElementStyle
+    const { drawType ,alpha, fillColor, fillStyle } = elm.styleConfig as IElementStyle
     if (fillColor === 'transparent') return
     // 绘制背景图形
     const backgroundElm = new PIXI.Graphics()
+    backgroundElm.name = 'background_elm'
     elm.addChild(backgroundElm)
     elm.setChildIndex(backgroundElm, elm.children.length - 1)
-    fillStyle === 'simple' && backgroundElm.beginFill(fillColor, alpha)
     backgroundElm.lineStyle({
       ...elm.styleConfig,
       width: 1,
@@ -172,7 +176,11 @@ class Base {
       cap: PIXI.LINE_CAP.ROUND,
       join: PIXI.LINE_JOIN.ROUND
     })
-    if (fillStyle === 'simple') return backgroundElm.drawPolygon(vertex)
+    if (fillStyle === 'simple') {
+      backgroundElm.beginFill(fillColor, alpha)
+      drawType !== 'arc' && backgroundElm.drawPolygon(vertex) 
+      return
+    }
     backgroundElm.line.alpha = 0
     for (let i = 0; i < vertex.length; i+=6) {
       const [x, y, cpX, cpY, toX, toY] = vertex.slice(i, i+6)

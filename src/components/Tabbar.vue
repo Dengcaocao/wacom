@@ -5,7 +5,7 @@
       :key="icon.name"
       class="item iconfont"
       :class="[icon.name, icon.action === configStore.drawType && 'active']"
-      @click="handleDrawType(icon.action as IDrawType)">
+      @click="handleUpdateDrawType(icon.action as IDrawType)">
     </span>
   </header>
 </template>
@@ -60,7 +60,7 @@ watch(() => configStore.drawType, (value) => {
   document.body.style.cursor = value === 'select' ? 'default' : 'crosshair'
 })
 
-const handleDrawType = (type: IDrawType) => configStore.updateDrawType(type)
+const handleUpdateDrawType = (type: IDrawType) => configStore.drawType = type
 </script>
 
 <style scoped>

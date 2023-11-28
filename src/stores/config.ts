@@ -27,7 +27,5 @@ export const useConfigStore = defineStore('config', () => {
     horn: 'right'
   })
 
-  const updateDrawType = (type: IDrawType) => drawType.value = type
-
-  return { pixiApp, scale, isCollapsed, drawType, bgColor, styleConfig, updateDrawType }
+  return { pixiApp, scale, isCollapsed, drawType, bgColor, styleConfig }
 })

@@ -49,8 +49,14 @@ function handlePointerdown (this: Application, { x, y }: MouseEvent) {
 // 开始绘制
 function handlePointermove (this: Application, { x, y }: MouseEvent) {
   if (!this.isDraw) return
+  const type = this.styleConfig.drawType
   const point = this.getMappingPoints(x, y)
-  this.drawRect(point.x, point.y)
+  const methods: any = {
+    rect: this.drawRect.bind(this),
+    diamond: this.drawDiamond.bind(this),
+    arc: this.drawArc.bind(this)
+  }
+  methods[type](point.x, point.y)
 }
 
 // 结束绘制

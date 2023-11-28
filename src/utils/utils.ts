@@ -3,7 +3,7 @@
  * @param num 边的数量
  * @param maxOffset 最大偏移量
  */
-export const createOffsetArr = (num: number, maxOffset = 5) => {
+export const createOffsetArr = (num: number, maxOffset = 3) => {
   /**
    * 一条线由开始点(x,y)、移动点(x,y)和控制点(x,y)组成，共6个
    */
