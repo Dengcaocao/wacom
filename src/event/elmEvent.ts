@@ -1,9 +1,9 @@
 import * as PIXI from 'pixi.js'
 import Application from '@/actions/application'
-import type { ExtendGraphics, ExtendText, IPoint } from '@/actions/types'
+import type { IPoint, MainElm } from '@/actions/types'
 
 function handlePointerdown (
-  this: ExtendGraphics | ExtendText,
+  this: MainElm,
   rootThis: Application,
   e: MouseEvent
 ) {
@@ -22,11 +22,11 @@ function handlePointerdown (
   this.startPoint = { x: e.x, y: e.y}
 }
 
-function handleActionEnd (this: ExtendGraphics | ExtendText) {
+function handleActionEnd (this: MainElm) {
   this.isMove = false
 }
 
-function handlePointermove (this: ExtendGraphics | ExtendText, e: MouseEvent) {
+function handlePointermove (this: MainElm, e: MouseEvent) {
   if (!this.isMove) return
   const mX = e.x - (this.startPoint as IPoint).x,
         mY = e.y - (this.startPoint as IPoint).y
@@ -35,7 +35,7 @@ function handlePointermove (this: ExtendGraphics | ExtendText, e: MouseEvent) {
   this.parent.y += mY
 }
 
-function installElmEvent (this: Application, elm: ExtendGraphics | ExtendText) {
+function installElmEvent (this: Application, elm: MainElm) {
   elm.on('pointerdown', (e) => {
     handlePointerdown.call(elm, this, e)
   })

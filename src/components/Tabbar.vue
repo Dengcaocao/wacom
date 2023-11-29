@@ -11,7 +11,7 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, watch } from 'vue'
+import { reactive, toRaw, watch } from 'vue'
 import type { IDrawType } from '@/stores/types'
 import { useConfigStore } from '@/stores/config'
 
@@ -60,7 +60,21 @@ watch(() => configStore.drawType, (value) => {
   document.body.style.cursor = value === 'select' ? 'default' : 'crosshair'
 })
 
-const handleUpdateDrawType = (type: IDrawType) => configStore.drawType = type
+const handleUpdateDrawType = (type: IDrawType) => {
+  configStore.drawType = type
+  if (type === 'image') {
+    const inputElm = document.createElement('input')
+    inputElm.setAttribute('type', 'file')
+    inputElm.setAttribute('multiple', 'false')
+    inputElm.onchange = () => {
+      const file = (inputElm.files as FileList)[0]
+      const url = URL.createObjectURL(file)
+      const pixiApp = toRaw(configStore.pixiApp)
+      pixiApp.drawImage(url)
+    }
+    inputElm.click()
+  }
+}
 </script>
 
 <style scoped>

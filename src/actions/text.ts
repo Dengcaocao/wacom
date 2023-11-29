@@ -64,7 +64,7 @@ class Text extends Mark {
       y: point.y - text.height / 2
     }
     this.container.addChild(text)
-    installElmEvent.call(this, text)
+    installElmEvent.call(this as any, text)
     elm.oninput = (e: any) => {
       text.text = e.target.value
       elm.style.width = text.width + 'px'

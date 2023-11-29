@@ -28,6 +28,8 @@ export type ExtendGraphics = PIXI.Graphics & IExtendAttribute
 
 export type ExtendText = PIXI.Text & IExtendAttribute
 
+export type ExtendSprite = PIXI.Sprite & IExtendAttribute
+
 export interface IExtremePoint {
   elm: ExtendGraphics
   type: string
@@ -37,3 +39,4 @@ export interface IExtremePoint {
   distance: number
 }
 
+export type MainElm = ExtendGraphics | ExtendText | ExtendSprite

@@ -43,6 +43,7 @@ function handlePointerdown (this: Application, { x, y }: MouseEvent) {
     this.container = undefined
   }
   this.startPoints = this.getMappingPoints(x, y)
+  if (this.styleConfig.drawType === 'image') return
   if (this.styleConfig.drawType === 'text') return this.drawText(this.startPoints)
   this.isDraw = true
 }
@@ -65,7 +66,7 @@ function handlePointermove (this: Application, { x, y }: MouseEvent) {
 
 // 结束绘制
 function handleDrawEnd (this: Application) {
-  if (this.styleConfig.drawType !== 'text' && this.container) {
+  if (!['text', 'image'].includes(this.styleConfig.drawType) && this.container) {
     this.drawSelected()
   }
   this.isDraw = false

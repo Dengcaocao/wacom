@@ -2,7 +2,7 @@ import * as PIXI from 'pixi.js'
 import Rect from './rect'
 import createDashedTexture from '@/texture/dashed'
 import installControlElmEvent from '@/event/controlElmEvent'
-import type { ExtendContainer, ExtendGraphics } from '@/actions/types'
+import type { ExtendContainer, ExtendGraphics, ExtendSprite, ExtendText, MainElm } from '@/actions/types'
 
 // 绘制选中效果的间隙大小
 export const gapSize = 12
@@ -15,7 +15,7 @@ const controlSize = 8
  * @param index 
  * @returns 
  */
-const setCursor = (childElm: PIXI.Graphics, index: number) => {
+const setCursor = (childElm: ExtendGraphics, index: number) => {
   switch (true) {
     case [0, 4].includes(index): {
       return childElm.cursor = 'ew-resize'
@@ -85,23 +85,55 @@ function controlPoint (
   })
 }
 
+/**
+ * 获取主图的最值
+ * @param mainElm 主图元素
+ * @returns 
+ */
+const getMaximum = (mainElm: MainElm) => {
+  switch (mainElm.name) {
+    case 'main_graphics': {
+      return (mainElm as ExtendGraphics).geometry.bounds
+    }
+
+    case 'main_text': {
+      return {
+        minX: 0, minY: 0,
+        maxX: (mainElm as ExtendText).width,
+        maxY: (mainElm as ExtendText).height
+      }
+    }
+
+    case 'main_sprite': {
+      return {
+        minX: 0, minY: 0,
+        maxX: (mainElm as ExtendSprite).width,
+        maxY: (mainElm as ExtendSprite).height
+      }
+    }
+
+    default: {
+      return (mainElm as ExtendGraphics).geometry.bounds
+    }
+  }
+}
+
 class Selected extends Rect {
   drawSelected () {
-    const elm = this.container as ExtendContainer
-    const main_graphics = elm.getChildByName('main_graphics') as PIXI.Graphics
-    const main_text = elm.getChildByName('main_text') as PIXI.Text
-    const selectedElm = elm.getChildByName('selected') as PIXI.Graphics
+    const containerElm = this.container as ExtendContainer
+    // 获取容器中的主图形
+    const mainElm = containerElm.children
+      .filter(item => item.name && /^main/.test(item.name))[0] as MainElm    
+    const selectedElm = containerElm.getChildByName('selected') as ExtendGraphics
     const selectedGraphics: ExtendGraphics = selectedElm || new PIXI.Graphics()
-    const { minX, minY, maxX, maxY } = main_graphics
-      ? main_graphics.geometry.bounds
-      : { minX: 0, minY: 0, maxX: main_text.width, maxY: main_text.height }
+    const { minX, minY, maxX, maxY } = getMaximum(mainElm)
     const width = maxX - minX + gapSize,
           height = maxY - minY + gapSize,
           halfWidth = width / 2,
           halfHeight = height / 2
     if (!selectedElm) {
       selectedGraphics.name = 'selected'
-      elm.addChild(selectedGraphics)
+      containerElm.addChild(selectedGraphics)
     } else {
       selectedGraphics.clear()
     }
@@ -111,8 +143,8 @@ class Selected extends Rect {
       texture: createDashedTexture(width, height)
     })
     selectedGraphics.position.set(
-      (main_graphics ? main_graphics.x : main_text.x) + minX + halfWidth - gapSize / 2,
-      (main_graphics ? main_graphics.y : main_text.y) + minY + halfHeight - gapSize / 2
+      mainElm.x + minX + halfWidth - gapSize / 2,
+      mainElm.y + minY + halfHeight - gapSize / 2
     )
     selectedGraphics.drawPolygon([
       -halfWidth, -halfHeight,
