@@ -3,6 +3,7 @@ import Rect from './rect'
 import createDashedTexture from '@/texture/dashed'
 import installControlElmEvent from '@/event/controlElmEvent'
 import type { ExtendContainer, ExtendGraphics } from '@/actions/types'
+import { getMaximum } from '@/utils/utils'
 
 // 绘制选中效果的间隙大小
 export const gapSize = 12
@@ -73,7 +74,7 @@ function controlPoint (
     if (isNewCreate) {
       elm.addChild(controlElm)
       setCursor(controlElm, index)
-      installControlElmEvent.call(this, controlElm, index)
+      installControlElmEvent.call(this as any, controlElm, index)
     }
     controlElm.position.set(x, y)
     controlElm.beginFill(0xffffff, 0.8)
@@ -89,9 +90,12 @@ class Selected extends Rect {
   drawSelected () {
     const elm = this.container as ExtendContainer
     const main_graphics = elm.getChildByName('main_graphics') as PIXI.Graphics
+    const main_text = elm.getChildByName('main_text') as PIXI.Text
     const selectedElm = elm.getChildByName('selected') as PIXI.Graphics
     const selectedGraphics: ExtendGraphics = selectedElm || new PIXI.Graphics()
-    const { minX, minY, maxX, maxY } = main_graphics.geometry.bounds
+    const { minX, minY, maxX, maxY } = main_graphics
+      ? main_graphics.geometry.bounds
+      : { minX: 0, minY: 0, maxX: main_text.width, maxY: main_text.height }
     const width = maxX - minX + gapSize,
           height = maxY - minY + gapSize,
           halfWidth = width / 2,
@@ -108,8 +112,8 @@ class Selected extends Rect {
       texture: createDashedTexture(width, height)
     })
     selectedGraphics.position.set(
-      main_graphics.x + minX + halfWidth - gapSize / 2,
-      main_graphics.y + minY + halfHeight - gapSize / 2
+      (main_graphics ? main_graphics.x : main_text.x) + minX + halfWidth - gapSize / 2,
+      (main_graphics ? main_graphics.y : main_text.y) + minY + halfHeight - gapSize / 2
     )
     selectedGraphics.drawPolygon([
       -halfWidth, -halfHeight,

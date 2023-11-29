@@ -26,6 +26,8 @@ export type ExtendContainer = PIXI.Container & IExtendAttribute
 
 export type ExtendGraphics = PIXI.Graphics & IExtendAttribute
 
+export type ExtendText = PIXI.Text & IExtendAttribute
+
 export interface IExtremePoint {
   elm: ExtendGraphics
   type: string

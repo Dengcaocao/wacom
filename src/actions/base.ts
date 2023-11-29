@@ -6,6 +6,7 @@ import type { IElementStyle } from '@/stores/types'
 
 class Base {
   app: PIXI.Application
+  dom: HTMLElement
   scale: number
   // 样式配置对象
   styleConfig: IElementStyle
@@ -20,6 +21,7 @@ class Base {
       antialias: true,
       eventMode: 'static'
     })
+    this.dom = dom
     this.scale = this.app.screen.width / width
     this.styleConfig = styleConfig
     this.initCanvasSize(width, height)

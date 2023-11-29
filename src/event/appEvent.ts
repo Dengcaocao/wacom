@@ -40,10 +40,11 @@ function handlePointerdown (this: Application, { x, y }: MouseEvent) {
   if (this.container) {
     const selectedElm = this.container.getChildByName('selected') as ExtendGraphics
     this.container.removeChild(selectedElm)
+    this.container = undefined
   }
-  this.container = undefined
-  this.isDraw = true
   this.startPoints = this.getMappingPoints(x, y)
+  if (this.styleConfig.drawType === 'text') return this.drawText(this.startPoints)
+  this.isDraw = true
 }
 
 // 开始绘制
@@ -63,7 +64,9 @@ function handlePointermove (this: Application, { x, y }: MouseEvent) {
 
 // 结束绘制
 function handleDrawEnd (this: Application) {
-  this.container && this.drawSelected()
+  if (this.styleConfig.drawType !== 'text' && this.container) {
+    this.drawSelected()
+  }
   this.isDraw = false
 }
 
