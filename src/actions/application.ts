@@ -1,4 +1,4 @@
-import CompleteApp from './text'
+import CompleteApp from './draw'
 import installAppEvent from '@/event/appEvent'
 import type { IBaseParams } from './types'
 

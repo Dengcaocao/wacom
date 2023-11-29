@@ -103,6 +103,7 @@ class Base {
       join: PIXI.LINE_JOIN.ROUND
     })
     const { drawType, type } = this.styleConfig as IElementStyle
+    if (drawType === 'paintingBrush') return
     if (drawType === 'arc' && type === 'simple' ) {
       return
     }
@@ -153,7 +154,7 @@ class Base {
     } else {
       this.container.offsetPoints[index] = this.container.offsetPoints[index] || createOffsetArr(4)
     }
-    this.drawStroke(graphics, index, vertex,)
+    this.drawStroke(graphics, index, vertex)
     this.drawBackground(graphics, vertex)
     return graphics
   }
