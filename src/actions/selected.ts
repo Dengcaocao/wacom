@@ -3,7 +3,6 @@ import Rect from './rect'
 import createDashedTexture from '@/texture/dashed'
 import installControlElmEvent from '@/event/controlElmEvent'
 import type { ExtendContainer, ExtendGraphics } from '@/actions/types'
-import { getMaximum } from '@/utils/utils'
 
 // 绘制选中效果的间隙大小
 export const gapSize = 12
