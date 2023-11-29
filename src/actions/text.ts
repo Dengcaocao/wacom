@@ -55,18 +55,19 @@ class Text extends Mark {
     const text: ExtendText = new PIXI.Text('', {
       fontFamily: 'LongCang-Regular',
       fontSize: fontSize,
+      lineHeight: fontSize,
       fill: this.styleConfig.color
     })
     text.name = 'main_text'
     text.styleConfig = this.styleConfig
-    text.position = {
-      ...point,
-      y: point.y - text.height / 2
-    }
     this.container.addChild(text)
     installElmEvent.call(this as any, text)
     elm.oninput = (e: any) => {
       text.text = e.target.value
+      text.position = {
+        ...point,
+        y: point.y - text.height / 2
+      }
       elm.style.width = text.width + 'px'
       elm.style.height = text.height + 'px'
     }
