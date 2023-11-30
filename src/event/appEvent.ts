@@ -1,6 +1,11 @@
 import * as PIXI from 'pixi.js'
 import Application from '@/actions/application'
+import Pinia from '@/stores/index'
+import { useConfigStore } from '@/stores/config'
 import type { ExtendGraphics } from '@/actions/types'
+import { toRefs } from 'vue'
+
+const { drawType } = toRefs(useConfigStore(Pinia))
 
 /**
  * 处理场景滚动
@@ -61,15 +66,16 @@ function handlePointermove (this: Application, { x, y }: MouseEvent) {
     straightLine: this.drawMark.bind(this),
     paintingBrush: this.paintingBrush.bind(this)
   }
-  methods[type](point.x, point.y)
+  methods[type] && methods[type](point.x, point.y)
 }
 
 // 结束绘制
 function handleDrawEnd (this: Application) {
-  if (!['text', 'image'].includes(this.styleConfig.drawType) && this.container) {
+  if (!['paintingBrush', 'text', 'image'].includes(this.styleConfig.drawType) && this.container) {
     this.drawSelected()
   }
   this.isDraw = false
+  drawType.value = 'select'
 }
 
 function installAppEvent (this: Application, stage: PIXI.Container) {

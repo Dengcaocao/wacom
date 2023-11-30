@@ -123,7 +123,7 @@ class Selected extends Rect {
     const containerElm = this.container as ExtendContainer
     // 获取容器中的主图形
     const mainElm = containerElm.children
-      .filter(item => item.name && /^main/.test(item.name))[0] as MainElm    
+      .filter(item => item.name && /^main/.test(item.name))[0] as MainElm
     const selectedElm = containerElm.getChildByName('selected') as ExtendGraphics
     const selectedGraphics: ExtendGraphics = selectedElm || new PIXI.Graphics()
     const { minX, minY, maxX, maxY } = getMaximum(mainElm)

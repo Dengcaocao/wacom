@@ -142,7 +142,7 @@ class Base {
     this.app.stage.addChild(this.container)
     const graphics: ExtendGraphics = new PIXI.Graphics()
     graphics.name = 'main_graphics'
-    graphics.styleConfig = this.styleConfig
+    graphics.styleConfig = { ...this.styleConfig }
     graphics.position.set(this.startPoints.x, this.startPoints.y)
     this.container.addChild(graphics)
     installElmEvent.call(this as any, graphics)

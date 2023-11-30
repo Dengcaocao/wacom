@@ -15,7 +15,9 @@ function handlePointerdown (
     const selectedElm = rootThis.container.getChildByName('selected') as PIXI.Graphics
     rootThis.container.removeChild(selectedElm)
   }
-  if (this.styleConfig?.drawType !== 'select') return
+  if (rootThis.styleConfig?.drawType === 'select') {
+    e.stopPropagation()
+  } else { return }
   rootThis.container = this.parent
   rootThis.drawSelected()
   this.isMove = true
@@ -36,9 +38,9 @@ function handlePointermove (this: MainElm, e: MouseEvent) {
 }
 
 function installElmEvent (this: Application, elm: MainElm) {
-  elm.on('pointerenter', function (this: MainElm) {
-    if (elm.styleConfig?.drawType !== 'select') return this.cursor = 'crosshair'
-    this.cursor = 'move'
+  elm.on('pointerenter', () => {
+    if (this.styleConfig?.drawType !== 'select') return elm.cursor = 'crosshair'
+    elm.cursor = 'move'
   })
   elm.on('pointerdown', (e) => {
     handlePointerdown.call(elm, this, e)
