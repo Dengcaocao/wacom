@@ -119,6 +119,16 @@ const getMaximum = (mainElm: MainElm) => {
 }
 
 class Selected extends Rect {
+  /**
+   * 移出选中
+   */
+  removeSelected () {
+    const selectedElm = this.container?.getChildByName('selected') as ExtendContainer
+    this.container?.removeChild(selectedElm)
+  }
+  /**
+   * 绘制选中
+   */
   drawSelected () {
     const containerElm = this.container as ExtendContainer
     // 获取容器中的主图形

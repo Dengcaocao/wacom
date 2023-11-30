@@ -1,14 +1,16 @@
 import Draw from './draw'
 import { Container, Sprite } from 'pixi.js'
 import installElmEvent from '@/event/elmEvent'
+import type { ExtendSprite } from './types'
 
 class spriteImage extends Draw {
   drawImage (url: string) {
     this.container = new Container()
     this.app.stage.addChild(this.container)
-    const sprite = Sprite.from(url)
+    const sprite: ExtendSprite = Sprite.from(url)
     installElmEvent.call(this as any, sprite)
     sprite.name = 'main_sprite'
+    sprite.styleConfig = { ...this.styleConfig }
     const image = new Image()
     image.src = url
     image.onload = () => {

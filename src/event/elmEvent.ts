@@ -1,4 +1,3 @@
-import * as PIXI from 'pixi.js'
 import Application from '@/actions/application'
 import type { IPoint, MainElm } from '@/actions/types'
 
@@ -11,9 +10,8 @@ function handlePointerdown (
    * 判断是否有元素被选中，如果当前点击的元素与选中元素不相等
    * 移出之前元素选中的效果，将点击的元素设置为选中元素
    */
-  if (rootThis.container && this.parent !== rootThis.container) {
-    const selectedElm = rootThis.container.getChildByName('selected') as PIXI.Graphics
-    rootThis.container.removeChild(selectedElm)
+  if (this.parent !== rootThis.container) {
+    rootThis.removeSelected()
   }
   if (rootThis.styleConfig?.drawType === 'select') {
     e.stopPropagation()

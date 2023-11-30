@@ -43,8 +43,7 @@ function handleWheel (this: Application, stage: PIXI.Container, { deltaX, deltaY
 function handlePointerdown (this: Application, { x, y }: MouseEvent) {
   // 绘制之前删除选中效果
   if (this.container) {
-    const selectedElm = this.container.getChildByName('selected') as ExtendGraphics
-    this.container.removeChild(selectedElm)
+    this.removeSelected()
     this.container = undefined
   }
   this.startPoints = this.getMappingPoints(x, y)

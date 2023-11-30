@@ -59,7 +59,7 @@ class Text extends Mark {
       fill: this.styleConfig.color
     })
     text.name = 'main_text'
-    text.styleConfig = this.styleConfig
+    text.styleConfig = { ...this.styleConfig }
     this.container.addChild(text)
     installElmEvent.call(this as any, text)
     elm.oninput = (e: any) => {
