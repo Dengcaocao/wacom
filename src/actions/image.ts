@@ -8,7 +8,6 @@ class spriteImage extends Draw {
     this.app.stage.addChild(this.container)
     const sprite = Sprite.from(url)
     installElmEvent.call(this as any, sprite)
-    // sprite.eventMode = 'none'
     sprite.name = 'main_sprite'
     const image = new Image()
     image.src = url

@@ -7,7 +7,6 @@ function handlePointerdown (
   rootThis: Application,
   e: MouseEvent
 ) {
-  e.stopPropagation()
   /**
    * 判断是否有元素被选中，如果当前点击的元素与选中元素不相等
    * 移出之前元素选中的效果，将点击的元素设置为选中元素
@@ -16,6 +15,7 @@ function handlePointerdown (
     const selectedElm = rootThis.container.getChildByName('selected') as PIXI.Graphics
     rootThis.container.removeChild(selectedElm)
   }
+  if (this.styleConfig?.drawType !== 'select') return
   rootThis.container = this.parent
   rootThis.drawSelected()
   this.isMove = true
@@ -36,6 +36,10 @@ function handlePointermove (this: MainElm, e: MouseEvent) {
 }
 
 function installElmEvent (this: Application, elm: MainElm) {
+  elm.on('pointerenter', function (this: MainElm) {
+    if (elm.styleConfig?.drawType !== 'select') return this.cursor = 'crosshair'
+    this.cursor = 'move'
+  })
   elm.on('pointerdown', (e) => {
     handlePointerdown.call(elm, this, e)
   })

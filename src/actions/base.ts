@@ -141,7 +141,6 @@ class Base {
     this.container.removeChildren()
     this.app.stage.addChild(this.container)
     const graphics: ExtendGraphics = new PIXI.Graphics()
-    graphics.cursor = 'move'
     graphics.name = 'main_graphics'
     graphics.styleConfig = this.styleConfig
     graphics.position.set(this.startPoints.x, this.startPoints.y)
@@ -167,7 +166,7 @@ class Base {
    */
   drawBackground (elm: ExtendGraphics, vertex: number[] = []) {
     const { drawType ,alpha, fillColor, fillStyle } = elm.styleConfig as IElementStyle
-    if (fillColor === 'transparent') return
+    if (fillColor === 'transparent' || ['mark', 'straightLine'].includes(drawType)) return
     // 绘制背景图形
     const backgroundElm = new PIXI.Graphics()
     backgroundElm.name = 'background_elm'
