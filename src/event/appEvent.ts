@@ -2,7 +2,6 @@ import * as PIXI from 'pixi.js'
 import Application from '@/actions/application'
 import Pinia from '@/stores/index'
 import { useConfigStore } from '@/stores/config'
-import type { ExtendGraphics } from '@/actions/types'
 import { toRefs } from 'vue'
 
 const { drawType } = toRefs(useConfigStore(Pinia))
@@ -70,7 +69,8 @@ function handlePointermove (this: Application, { x, y }: MouseEvent) {
 
 // 结束绘制
 function handleDrawEnd (this: Application) {
-  if (!['paintingBrush', 'text', 'image'].includes(this.styleConfig.drawType) && this.container) {
+  const disabledUDS = ['select', 'paintingBrush', 'text', 'image']
+  if (!disabledUDS.includes(this.styleConfig.drawType) && this.container) {
     this.drawSelected()
   }
   this.isDraw = false

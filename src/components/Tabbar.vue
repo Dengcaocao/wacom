@@ -71,6 +71,7 @@ const handleUpdateDrawType = (type: IDrawType) => {
       const url = URL.createObjectURL(file)
       const pixiApp = toRaw(configStore.pixiApp)
       pixiApp.drawImage(url)
+      configStore.drawType = 'select'
     }
     inputElm.click()
   }

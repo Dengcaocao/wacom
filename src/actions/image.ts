@@ -5,6 +5,7 @@ import type { ExtendSprite } from './types'
 
 class spriteImage extends Draw {
   drawImage (url: string) {
+    this.removeSelected()
     this.container = new Container()
     this.app.stage.addChild(this.container)
     const sprite: ExtendSprite = Sprite.from(url)
