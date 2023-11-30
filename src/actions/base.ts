@@ -213,6 +213,15 @@ class Base {
       backgroundElm.lineTo(toX, toY)
     }
   }
+
+  /**
+   * 清空画布
+   */
+  clear () {
+    this.app.stage.children
+      .filter(item => item.name !== 'mesh')
+      .forEach(item => this.app.stage.removeChild(item))
+  }
 }
 
 export default Base

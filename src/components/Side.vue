@@ -1,7 +1,7 @@
 <template>
   <aside class="mobile md:pc" :class="[isCollapsed && 'active']">
     <section class="top">
-      <div class="item iconfont icon-weibiaoti544"></div>
+      <div class="item iconfont icon-weibiaoti544" @click="clearpop.visible = true"></div>
       <div class="item iconfont icon-export-img"></div>
       <div class="item iconfont icon-dongtaitiaosepan md:hidden" @click="isCollapsed = !isCollapsed"></div>
       <div class="item bg-transparent hover:bg-transparent text-base p-0">
@@ -11,16 +11,24 @@
     <section class="middle" :class="[isCollapsed && 'active']">
       <config />
     </section>
+    <clear-pop ref="clearpop" @notify="handleClear" />
   </aside>
 </template>
 
 <script setup lang="ts">
-import { toRefs } from 'vue'
+import { ref, toRefs } from 'vue'
 import { useConfigStore } from '@/stores/config'
 import InputColor from '@/components/InputColor.vue'
 import Config from './Config.vue'
+import ClearPop from '@/components/ClearPop.vue'
 
-const { isCollapsed, bgColor } = toRefs(useConfigStore())
+const { pixiApp ,isCollapsed, bgColor } = toRefs(useConfigStore())
+
+const clearpop = ref()
+const handleClear = () => {
+  pixiApp.value.clear()
+  clearpop.value.visible = false
+}
 </script>
 
 <style scoped>

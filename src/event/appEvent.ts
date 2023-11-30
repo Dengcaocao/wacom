@@ -74,7 +74,7 @@ function handleDrawEnd (this: Application) {
     this.drawSelected()
   }
   this.isDraw = false
-  drawType.value = 'select'
+  this.styleConfig.drawType !=='paintingBrush' && (drawType.value = 'select')
 }
 
 function installAppEvent (this: Application, stage: PIXI.Container) {
