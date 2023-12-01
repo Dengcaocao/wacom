@@ -15,12 +15,19 @@
 </template>
 
 <script setup lang="ts">
-import { ref, defineProps, defineExpose } from 'vue'
+import { ref, defineProps, defineExpose, watch } from 'vue'
 
 const props = defineProps<{
   title: string
 }>()
+
+const emit = defineEmits(['statusChange'])
+
 const visible = ref(false)
+watch(visible, (status: boolean) => {
+  emit('statusChange', status)
+})
+
 defineExpose({
   visible
 })
@@ -43,7 +50,7 @@ defineExpose({
            w-full h-full;
   }
   .modal-content {
-    @apply w-5/12 p-2.5 rounded bg-white opacity-100;
+    @apply w-5/12 min-w-max p-2.5 rounded bg-white opacity-100;
   }
   .title {
     @apply relative mb-2.5 text-center text-lg font-medium;
