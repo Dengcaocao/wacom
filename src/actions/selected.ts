@@ -122,9 +122,9 @@ class Selected extends Rect {
   /**
    * 移出选中
    */
-  removeSelected () {
-    const selectedElm = this.container?.getChildByName('selected') as ExtendContainer
-    this.container?.removeChild(selectedElm)
+  removeSelected (container = this.container) {
+    const selectedElm = container?.getChildByName('selected') as ExtendContainer
+    container?.removeChild(selectedElm)
   }
   /**
    * 绘制选中
