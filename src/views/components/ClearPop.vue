@@ -3,18 +3,25 @@
     <p class="my-2.5 px-3">这将清空整个画布。是否继续?</p>
     <div class="footer">
       <button @click="popModal.visible = false">取消</button>
-      <button @click="emit('notify')">确定</button>
+      <button @click="handleClear">确定</button>
     </div>
   </pop>
 </template>
 
 <script setup lang="ts">
-import { ref, defineEmits, defineExpose } from 'vue'
+import { ref, defineExpose, toRefs } from 'vue'
 import Pop from '@/components/Pop.vue'
+import { useConfigStore } from '@/stores/config'
+
+const { pixiApp } = toRefs(useConfigStore())
 
 const popModal = ref()
 
-const emit = defineEmits(['notify'])
+const handleClear = () => {
+  pixiApp.value.clear()
+  popModal.value.visible = false
+}
+
 defineExpose({
   popModal
 })

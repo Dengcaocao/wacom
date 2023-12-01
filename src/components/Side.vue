@@ -2,7 +2,7 @@
   <aside class="mobile md:pc" :class="[isCollapsed && 'active']">
     <section class="top">
       <div class="item iconfont icon-weibiaoti544" @click="clearpop.popModal.visible = true"></div>
-      <div class="item iconfont icon-export-img" @click="pixiApp.toImage()"></div>
+      <div class="item iconfont icon-export-img" @click="toImagePop.popModal.visible = true"></div>
       <div class="item iconfont icon-dongtaitiaosepan md:hidden" @click="isCollapsed = !isCollapsed"></div>
       <div class="item bg-transparent hover:bg-transparent text-base p-0">
         <input-color v-model="bgColor" />
@@ -11,7 +11,8 @@
     <section class="middle" :class="[isCollapsed && 'active']">
       <config />
     </section>
-    <clear-pop ref="clearpop" @notify="handleClear" />
+    <clear-pop ref="clearpop" />
+    <to-image ref="toImagePop" />
   </aside>
 </template>
 
@@ -21,14 +22,12 @@ import { useConfigStore } from '@/stores/config'
 import InputColor from '@/components/InputColor.vue'
 import Config from './Config.vue'
 import ClearPop from '@/views/components/ClearPop.vue'
+import ToImage from '@/views/components/toImagePop.vue'
 
-const { pixiApp ,isCollapsed, bgColor } = toRefs(useConfigStore())
+const { isCollapsed, bgColor } = toRefs(useConfigStore())
 
 const clearpop = ref()
-const handleClear = () => {
-  pixiApp.value.clear()
-  clearpop.value.popModal.visible = false
-}
+const toImagePop = ref()
 </script>
 
 <style scoped>
