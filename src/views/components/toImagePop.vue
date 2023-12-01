@@ -46,7 +46,10 @@ defineExpose({
 
 <style scoped>
   .container-img {
-    background-image: url('@/assets/bg-transparent.png');
+    background-image: linear-gradient(white 50%, transparent 50%),
+                      linear-gradient(to right, white 50%, transparent 50% );
+    background-size: 4px 4px; 
+    background-color: #e6e6e6;
     @apply flex justify-center items-center h-48 p-4;
   }
   .footer {
