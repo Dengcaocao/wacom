@@ -18,16 +18,17 @@ const createElm = (
 ) => {
   const elm = document.createElement(tag)
   elm.style.cssText = `
+    overflow: hidden;
     position: absolute;
     top: ${position.y}px;
     left: ${position.x}px;
     transform: translateY(-50%);
+    width: ${fontSize}px;
     height: ${fontSize}px;
     line-height: 1;
     font-family: LongCang-Regular;
     font-size: ${fontSize}px;
     resize: none;
-    box-sizing: content-box;
     border: none;
     outline: none;
     color: transparent;
@@ -68,7 +69,7 @@ class Text extends Mark {
         ...point,
         y: point.y - text.height / 2
       }
-      elm.style.width = text.width + 'px'
+      elm.style.width = text.width + fontSize + 'px'
       elm.style.height = text.height + 'px'
     }
     elm.onblur = () => {
