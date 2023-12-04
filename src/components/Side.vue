@@ -1,5 +1,5 @@
 <template>
-  <aside class="mobile md:pc" :class="[isCollapsed && 'active']">
+  <aside class="mobile md:pc" :class="[!isCollapsed && 'active']">
     <section class="top">
       <div class="item iconfont icon-weibiaoti544" @click="clearpop.popModal.visible = true"></div>
       <div class="item iconfont icon-export-img" @click="toImagePop.popModal.visible = true"></div>
@@ -8,7 +8,7 @@
         <input-color v-model="bgColor" />
       </div>
     </section>
-    <section class="middle" :class="[isCollapsed && 'active']">
+    <section class="middle" :class="[!isCollapsed && 'active']">
       <config />
     </section>
     <clear-pop ref="clearpop" />

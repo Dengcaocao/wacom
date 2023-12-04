@@ -57,8 +57,11 @@ const icons = reactive([
 ])
 
 watch(() => configStore.drawType, type => {
+  if (type !== 'select') {
+    configStore.isCollapsed = false
+    configStore.pixiApp.removeSelected()
+  }
   configStore.pixiApp.styleConfig.drawType = type
-  type !== 'select' && configStore.pixiApp.removeSelected()
   document.body.style.cursor = type === 'select' ? 'default' : 'crosshair'
 })
 
