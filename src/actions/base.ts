@@ -237,39 +237,47 @@ class Base {
       maxY: 0
     }
     const displayObject = new PIXI.Container()
-    if (isDownload && type === 'image/jpeg') {
-      children.forEach(item => {
-        const mainName = item.children
-          .map(elmItem => elmItem.name)
-          .filter(name => /^main/.test(name as string))
-          .toString()
-        const mainElm = item.getChildByName(mainName) as ExtendGraphics
-        const { minX, minY, maxX, maxY } = mainElm.geometry.bounds
-        position = {
-          x: (!position.x || mainElm.x < position.x) ? mainElm.x : position.x,
-          y: (!position.y || mainElm.y < position.y) ? mainElm.y : position.y,
-          minX: minX < position.minX ? minX : position.minX,
-          minY: minY < position.minY ? minY : position.minY,
-          maxX: maxX > position.maxX ? maxX : position.maxX,
-          maxY: maxY > position.maxY ? maxY : position.maxY,
-        }
-      })
-      const imgBgElm = new PIXI.Graphics()
-      imgBgElm.name = 'img_bg'
-      if (this.container) {
-        (this as any).removeSelected()
-        this.container.addChildAt(imgBgElm, 0)
-        displayObject.addChild(this.container)
-      } else {
-        this.app.stage.addChildAt(imgBgElm, 1)
-        displayObject.addChild(imgBgElm, ...children)
+    children.forEach(item => {
+      const mainName = item.children
+        .map(elmItem => elmItem.name)
+        .filter(name => /^main/.test(name as string))
+        .toString()
+      const mainElm = item.getChildByName(mainName) as ExtendGraphics
+      const { minX, minY, maxX, maxY } = mainElm.geometry.bounds
+      position = {
+        x: (!position.x || mainElm.x < position.x) ? mainElm.x : position.x,
+        y: (!position.y || mainElm.y < position.y) ? mainElm.y : position.y,
+        minX: minX < position.minX ? minX : position.minX,
+        minY: minY < position.minY ? minY : position.minY,
+        maxX: maxX > position.maxX ? maxX : position.maxX,
+        maxY: maxY > position.maxY ? maxY : position.maxY,
       }
-      const img = await this.app.renderer.extract.image(displayObject, type)
-      imgBgElm.beginFill(0xffffff, 1)
-      const { x, y,  minX, minY, maxX, maxY } = position
-      imgBgElm.drawRect(x + minX - 6, y + minY - 6, img.width + 6, img.height + 6)
+    })
+    const imgBgElm = new PIXI.Graphics()
+    imgBgElm.name = 'img_bg'
+    if (this.container) {
+      (this as any).removeSelected()
+      this.container.addChildAt(imgBgElm, 0)
+      displayObject.addChild(this.container)
+    } else {
+      this.app.stage.addChildAt(imgBgElm, 1)
+      displayObject.addChild(imgBgElm, ...children)
     }
-    const base64 = await this.app.renderer.extract.base64(displayObject, type)
+    const img = await this.app.renderer.extract.image(displayObject, type)
+    imgBgElm.beginFill(0xffffff, 1)
+    const { x, y,  minX, minY } = position
+    imgBgElm.drawRect(x + minX - 6, y + minY - 6, img.width + 6, img.height + 6)
+    let base64 = await this.app.renderer.extract.base64(displayObject, type)
+    // 根据下载类型移出背景
+    if (isDownload && type === 'image/png') {
+      if (this.container) {
+        const imgBgElm = this.container.getChildByName('img_bg') as PIXI.DisplayObject
+        this.container.removeChild(imgBgElm)
+      }
+      const imgBgElm = displayObject.getChildByName('img_bg') as PIXI.DisplayObject
+      displayObject.removeChild(imgBgElm)
+      base64 = await this.app.renderer.extract.base64(displayObject, type)
+    }
     // 上面将arr添加到另一个容器中后，导致stage中的图形消失，需再次添加
     this.app.stage.addChild(...children)
     if (this.container) {
