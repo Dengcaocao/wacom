@@ -1,5 +1,5 @@
 import * as PIXI from 'pixi.js'
-import { createOffsetArr } from '@/utils/utils'
+import { createOffsetArr, getAngle } from '@/utils/utils'
 import installElmEvent from '@/event/elmEvent'
 import type { IBaseParams, ExtendContainer, ExtendGraphics } from './types'
 import type { IElementStyle } from '@/stores/types'
@@ -137,24 +137,24 @@ class Base {
     vertex: number[] = [],
     maxNum: number
   ) {
-    this.container = this.container || new PIXI.Container()
-    this.container.removeChildren()
-    this.app.stage.addChild(this.container)
     const graphics: ExtendGraphics = new PIXI.Graphics()
     graphics.name = 'main_graphics'
     graphics.styleConfig = { ...this.styleConfig }
     graphics.position.set(this.startPoints.x, this.startPoints.y)
-    this.container.addChild(graphics)
     installElmEvent.call(this as any, graphics)
+    const container = this.container as ExtendContainer
+    container.removeChildren()
+    container.addChild(graphics)
     // 获取图形在容器中位置，并设置随机偏移点
-    const index = this.container.getChildIndex(graphics)
-    if (!this.container.offsetPoints) {
-      this.container.offsetPoints = [createOffsetArr(maxNum)]
+    const index = container.getChildIndex(graphics)
+    if (!container.offsetPoints) {
+      container.offsetPoints = [createOffsetArr(maxNum)]
     } else {
-      this.container.offsetPoints[index] = this.container.offsetPoints[index] || createOffsetArr(4)
+      container.offsetPoints[index] = container.offsetPoints[index] || createOffsetArr(maxNum)
     }
     this.drawStroke(graphics, index, vertex)
     this.drawBackground(graphics, vertex)
+    container.setChildIndex(graphics, container.children.length - 1)
     return graphics
   }
 
@@ -165,13 +165,12 @@ class Base {
    * @returns 
    */
   drawBackground (elm: ExtendGraphics, vertex: number[] = []) {
-    const { drawType ,alpha, fillColor, fillStyle } = elm.styleConfig as IElementStyle
+    const { drawType ,alpha, type, fillColor, fillStyle } = elm.styleConfig as IElementStyle
     if (fillColor === 'transparent' || ['mark', 'straightLine'].includes(drawType)) return
-    // 绘制背景图形
+    // 创建背景图形
     const backgroundElm = new PIXI.Graphics()
-    backgroundElm.name = 'background_elm'
-    elm.addChild(backgroundElm)
-    elm.setChildIndex(backgroundElm, elm.children.length - 1)
+    backgroundElm.name = 'background_elm_left'
+    backgroundElm.position.set(elm.x, elm.y)
     backgroundElm.lineStyle({
       ...elm.styleConfig,
       width: 1,
@@ -179,40 +178,78 @@ class Base {
       cap: PIXI.LINE_CAP.ROUND,
       join: PIXI.LINE_JOIN.ROUND
     })
+    this.container?.addChild(backgroundElm)
+    this.container?.setChildIndex(backgroundElm, this.container.children.length - 2)
     if (fillStyle === 'simple') {
       backgroundElm.beginFill(fillColor, alpha)
-      drawType !== 'arc' && backgroundElm.drawPolygon(vertex) 
+      drawType !== 'arc' && backgroundElm.drawPolygon(vertex)
       return
     }
-    backgroundElm.line.alpha = 0
-    for (let i = 0; i < vertex.length; i+=6) {
-      const [x, y, cpX, cpY, toX, toY] = vertex.slice(i, i+6)
-      // 使用贝塞尔曲线绘制获取图形上的每个点
-      backgroundElm.moveTo(x, y)
-      backgroundElm.quadraticCurveTo(cpX, cpY, toX, toY)
+    // 获取图形上的每个点
+    elm.getBounds()
+    const graphicsData = elm.geometry.graphicsData
+    let p: number[] = []
+    const length = type === 'simple'
+      ? graphicsData.length
+      : graphicsData.length / 2
+    for (let i = 0; i < length; i++) {
+      // 处理不同类型使绘制方向一样
+      if (drawType === 'rect') {
+        p = [...p, ...graphicsData[i].points]
+      }
+      if (drawType === 'arc') {
+        // 处理普通弧形的点
+        if (type === 'simple') {
+          p = graphicsData[i].points.filter((_, index) => index % 4 < 2)
+          let index = Math.floor(p.length / 8)
+          index % 2 === 1 && index++
+          const prefixP = p.slice(0, index)
+          p = p.slice(index).concat(prefixP)
+          continue
+        }
+        p = [...p, ...graphicsData[i].points]
+        if (i === length - 1) {
+          let index = graphicsData[0].points.length / 2
+          index % 2 === 1 && index++
+          const prefixP = p.slice(0, index)
+          p = p.slice(index).concat(prefixP)
+        }
+      }
+      if (drawType === 'diamond' && i % 2 === 1) {
+        p = [...p, ...graphicsData[i].points]
+      }
     }
-    // 调用后才能获取到points
-    backgroundElm.getBounds()
-    const points = backgroundElm.geometry.points
-    let arr: number[][] = []
-    for (let i = 0; i < points.length; i += 2) {
-      arr.push([points[i], points[i + 1]])
+    // 获取主图形的偏移量
+    const getOffset = () => {
+      const offsetPoints = (elm.parent as ExtendContainer).offsetPoints
+      return (offsetPoints as number[][])[0]
+        .sort(() => Math.random() - 0.5) // 打乱数组
+        .slice(-4)
+    }
+    // 绘制背景曲线
+    for (let i = 0; i < p.length/2; i+=2) {
+      let [x, y] = p.slice(i, i + 2)
+      let [toX, toY] = p.slice(p.length - 2 - i)
+      for (let j = 0; j < 2; j++) {
+        const [o1, o2, o3, o4] = getOffset()
+        x += o1, y+= o2
+        toX += o3, toY+= o4
+        const { width, height } = getAngle({x, y}, {x: toX, y: toY})
+        backgroundElm.moveTo(x, y)
+        backgroundElm.quadraticCurveTo(x + width/2, y + height/2, toX, toY)
+      }
     }
     if (fillStyle === 'grid') {
-      // 添加反向绘制
-      const count = arr.length / 4
-      const left = [...arr.slice(0, count).reverse(), ...arr.slice(-count)]
-      const right = [...arr.slice(count * 2, -count), ...arr.slice(count, count * 2).reverse()]
-      arr = [...arr.slice(0, count * 2), ...left, ...right, ...arr.slice(-count * 2)]
-    }
-    backgroundElm.line.alpha = alpha
-    for (let i = 0; i < arr.length/2; i++) {
-      const [x, y] = arr[i]
-      const [toX, toY] = arr[arr.length - 1 - i]
-      backgroundElm.moveTo(x, y)
-      backgroundElm.lineTo(toX, toY)
+      const backgroundElm_right = backgroundElm.clone()
+      backgroundElm_right.name = 'background_elm_right'
+      this.container?.addChild(backgroundElm_right)
+      this.container?.setChildIndex(backgroundElm_right, this.container.children.length - 2)
+      backgroundElm_right.scale.set(-1, 1)
+      backgroundElm_right.position.set(elm.x + elm.geometry.bounds.maxX, elm.y)
     }
   }
+
+  copy (copyElm: ExtendGraphics) {}
 
   /**
    * 清空画布
