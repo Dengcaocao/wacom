@@ -40,14 +40,16 @@ function handleWheel (this: Application, stage: PIXI.Container, { deltaX, deltaY
 }
 
 function handlePointerdown (this: Application, { x, y }: MouseEvent) {
+  this.startPoints = this.getMappingPoints(x, y)
+  if (this.styleConfig.drawType === 'image') return
+  if (this.styleConfig.drawType === 'text') return this.drawText(this.startPoints)
   // 绘制之前删除选中效果
   if (this.container) {
     this.removeSelected()
     this.container = undefined
   }
-  this.startPoints = this.getMappingPoints(x, y)
-  if (this.styleConfig.drawType === 'image') return
-  if (this.styleConfig.drawType === 'text') return this.drawText(this.startPoints)
+  this.container = new PIXI.Container()
+  this.app.stage.addChild(this.container)
   this.isDraw = true
 }
 
@@ -69,12 +71,13 @@ function handlePointermove (this: Application, { x, y }: MouseEvent) {
 
 // 结束绘制
 function handleDrawEnd (this: Application) {
+  if (!this.container?.children.length) this.app.stage.removeChild(this.container as PIXI.DisplayObject)
   const disabledUDS = ['select', 'paintingBrush', 'text', 'image']
   if (!disabledUDS.includes(this.styleConfig.drawType) && this.container) {
     this.drawSelected()
   }
   this.isDraw = false
-  this.styleConfig.drawType !=='paintingBrush' && (drawType.value = 'select')
+  // this.styleConfig.drawType !=='paintingBrush' && (drawType.value = 'select')
 }
 
 function installAppEvent (this: Application, stage: PIXI.Container) {

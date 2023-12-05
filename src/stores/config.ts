@@ -4,7 +4,7 @@ import type { IDrawType, IElementStyle } from './types'
 
 export const useConfigStore = defineStore('config', () => {
   // 绘制实例
-  const pixiApp = ref()
+  const pixiApp: any = null
   // 缩放
   const scale = ref(2)
   // 是否折叠

@@ -46,11 +46,12 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, toRefs } from 'vue'
+import { reactive, toRaw, toRefs } from 'vue'
 import { useConfigStore } from '@/stores/config'
 import InputColor from '@/components/InputColor.vue'
 
-const { pixiApp, drawType, styleConfig } = toRefs(useConfigStore())
+const config = useConfigStore()
+const { drawType, styleConfig } = toRefs(config)
 
 const configList = reactive([
   {
@@ -193,11 +194,13 @@ const configList = reactive([
 ])
 
 const handleCopy = () => {
-  pixiApp.value.copy()
+  const pixiApp = toRaw(config.pixiApp)
+  pixiApp.copy()
 }
 
 const handleDel = () => {
-  pixiApp.value.delGraphics()
+  const pixiApp = toRaw(config.pixiApp)
+  pixiApp.delGraphics()
 }
 </script>
 

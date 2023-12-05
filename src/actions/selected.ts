@@ -131,6 +131,7 @@ class Selected extends Rect {
    */
   drawSelected () {
     const containerElm = this.container as ExtendContainer
+    if (!containerElm.children.length) return
     // 获取容器中的主图形
     const mainElm = containerElm.children
       .filter(item => item.name && /^main/.test(item.name))[0] as MainElm

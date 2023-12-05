@@ -250,7 +250,7 @@ class Base {
   }
 
   copy (copyElm: ExtendGraphics) {}
-
+ 
   /**
    * 清空画布
    */
