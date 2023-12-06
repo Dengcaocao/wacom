@@ -13,11 +13,14 @@ function handlePointerdown (
   if (this.parent !== rootThis.container) {
     rootThis.removeSelected()
   }
-  if (rootThis.styleConfig?.drawType === 'select') {
-    e.stopPropagation()
-  } else { return }
+  if (rootThis.styleConfig?.drawType !== 'select') return
+  e.stopPropagation()
   rootThis.container = this.parent
   rootThis.drawSelected()
+  rootThis.app.stage.setChildIndex(
+    this.parent,
+    rootThis.app.stage.children.length - 1
+  )
   this.isMove = true
   this.startPoint = { x: e.x, y: e.y}
 }
