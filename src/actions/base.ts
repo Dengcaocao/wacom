@@ -140,7 +140,6 @@ class Base {
     const graphics: ExtendGraphics = new PIXI.Graphics()
     graphics.name = 'main_graphics'
     graphics.styleConfig = { ...this.styleConfig }
-    graphics.position.set(this.startPoints.x, this.startPoints.y)
     installElmEvent.call(this as any, graphics)
     const container = this.container as ExtendContainer
     container.removeChildren()

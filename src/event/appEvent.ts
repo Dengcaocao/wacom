@@ -49,6 +49,7 @@ function handlePointerdown (this: Application, { x, y }: MouseEvent) {
     this.container = undefined
   }
   this.container = new PIXI.Container()
+  this.container.position.set(this.startPoints.x, this.startPoints.y)
   this.app.stage.addChild(this.container)
   this.isDraw = true
 }
