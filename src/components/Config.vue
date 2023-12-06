@@ -200,7 +200,7 @@ const handleCopy = () => {
 
 const handleDel = () => {
   const pixiApp = toRaw(config.pixiApp)
-  pixiApp.delGraphics()
+  pixiApp.clear(true)
 }
 </script>
 

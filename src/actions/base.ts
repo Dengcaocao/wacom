@@ -264,7 +264,8 @@ class Base {
   /**
    * 清空画布
    */
-  clear () {
+  clear (isDelElm: boolean) {
+    if (isDelElm) return this.app.stage.removeChild(this.container as PIXI.DisplayObject)
     this.app.stage.children
       .filter(item => item.name !== 'mesh')
       .forEach(item => this.app.stage.removeChild(item))
