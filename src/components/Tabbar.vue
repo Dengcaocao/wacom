@@ -5,6 +5,7 @@
       :key="icon.name"
       class="item iconfont"
       :class="[icon.name, icon.action === configStore.drawType && 'active']"
+      :title="icon.title"
       @click="handleUpdateDrawType(icon.action as IDrawType)">
     </span>
   </header>
@@ -19,38 +20,47 @@ const configStore = useConfigStore()
 
 const icons = reactive([
   {
+    title: '选择',
     name: 'icon-zhizhen',
     action: 'select'
   },
   {
+    title: '矩形',
     name: 'icon-dantupailie',
     action: 'rect'
   },
   {
+    title: '菱形',
     name: 'icon-lingxing',
     action: 'diamond'
   },
   {
+    title: '圆',
     name: 'icon-luyin',
     action: 'arc'
   },
   {
+    title: '箭头',
     name: 'icon-xiangshangjiantoucuxiao',
     action: 'mark'
   },
   {
+    title: '线段',
     name: 'icon-xian',
     action: 'straightLine'
   },
   {
+    title: '画笔',
     name: 'icon-Icon_huabi',
     action: 'paintingBrush'
   },
   {
+    title: '文本',
     name: 'icon-ziti',
     action: 'text'
   },
   {
+    title: '图片',
     name: 'icon-tupian',
     action: 'image'
   }

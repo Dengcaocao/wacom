@@ -24,7 +24,6 @@ const handleStatusChange = async (status: boolean) => {
   if (status) {
     const pixiApp = toRaw(config.pixiApp)
     url.value = await pixiApp.canvas2Base64()
-    console.log(url.value)
   }
 }
 

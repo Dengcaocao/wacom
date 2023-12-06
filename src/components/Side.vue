@@ -1,8 +1,8 @@
 <template>
   <aside class="mobile md:pc" :class="[!isCollapsed && 'active']">
     <section class="top">
-      <div class="item iconfont icon-weibiaoti544" @click="clearpop.popModal.visible = true"></div>
-      <div class="item iconfont icon-export-img" @click="toImagePop.popModal.visible = true"></div>
+      <div title="清空" class="item iconfont icon-weibiaoti544" @click="clearpop.popModal.visible = true"></div>
+      <div title="保存图片" class="item iconfont icon-export-img" @click="toImagePop.popModal.visible = true"></div>
       <div class="item iconfont icon-dongtaitiaosepan md:hidden" @click="isCollapsed = !isCollapsed"></div>
       <div class="item bg-transparent hover:bg-transparent text-base p-0">
         <input-color v-model="bgColor" />

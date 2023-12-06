@@ -38,8 +38,16 @@
     <div class="item">
       <h3 class="title">操作</h3>
       <div class="flex">
-        <div @click="handleCopy" class="action iconfont icon-fuzhi_copy cursor-pointer hover:bg-theme-color-deep"></div>
-        <div @click="handleDel" class="action iconfont icon-weibiaoti544 cursor-pointer hover:bg-theme-color-deep"></div>
+        <div
+          title="复制"
+          @click="handleCopy"
+          class="action iconfont icon-fuzhi_copy cursor-pointer hover:bg-theme-color-deep">
+        </div>
+        <div
+          title="删除"
+          @click="handleDel"
+          class="action iconfont icon-weibiaoti544 cursor-pointer hover:bg-theme-color-deep">
+        </div>
       </div>
     </div>
   </main>
