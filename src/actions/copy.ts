@@ -15,12 +15,13 @@ class Copy extends SpriteImage {
         const graphicsData = (elm as ExtendGraphics).geometry.graphicsData
         const graphics: ExtendGraphics = new Graphics()
         container.addChild(graphics)
+        graphics.name = elm.name
+        graphics.hitArea = elm.hitArea
+        graphics.scale = elm.scale
         if (elm.name === 'main_graphics') {
           graphics.styleConfig = { ...(elm as ExtendGraphics).styleConfig as IElementStyle }
           installElmEvent.call(this, graphics)
         }
-        graphics.name = elm.name
-        graphics.hitArea = elm.hitArea
         graphics.beginFill(
           (elm as ExtendGraphics).fill.color,
           (elm as ExtendGraphics).fill.alpha

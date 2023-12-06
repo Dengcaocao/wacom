@@ -167,22 +167,28 @@ class Base {
   drawBackground (elm: ExtendGraphics, vertex: number[] = []) {
     const { drawType ,alpha, type, fillColor, fillStyle } = elm.styleConfig as IElementStyle
     if (fillColor === 'transparent' || ['mark', 'straightLine'].includes(drawType)) return
+    const lineStyle = new PIXI.LineStyle()
+    lineStyle.width = 1
+    lineStyle.color = parseInt(fillColor.slice(1), 10)
+    lineStyle.alpha = alpha
+    lineStyle.cap = PIXI.LINE_CAP.ROUND
+    lineStyle.join = PIXI.LINE_JOIN.ROUND
     // 创建背景图形
-    const backgroundElm = new PIXI.Graphics()
-    backgroundElm.name = 'background_elm_left'
-    backgroundElm.position.set(elm.x, elm.y)
-    backgroundElm.lineStyle({
+    const backgroundElm_left = new PIXI.Graphics()
+    backgroundElm_left.name = 'background_elm_left'
+    backgroundElm_left.position.set(elm.x, elm.y)
+    backgroundElm_left.lineStyle({
       ...elm.styleConfig,
       width: 1,
       color: fillColor,
       cap: PIXI.LINE_CAP.ROUND,
       join: PIXI.LINE_JOIN.ROUND
     })
-    this.container?.addChild(backgroundElm)
-    this.container?.setChildIndex(backgroundElm, this.container.children.length - 2)
+    this.container?.addChild(backgroundElm_left)
+    this.container?.setChildIndex(backgroundElm_left, this.container.children.length - 2)
     if (fillStyle === 'simple') {
-      backgroundElm.beginFill(fillColor, alpha)
-      drawType !== 'arc' && backgroundElm.drawPolygon(vertex)
+      backgroundElm_left.beginFill(fillColor, alpha)
+      drawType !== 'arc' && backgroundElm_left.drawPolygon(vertex)
       return
     }
     // 获取图形上的每个点
@@ -235,17 +241,21 @@ class Base {
         x += o1, y+= o2
         toX += o3, toY+= o4
         const { width, height } = getAngle({x, y}, {x: toX, y: toY})
-        backgroundElm.moveTo(x, y)
-        backgroundElm.quadraticCurveTo(x + width/2, y + height/2, toX, toY)
+        backgroundElm_left.moveTo(x, y)
+        backgroundElm_left.quadraticCurveTo(x + width/2, y + height/2, toX, toY)
       }
     }
     if (fillStyle === 'grid') {
-      const backgroundElm_right = backgroundElm.clone()
+      const backgroundElm_right = new PIXI.Graphics()
       backgroundElm_right.name = 'background_elm_right'
       this.container?.addChild(backgroundElm_right)
       this.container?.setChildIndex(backgroundElm_right, this.container.children.length - 2)
-      backgroundElm_right.scale.set(-1, 1)
+      backgroundElm_right.lineStyle(backgroundElm_left.line)
       backgroundElm_right.position.set(elm.x + elm.geometry.bounds.maxX, elm.y)
+      backgroundElm_left.geometry.graphicsData.forEach(item => {
+        backgroundElm_right.drawShape(item.shape)
+      })
+      backgroundElm_right.scale.set(-1, 1)
     }
   }
 
