@@ -72,7 +72,10 @@ function handlePointermove (this: Application, { x, y }: MouseEvent) {
 
 // 结束绘制
 function handleDrawEnd (this: Application) {
-  if (!this.container?.children.length) this.app.stage.removeChild(this.container as PIXI.DisplayObject)
+  if (!this.container?.children.length) {
+    this.app.stage.removeChild(this.container as PIXI.DisplayObject)
+    this.container = undefined
+  }
   const disabledUDS = ['select', 'paintingBrush', 'text', 'image']
   if (!disabledUDS.includes(this.styleConfig.drawType) && this.container) {
     this.drawSelected()

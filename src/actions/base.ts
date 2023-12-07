@@ -261,7 +261,9 @@ class Base {
   copy (copyElm: ExtendGraphics) {}
  
   /**
-   * 清空画布
+   * 删除元素或清空画布
+   * @param isDelElm 是否是删除元素
+   * @returns 
    */
   clear (isDelElm: boolean) {
     if (isDelElm) return this.app.stage.removeChild(this.container as PIXI.DisplayObject)
@@ -271,66 +273,61 @@ class Base {
   }
 
   /**
-   * 将canvas转为base64
+   * 将canvas 转为 base64
+   * @param type 图片类型 png | jpeg
+   * @returns 
    */
-  async canvas2Base64 (isDownload: boolean = false, type: string = 'image/png') {
-    const children = this.app.stage.children.filter(item => item.name !== 'mesh') as ExtendContainer[]
-    let position = {
-      x: 0,
-      y: 0,
-      minX: 0,
-      minY: 0,
-      maxX: 0,
-      maxY: 0
-    }
-    const displayObject = new PIXI.Container()
-    children.forEach(item => {
-      const mainName = item.children
-        .map(elmItem => elmItem.name)
-        .filter(name => /^main/.test(name as string))
-        .toString()
-      const mainElm = item.getChildByName(mainName) as ExtendGraphics
-      const { minX, minY, maxX, maxY } = mainElm.geometry.bounds
-      position = {
-        x: (!position.x || mainElm.x < position.x) ? mainElm.x : position.x,
-        y: (!position.y || mainElm.y < position.y) ? mainElm.y : position.y,
-        minX: minX < position.minX ? minX : position.minX,
-        minY: minY < position.minY ? minY : position.minY,
-        maxX: maxX > position.maxX ? maxX : position.maxX,
-        maxY: maxY > position.maxY ? maxY : position.maxY,
-      }
-    })
-    const imgBgElm = new PIXI.Graphics()
-    imgBgElm.name = 'img_bg'
-    if (this.container) {
-      (this as any).removeSelected()
-      this.container.addChildAt(imgBgElm, 0)
-      displayObject.addChild(this.container)
-    } else {
-      this.app.stage.addChildAt(imgBgElm, 1)
-      displayObject.addChild(imgBgElm, ...children)
-    }
-    const img = await this.app.renderer.extract.image(displayObject, type)
-    imgBgElm.beginFill(0xffffff, 1)
-    const { x, y,  minX, minY } = position
-    imgBgElm.drawRect(x + minX - 6, y + minY - 6, img.width + 6, img.height + 6)
-    let base64 = await this.app.renderer.extract.base64(displayObject, type)
-    // 根据下载类型移出背景
-    if (isDownload && type === 'image/png') {
+  async canvas2Base64 (type: string = 'image/jpeg') {
+    // 获取需要保存的元素
+    const saveElms = this.container
+      ? [this.container]
+      : this.app.stage.children.filter(item => item.name !== 'mesh')
+    // 获取每个容器的定位和宽高
+    const elmBounds = saveElms.map(container => ({
+      x: container.x,
+      y: container.y
+    }))
+    // 使用 position x,y 排序拿取 minX maxX
+    const rectangleMinX = elmBounds
+      .map(item => item.x)
+      .sort((a, b) => a - b)
+      .find((_, index) => index === 0)
+    const rectangleMinY = elmBounds
+      .map(item => item.y)
+      .sort((a, b) => a - b)
+      .find((_, index) => index === 0)
+    // 创建白色背景元素并添加到对应的容器中
+    const imgBgElm = new PIXI.Graphics();
+    (this as any).removeSelected()
+    if (type === 'image/jpeg') {
       if (this.container) {
-        const imgBgElm = this.container.getChildByName('img_bg') as PIXI.DisplayObject
-        this.container.removeChild(imgBgElm)
+        this.container.addChildAt(imgBgElm, 0)
+      } else {
+        saveElms.unshift(imgBgElm)
+        imgBgElm.position.set(rectangleMinX, rectangleMinY)
+        this.app.stage.addChildAt(imgBgElm, 1)
       }
-      const imgBgElm = displayObject.getChildByName('img_bg') as PIXI.DisplayObject
-      displayObject.removeChild(imgBgElm)
-      base64 = await this.app.renderer.extract.base64(displayObject, type)
     }
-    // 上面将arr添加到另一个容器中后，导致stage中的图形消失，需再次添加
-    this.app.stage.addChild(...children)
+    // 创建一个保存容器对象
+    const saveDisplayObject = new PIXI.Container()
+    saveDisplayObject.addChild(...saveElms)
+    const img = await this.app.renderer.extract.image(saveDisplayObject, type)
+    imgBgElm.beginFill(0xffffff, 1)
+    imgBgElm.drawRect(
+      -8, -8,
+      img.width + 8,
+      img.height + 8
+    )
+    const base64 = await this.app.renderer.extract.base64(saveDisplayObject, type)
+    // 将元素添加到另一个容器中后，导致stage中的图形消失，需再次添加stage中，并删除白色背景
     if (this.container) {
-      const imgBgElm = this.container.getChildByName('img_bg') as PIXI.DisplayObject
-      this.container.removeChild(imgBgElm)
+      this.container.removeChild(imgBgElm);
+      (this as any).drawSelected()
+    } else {
+      this.app.stage.removeChild(imgBgElm)
+      type === 'image/jpeg' && saveElms.shift()
     }
+    this.app.stage.addChild(...saveElms)
     return base64
   }
 }

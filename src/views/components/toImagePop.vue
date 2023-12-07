@@ -29,13 +29,14 @@ const handleStatusChange = async (status: boolean) => {
 
 const handleSaveImage = async (type: string) => {
   const pixiApp = toRaw(config.pixiApp)
-  const src = await pixiApp.canvas2Base64(true, type)
+  const src = await pixiApp.canvas2Base64(type)
   const tag_a = document.createElement('a')
   const name = Math.random().toString(16).slice(-6)
   tag_a.setAttribute('href', src)
   tag_a.setAttribute('download', name)
   tag_a.click()
   URL.revokeObjectURL(src)
+  popModal.value.visible = false
 }
 
 defineExpose({
