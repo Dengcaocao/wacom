@@ -1,4 +1,4 @@
-import { Container, Graphics } from 'pixi.js'
+import { Container, Graphics, Text } from 'pixi.js'
 import SpriteImage from './image'
 import type { ExtendGraphics, ExtendSprite } from '@/actions/types'
 import installElmEvent from '@/event/elmEvent'
@@ -10,10 +10,16 @@ class Copy extends SpriteImage {
     let { x, y } = this.container
     x += 10, y+= 10
     const sprite = this.container.getChildByName('main_sprite') as ExtendSprite
+    const text = this.container.getChildByName('main_text') as Text
     if (sprite) {
       const url = sprite.texture.baseTexture.cacheId
       this.drawImage(url, { x, y })
       return
+    }
+    if (text) {
+      this.removeSelected()
+      this.drawText(text.text, { x, y })
+      return this.drawSelected()
     }
     const container = new Container()
     container.position.set(x, y)

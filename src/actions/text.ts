@@ -20,9 +20,8 @@ const createElm = (
   elm.style.cssText = `
     overflow: hidden;
     position: absolute;
-    top: ${position.y}px;
+    top: ${position.y - fontSize/2}px;
     left: ${position.x}px;
-    transform: translateY(-50%);
     width: ${fontSize}px;
     height: ${fontSize}px;
     line-height: 1;
@@ -39,36 +38,36 @@ const createElm = (
 }
 
 class Text extends Mark {
-  drawText (point: { x: number, y: number }) {
+  drawText (txt: string = '', position?: { x: number, y: number }) {
     const elm = createElm(
       'textarea',
       {
         // 将stage位置处理为屏幕位置
-        x: point.x - Math.abs(this.app.stage.x) / this.scale,
-        y: point.y - Math.abs(this.app.stage.y) / this.scale
+        x: this.startPoints.x - Math.abs(this.app.stage.x) / this.scale,
+        y: this.startPoints.y - Math.abs(this.app.stage.y) / this.scale
       },
       this.styleConfig.color
     )
+    position = position || { ...this.startPoints }
+    position.y -= txt ? 0 : fontSize / 2
     this.container = new PIXI.Container()
+    this.container.position = position
     this.app.stage.addChild(this.container)
     PIXI.Text.defaultResolution = window.devicePixelRatio || 1
     PIXI.Text.defaultAutoResolution = false
-    const text: ExtendText = new PIXI.Text('', {
+    const text: ExtendText = new PIXI.Text(txt, {
       fontFamily: 'LongCang-Regular',
       fontSize: fontSize,
       lineHeight: fontSize,
       fill: this.styleConfig.color
     })
     text.name = 'main_text'
+    text.alpha = this.styleConfig.alpha
     text.styleConfig = { ...this.styleConfig }
     this.container.addChild(text)
     installElmEvent.call(this as any, text)
     elm.oninput = (e: any) => {
       text.text = e.target.value
-      text.position = {
-        ...point,
-        y: point.y - text.height / 2
-      }
       elm.style.width = text.width + fontSize + 'px'
       elm.style.height = text.height + 'px'
     }
@@ -76,7 +75,7 @@ class Text extends Mark {
       this.container = undefined
       elm.parentNode?.removeChild(elm)
     }
-    this.dom.appendChild(elm)
+    !txt && this.dom.appendChild(elm)
     setTimeout(() => elm.focus())
   }
 }

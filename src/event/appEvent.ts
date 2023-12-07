@@ -43,7 +43,7 @@ function handleWheel (this: Application, { deltaX, deltaY }: WheelEvent) {
 function handlePointerdown (this: Application, { x, y }: MouseEvent) {
   this.startPoints = this.getMappingPoints(x, y)
   if (this.styleConfig.drawType === 'image') return
-  if (this.styleConfig.drawType === 'text') return this.drawText(this.startPoints)
+  if (this.styleConfig.drawType === 'text') return this.drawText()
   // 绘制之前删除选中效果
   if (this.container) {
     this.removeSelected()
