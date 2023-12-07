@@ -8,16 +8,22 @@
       :title="icon.title"
       @click="handleUpdateDrawType(icon.action as IDrawType)">
     </span>
+    <div class="tips">{{tips}}</div>
   </header>
 </template>
 
 <script setup lang="ts">
-import { reactive, toRaw, watch } from 'vue'
+import { reactive, ref, toRaw, watch } from 'vue'
 import type { IDrawType } from '@/stores/types'
 import { useConfigStore } from '@/stores/config'
 
+const info: any = {
+  select: '滚动或空格+鼠标左键移动画布',
+}
+
 const configStore = useConfigStore()
 
+const tips = ref(info.select)
 const icons = reactive([
   {
     title: '选择',
@@ -71,6 +77,7 @@ watch(() => configStore.drawType, type => {
     configStore.isCollapsed = false
     configStore.pixiApp.removeSelected()
   }
+  tips.value = info[type]
   configStore.pixiApp.styleConfig.drawType = type
   document.body.style.cursor = type === 'select' ? 'default' : 'crosshair'
 })
@@ -109,6 +116,10 @@ const handleUpdateDrawType = (type: IDrawType) => {
   }
   .active {
     background-color: theme('colors.theme-color-deep');
+  }
+  .tips {
+    @apply absolute bottom-0 translate-y-full
+           w-full text-xs leading-8 text-center text-slate-600;
   }
 }
 </style>

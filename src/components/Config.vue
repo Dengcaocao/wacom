@@ -39,12 +39,12 @@
       <h3 class="title">操作</h3>
       <div class="flex">
         <div
-          title="复制"
+          title="复制(ctrl+c)"
           @click="handleCopy"
           class="action iconfont icon-fuzhi_copy cursor-pointer hover:bg-theme-color-deep">
         </div>
         <div
-          title="删除"
+          title="删除(backspace | delete)"
           @click="handleDel"
           class="action iconfont icon-weibiaoti544 cursor-pointer hover:bg-theme-color-deep">
         </div>
