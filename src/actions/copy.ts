@@ -1,13 +1,22 @@
 import { Container, Graphics } from 'pixi.js'
 import SpriteImage from './image'
-import type { ExtendGraphics } from '@/actions/types'
+import type { ExtendGraphics, ExtendSprite } from '@/actions/types'
 import installElmEvent from '@/event/elmEvent'
 import type { IElementStyle } from '@/stores/types'
 
 class Copy extends SpriteImage {
   copy () {
     if (!this.container) return
+    let { x, y } = this.container
+    x += 10, y+= 10
+    const sprite = this.container.getChildByName('main_sprite') as ExtendSprite
+    if (sprite) {
+      const url = sprite.texture.baseTexture.cacheId
+      this.drawImage(url, { x, y })
+      return
+    }
     const container = new Container()
+    container.position.set(x, y)
     this.app.stage.addChild(container)
     this.container.children
       .filter(elm => elm.name !== 'selected')
@@ -29,7 +38,6 @@ class Copy extends SpriteImage {
         graphics.lineStyle({
           ...(elm as ExtendGraphics).line
         })
-        graphics.position.set(elm.parent.x + elm.x + 10, elm.parent.y + elm.y + 10)
         graphicsData.forEach(item => graphics.drawShape(item.shape))
       })
     this.removeSelected()
