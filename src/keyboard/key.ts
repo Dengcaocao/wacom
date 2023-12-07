@@ -6,6 +6,8 @@ function handleKeydown (this: Application, e: KeyboardEvent) {
   this.keys.push(key)
   switch (true) {
     case ['backspace', 'delete'].includes(key): {
+      const textarea = document.querySelector('textarea')
+      if (textarea) return
       return this.app.stage.removeChild(this.container as ExtendContainer)
     }
     case e.ctrlKey && key === 'c': {
