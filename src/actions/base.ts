@@ -17,9 +17,10 @@ class Base {
     this.app = new PIXI.Application({
       width: width * 2,
       height: height * 2,
-      backgroundColor: bgColor || 0xffffff,
       antialias: true,
-      eventMode: 'static'
+      eventMode: 'static',
+      backgroundColor: bgColor || 0xffffff,
+      resolution: window.devicePixelRatio || 1
     })
     this.dom = dom
     this.scale = this.app.screen.width / width

@@ -53,8 +53,8 @@ class Text extends Mark {
     this.container = new PIXI.Container()
     this.container.position = position
     this.app.stage.addChild(this.container)
-    PIXI.Text.defaultResolution = window.devicePixelRatio || 1
-    PIXI.Text.defaultAutoResolution = false
+    // PIXI.Text.defaultResolution = window.devicePixelRatio || 1
+    // PIXI.Text.defaultAutoResolution = false
     const text: ExtendText = new PIXI.Text(txt, {
       fontFamily: 'LongCang-Regular',
       fontSize: fontSize,

@@ -35,7 +35,7 @@ class Copy extends SpriteImage {
         graphics.scale = elm.scale
         if (elm.name === 'main_graphics') {
           graphics.styleConfig = { ...(elm as ExtendGraphics).styleConfig as IElementStyle }
-          installElmEvent.call(this, graphics)
+          installElmEvent.call(this as any, graphics)
         }
         graphics.beginFill(
           (elm as ExtendGraphics).fill.color,
