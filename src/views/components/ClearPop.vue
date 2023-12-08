@@ -9,7 +9,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, defineExpose, toRefs } from 'vue'
+import { ref, toRefs } from 'vue'
 import Pop from '@/components/Pop.vue'
 import { useConfigStore } from '@/stores/config'
 

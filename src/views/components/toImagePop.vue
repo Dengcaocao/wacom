@@ -11,7 +11,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, defineExpose, toRaw } from 'vue'
+import { ref, toRaw } from 'vue'
 import Pop from '@/components/Pop.vue'
 import { useConfigStore } from '@/stores/config'
 

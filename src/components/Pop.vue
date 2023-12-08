@@ -15,7 +15,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, defineProps, defineExpose, watch } from 'vue'
+import { ref, watch } from 'vue'
 
 const props = defineProps<{
   title: string
