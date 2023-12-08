@@ -8,6 +8,6 @@
 <style scoped>
 @font-face {
   font-family: "LongCang-Regular";
-  src: url("@/assets/font/LongCang-Regular.ttf") format("truetype");
+  src: url("@/assets/font/handwriting.ttf") format("truetype");
 }
 </style>
