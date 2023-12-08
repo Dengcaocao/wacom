@@ -2,7 +2,7 @@ import * as PIXI from 'pixi.js'
 import Rect from './rect'
 import createDashedTexture from '@/texture/dashed'
 import installControlElmEvent from '@/event/controlElmEvent'
-import type { ExtendContainer, ExtendGraphics, ExtendSprite, ExtendText, MainElm } from '@/actions/types'
+import type { ExtendContainer, ExtendSprite, ExtendText, MainElm } from '@/actions/types'
 
 // 绘制选中效果的间隙大小
 export const gapSize = 12
@@ -15,7 +15,7 @@ const controlSize = 8
  * @param index 
  * @returns 
  */
-const setCursor = (childElm: ExtendGraphics, index: number) => {
+const setCursor = (childElm: PIXI.Graphics, index: number) => {
   switch (true) {
     case [0, 4].includes(index): {
       return childElm.cursor = 'ew-resize'
@@ -40,7 +40,7 @@ const setCursor = (childElm: ExtendGraphics, index: number) => {
  */
 function controlPoint (
   this: Selected,
-  elm: ExtendGraphics,
+  elm: PIXI.Graphics,
   width: number,
   height: number
 ) {
@@ -73,7 +73,7 @@ function controlPoint (
     if (isNewCreate) {
       elm.addChild(controlElm)
       setCursor(controlElm, index)
-      installControlElmEvent.call(this as any, controlElm, index)
+      installControlElmEvent.call(this, controlElm, index)
     }
     controlElm.position.set(x, y)
     controlElm.beginFill(0xffffff, 0.8)
@@ -93,7 +93,7 @@ function controlPoint (
 const getMaximum = (mainElm: MainElm) => {
   switch (mainElm.name) {
     case 'main_graphics': {
-      return (mainElm as ExtendGraphics).geometry.bounds
+      return (mainElm as PIXI.Graphics).geometry.bounds
     }
 
     case 'main_text': {
@@ -113,7 +113,7 @@ const getMaximum = (mainElm: MainElm) => {
     }
 
     default: {
-      return (mainElm as ExtendGraphics).geometry.bounds
+      return (mainElm as PIXI.Graphics).geometry.bounds
     }
   }
 }
@@ -131,39 +131,35 @@ class Selected extends Rect {
    */
   drawSelected () {
     const containerElm = this.container as ExtendContainer
-    if (!containerElm.children.length) return
+    let selectedElm = containerElm.getChildByName('selected') as PIXI.Graphics
+    if (selectedElm) return
+    selectedElm = new PIXI.Graphics()
+    selectedElm.name = 'selected'
+    containerElm.addChild(selectedElm)
     // 获取容器中的主图形
     const mainElm = containerElm.children
       .filter(item => item.name && /^main/.test(item.name))[0] as MainElm
-    const selectedElm = containerElm.getChildByName('selected') as ExtendGraphics
-    const selectedGraphics: ExtendGraphics = selectedElm || new PIXI.Graphics()
     const { minX, minY, maxX, maxY } = getMaximum(mainElm)
     const width = maxX - minX + gapSize,
           height = maxY - minY + gapSize,
           halfWidth = width / 2,
           halfHeight = height / 2
-    if (!selectedElm) {
-      selectedGraphics.name = 'selected'
-      containerElm.addChild(selectedGraphics)
-    } else {
-      selectedGraphics.clear()
-    }
-    selectedGraphics.beginFill(0, 0)
-    selectedGraphics.lineTextureStyle({
+    selectedElm.beginFill(0, 0)
+    selectedElm.lineTextureStyle({
       width: 1,
       texture: createDashedTexture(width, height)
     })
-    selectedGraphics.position.set(
+    selectedElm.position.set(
       mainElm.x + minX + halfWidth - gapSize / 2,
       mainElm.y + minY + halfHeight - gapSize / 2
     )
-    selectedGraphics.drawPolygon([
+    selectedElm.drawPolygon([
       -halfWidth, -halfHeight,
       halfWidth, -halfHeight,
       halfWidth, halfHeight,
       -halfWidth, halfHeight
     ])
-    controlPoint.call(this, selectedGraphics, halfWidth, halfHeight)
+    controlPoint.call(this, selectedElm, halfWidth, halfHeight)
   }
 }
 

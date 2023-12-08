@@ -1,10 +1,5 @@
 import * as PIXI from 'pixi.js'
 import Application from '@/actions/application'
-import Pinia from '@/stores/index'
-import { useConfigStore } from '@/stores/config'
-import { toRefs } from 'vue'
-
-const { drawType } = toRefs(useConfigStore(Pinia))
 
 /**
  * 处理场景滚动

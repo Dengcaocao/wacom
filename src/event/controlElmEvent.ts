@@ -1,98 +1,57 @@
 import * as PIXI from 'pixi.js'
-import Application from '@/actions/application'
+import Selected from '@/actions/selected'
 import { gapSize } from '@/actions/selected'
-import type { ExtendGraphics } from '@/actions/types'
+import type { ExtendContainer, ExtendGraphics } from '@/actions/types'
 
 // 记录点击时的数据
-let containerElm: PIXI.Container
+let containerElm: ExtendContainer
 let main_graphics: PIXI.Graphics
-let main_graphics_position: PIXI.ObservablePoint
 let selectedElm: PIXI.Graphics
 let pointsGap: number[]
+let initSize = { width: 0, height: 0 }
 
 function handlePointerdown (
-  this: ExtendGraphics,
-  rootThis: Application,
+  this: PIXI.Graphics,
+  rootThis: Selected,
   index: number,
   e: MouseEvent
 ) {
   e.stopPropagation()
-  this.isMove = true
   // 获取父容器
   containerElm = this.parent.parent
+  containerElm.isMove = true
+  containerElm.startPoint = { x: e.x, y: e.y }
   selectedElm = containerElm.getChildByName('selected') as PIXI.Graphics
   main_graphics = containerElm.getChildByName('main_graphics') as PIXI.Graphics
+  const { width, height } = containerElm
+  initSize = { width, height }
   // 保存最开始的定位信息
-  main_graphics_position = main_graphics_position || main_graphics.position
-  const { minX, minY, maxX, maxY } = main_graphics.geometry.bounds
-  const w = maxX - minX, h = maxY - minY
-  // 设置绘制起始点 和空隙
-  switch (index) {
-    case 0: {
-      rootThis.startPoints = main_graphics.position
-      return pointsGap = [-gapSize, h/2]
-    }
-    case 1: {
-      rootThis.startPoints = main_graphics.position
-      return pointsGap = [-gapSize, -gapSize]
-    }
-    case 2: {
-      rootThis.startPoints = main_graphics.position
-      return pointsGap = [w/2, -gapSize]
-    }
-    case 3: {
-      rootThis.startPoints = {
-        x: main_graphics_position.x + w,
-        y: main_graphics_position.y
-      }
-      return pointsGap = [gapSize, -gapSize]
-    }
-    case 4: {
-      rootThis.startPoints = {
-        x: main_graphics_position.x + w,
-        y: main_graphics_position.y
-      }
-      return pointsGap = [gapSize, h/2]
-    }
-    case 5: {
-      rootThis.startPoints = {
-        x: main_graphics_position.x + w,
-        y: main_graphics_position.y + h
-      }
-      return pointsGap = [gapSize, gapSize]
-    }
-    case 6: {
-      rootThis.startPoints = {
-        x: main_graphics_position.x + w,
-        y: main_graphics_position.y + h
-      }
-      return pointsGap = [w/2 * -1, gapSize]
-    }
-    case 7: {
-      rootThis.startPoints = {
-        x: main_graphics_position.x,
-        y: main_graphics_position.y + h
-      }
-      return pointsGap = [-gapSize, gapSize]
-    }
-  }
+  // main_graphics_position = main_graphics_position || main_graphics.position
+  // const { minX, minY, maxX, maxY } = main_graphics.geometry.bounds
+  // const w = maxX - minX, h = maxY - minY
 }
 
 function handleActionEnd (
-  this: ExtendGraphics,
+  this: PIXI.Graphics,
   e: MouseEvent
 ) {
   e.stopPropagation()
-  this.isMove = false
+  containerElm.isMove = false
 }
 
 function handlePointermove (
-  this: ExtendGraphics,
-  rootThis: Application,
+  this: PIXI.Graphics,
+  rootThis: Selected,
   e: MouseEvent
 ) {
   e.stopPropagation()
-  if (!this.isMove) return
+  if (!containerElm?.isMove) return
+  const { width, height } = initSize
+  const { x, y } = containerElm.startPoint || { x: 0, y: 0 }
+  const mX = e.x - x
+  const mY = e.y - y
+  containerElm.scale.set(1 + mX/width, 1+mY/height)
+  return console.log(mX, width)
   containerElm.removeChild(main_graphics)
   // tips 这里要加上container移动的位置的取反
   const point = rootThis.getMappingPoints(
@@ -110,22 +69,22 @@ function handlePointermove (
 }
 
 function installControlElmEvent (
-  this: Application,
-  elm: ExtendGraphics,
+  this: Selected,
+  controlElm: ExtendGraphics,
   index: number
 ) {
-  elm.on('pointerdown', e => {
-    handlePointerdown.call(elm, this, index, e)
+  controlElm.on('pointerdown', e => {
+    handlePointerdown.call(controlElm, this, index, e)
   })
-  elm.on('pointerup', e => {
-    handleActionEnd.call(elm, e)
+  controlElm.on('pointerup', e => {
+    handleActionEnd.call(controlElm, e)
   })
   // 使用最外层容器触发移动事件，控制点太小容易掉
-  elm.parent.parent.parent.on('pointerup', e => {
-    handleActionEnd.call(elm, e)
+  controlElm.parent.parent.parent.on('pointerup', e => {
+    handleActionEnd.call(controlElm, e)
   })
-  elm.parent.parent.parent.on('pointermove', e => {
-    handlePointermove.call(elm, this, e)
+  controlElm.parent.parent.parent.on('pointermove', e => {
+    handlePointermove.call(controlElm, this, e)
   })
 }
 
