@@ -9,7 +9,7 @@
 </template>
 
 <script setup lang="ts">
-import { onMounted, ref, watch } from 'vue'
+import { onMounted, ref, toRaw, watch } from 'vue'
 import { useConfigStore } from '@/stores/config'
 import Tabbar from '@/components/Tabbar.vue'
 import Side from '@/components/Side.vue'
@@ -27,14 +27,15 @@ watch(configStore.styleConfig, config => {
 })
  
 onMounted(() => {
-  configStore.pixiApp = new Application({
+  const app = new Application({
     width: window.innerWidth,
     height: window.innerHeight,
-    styleConfig: {
+    graphicsConfig: {
       drawType: configStore.drawType,
-      ...configStore.styleConfig
+      styleConfig: configStore.styleConfig
     },
     dom: container.value as HTMLElement
   })
+  configStore.pixiApp = toRaw(app)
 })
 </script>

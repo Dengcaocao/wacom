@@ -1,7 +1,7 @@
 import * as PIXI from 'pixi.js'
 import { createOffsetArr, getAngle } from '@/utils/utils'
 import installElmEvent from '@/event/elmEvent'
-import type { IBaseParams, ExtendContainer, ExtendGraphics } from './types'
+import type { IBaseParams, ExtendContainer, ExtendGraphics, IExtendAttribute, IGraphicsConfig } from './types'
 import type { IElementStyle } from '@/stores/types'
 
 class Base {
@@ -9,11 +9,11 @@ class Base {
   dom: HTMLElement
   scale: number
   // 样式配置对象
-  styleConfig: IElementStyle
+  graphicsConfig: IGraphicsConfig
   container: ExtendContainer | undefined
-  startPoints: { x: number, y: number } = { x: 0, y: 0 }
   isDraw: boolean = false
-  constructor ({ width, height, bgColor, styleConfig, dom }: IBaseParams) {
+  startPoints: { x: number, y: number } = { x: 0, y: 0 }
+  constructor ({ width, height, bgColor, graphicsConfig, dom }: IBaseParams) {
     this.app = new PIXI.Application({
       width: width * 2,
       height: height * 2,
@@ -24,7 +24,7 @@ class Base {
     })
     this.dom = dom
     this.scale = this.app.screen.width / width
-    this.styleConfig = styleConfig
+    this.graphicsConfig = graphicsConfig
     this.initCanvasSize(width, height)
     this.createMesh()
     dom.appendChild(this.app.view as HTMLCanvasElement)
@@ -99,29 +99,29 @@ class Base {
   ) {
     elm.beginFill(0, 0)
     elm.lineStyle({
-      ...this.styleConfig,
+      ...this.graphicsConfig.styleConfig,
       cap: PIXI.LINE_CAP.ROUND,
       join: PIXI.LINE_JOIN.ROUND
     })
-    const { drawType, type } = this.styleConfig as IElementStyle
+    const container = this.container as ExtendContainer
+    const customInfo = container.customInfo as IExtendAttribute
+    const { drawType, styleConfig, randomOffset } = customInfo
     if (drawType === 'paintingBrush') return
-    if (drawType === 'arc' && type === 'simple' ) {
-      return
-    }
+    if (drawType === 'arc' && styleConfig?.type === 'simple' ) return
     // 记录点位消息
-    const offsetPoints = (this.container as ExtendContainer).offsetPoints || []
-    const qcPoints = (this.styleConfig as IElementStyle).type === 'simple'
+    const currRandomOffset = randomOffset || []
+    const controlPoints = styleConfig.type === 'simple'
       ? vertex
-      : offsetPoints[index]
+      : currRandomOffset
         .map((item, index) => {
           const vertexIndex = index % vertex.length
           return item + vertex[vertexIndex]
         })
-    elm.qcPoints = qcPoints.length
-      ? qcPoints
-      : elm.qcPoints
-    for (let i = 0; i < (elm.qcPoints as number[]).length; i+=6) {
-      const [x, y, cpX, cpY, toX, toY] = (elm.qcPoints as number[]).slice(i, i+6)
+    customInfo.controlPoints = controlPoints.length
+      ? controlPoints
+      : customInfo.controlPoints as number[]
+    for (let i = 0; i < customInfo.controlPoints.length; i+=6) {
+      const [x, y, cpX, cpY, toX, toY] = customInfo.controlPoints.slice(i, i+6)
       elm.moveTo(x, y)
       // 都使用贝塞尔曲线能拿到图形上每个点的信息
       elm.quadraticCurveTo(cpX, cpY, toX, toY)
@@ -138,10 +138,9 @@ class Base {
     vertex: number[] = [],
     maxNum: number
   ) {
-    const graphics: ExtendGraphics = new PIXI.Graphics()
+    const graphics = new PIXI.Graphics()
     graphics.name = 'main_graphics'
-    graphics.styleConfig = { ...this.styleConfig }
-    installElmEvent.call(this as any, graphics)
+    installElmEvent(graphics)
     const container = this.container as ExtendContainer
     container.removeChildren()
     container.addChild(graphics)

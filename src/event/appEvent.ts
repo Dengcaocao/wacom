@@ -1,5 +1,6 @@
 import * as PIXI from 'pixi.js'
 import Application from '@/actions/application'
+import type { ExtendContainer, IExtendAttribute } from '@/actions/types'
 
 /**
  * 处理场景滚动
@@ -37,14 +38,18 @@ function handleWheel (this: Application, { deltaX, deltaY }: WheelEvent) {
 
 function handlePointerdown (this: Application, { x, y }: MouseEvent) {
   this.startPoints = this.getMappingPoints(x, y)
-  if (this.styleConfig.drawType === 'image') return
-  if (this.styleConfig.drawType === 'text') return this.drawText()
+  if (this.graphicsConfig.drawType === 'image') return
+  if (this.graphicsConfig.drawType === 'text') return this.drawText()
   // 绘制之前删除选中效果
   if (this.container) {
     this.removeSelected()
     this.container = undefined
   }
   this.container = new PIXI.Container()
+  this.container.customInfo = {
+    drawType: this.graphicsConfig.drawType,
+    styleConfig: { ...this.graphicsConfig.styleConfig }
+  }
   this.container.position.set(this.startPoints.x, this.startPoints.y)
   this.app.stage.addChild(this.container)
   if (this.keys.includes('space')) document.body.style.cursor = 'grabbing'
@@ -58,7 +63,8 @@ function handlePointermove (this: Application, { x, y }: MouseEvent) {
   const deltaX = (point.x - this.startPoints.x) * -1
   const deltaY = (point.y - this.startPoints.y) * -1
   if (this.keys.includes('space')) return handleWheel.call(this, { deltaX, deltaY } as WheelEvent)
-  const type = this.styleConfig.drawType
+  const container = <ExtendContainer>this.container
+  const drawType = (container.customInfo as IExtendAttribute).drawType
   const methods: any = {
     rect: this.drawRect.bind(this),
     diamond: this.drawDiamond.bind(this),
@@ -67,7 +73,7 @@ function handlePointermove (this: Application, { x, y }: MouseEvent) {
     straightLine: this.drawMark.bind(this),
     paintingBrush: this.paintingBrush.bind(this)
   }
-  methods[type] && methods[type](point.x, point.y)
+  methods[drawType] && methods[drawType](point.x, point.y)
 }
 
 // 结束绘制
@@ -77,7 +83,9 @@ function handleDrawEnd (this: Application) {
     this.container = undefined
   }
   const disabledUDS = ['select', 'paintingBrush', 'text', 'image']
-  if (!disabledUDS.includes(this.styleConfig.drawType) && this.container) {
+  const container = <ExtendContainer>this.container
+  const drawType = (container.customInfo as IExtendAttribute).drawType
+  if (!disabledUDS.includes(drawType) && container) {
     this.drawSelected()
   }
   if (this.keys.includes('space')) document.body.style.cursor = 'default'

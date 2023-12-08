@@ -1,10 +1,15 @@
 import * as PIXI from 'pixi.js'
 import type { IElementStyle } from '@/stores/types'
+
+export interface IGraphicsConfig {
+  drawType: string
+  styleConfig: IElementStyle
+}
 export interface IBaseParams {
   width: number
   height: number,
   bgColor?: number,
-  styleConfig: IElementStyle
+  graphicsConfig: IGraphicsConfig
   dom: HTMLElement
 }
 
@@ -14,24 +19,18 @@ export interface IPoint {
 }
 // 扩展容器或图形上的属性
 export interface IExtendAttribute {
-  styleConfig?: IElementStyle
+  drawType: string
   isMove?: boolean
   startPoint?: IPoint
-  offsetPoints?: number[][]
-  // 图形
-  qcPoints?: number[]
+  styleConfig: IElementStyle
+  randomOffset?: []
+  controlPoints?: number[]
 }
 
-export type ExtendContainer = PIXI.Container & IExtendAttribute
-
-export type ExtendGraphics = PIXI.Graphics & IExtendAttribute
-
-export type ExtendText = PIXI.Text & IExtendAttribute
-
-export type ExtendSprite = PIXI.Sprite & IExtendAttribute
+export type ExtendContainer = PIXI.Container & { customInfo?: IExtendAttribute }
 
 export interface IExtremePoint {
-  elm: ExtendGraphics
+  elm: PIXI.Graphics
   type: string
   point: IPoint
   direction: string
@@ -39,4 +38,4 @@ export interface IExtremePoint {
   distance: number
 }
 
-export type MainElm = ExtendGraphics | ExtendText | ExtendSprite
+export type MainElm = PIXI.Graphics | PIXI.Text | PIXI.Sprite
