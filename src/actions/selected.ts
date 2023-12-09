@@ -2,7 +2,7 @@ import * as PIXI from 'pixi.js'
 import Rect from './rect'
 import createDashedTexture from '@/texture/dashed'
 import installControlElmEvent from '@/event/controlElmEvent'
-import type { ExtendContainer, ExtendSprite, ExtendText, MainElm } from '@/actions/types'
+import type { ExtendContainer, MainElm } from '@/actions/types'
 
 // 绘制选中效果的间隙大小
 export const gapSize = 12
@@ -99,16 +99,16 @@ const getMaximum = (mainElm: MainElm) => {
     case 'main_text': {
       return {
         minX: 0, minY: 0,
-        maxX: (mainElm as ExtendText).width,
-        maxY: (mainElm as ExtendText).height
+        maxX: (mainElm as PIXI.Text).width,
+        maxY: (mainElm as PIXI.Text).height
       }
     }
 
     case 'main_sprite': {
       return {
         minX: 0, minY: 0,
-        maxX: (mainElm as ExtendSprite).width,
-        maxY: (mainElm as ExtendSprite).height
+        maxX: (mainElm as PIXI.Sprite).width,
+        maxY: (mainElm as PIXI.Sprite).height
       }
     }
 

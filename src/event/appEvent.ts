@@ -37,9 +37,8 @@ function handleWheel (this: Application, { deltaX, deltaY }: WheelEvent) {
 }
 
 function handlePointerdown (this: Application, { x, y }: MouseEvent) {
+  const { drawType, styleConfig } = this.graphicsConfig
   this.startPoints = this.getMappingPoints(x, y)
-  if (this.graphicsConfig.drawType === 'image') return
-  if (this.graphicsConfig.drawType === 'text') return this.drawText()
   // 绘制之前删除选中效果
   if (this.container) {
     this.removeSelected()
@@ -47,11 +46,13 @@ function handlePointerdown (this: Application, { x, y }: MouseEvent) {
   }
   this.container = new PIXI.Container()
   this.container.customInfo = {
-    drawType: this.graphicsConfig.drawType,
-    styleConfig: { ...this.graphicsConfig.styleConfig }
+    drawType,
+    styleConfig: { ...styleConfig }
   }
   this.container.position.set(this.startPoints.x, this.startPoints.y)
   this.app.stage.addChild(this.container)
+  if (drawType === 'image') return
+  if (drawType === 'text') return this.drawText()
   if (this.keys.includes('space')) document.body.style.cursor = 'grabbing'
   this.isDraw = true
 }
@@ -63,7 +64,7 @@ function handlePointermove (this: Application, { x, y }: MouseEvent) {
   const deltaX = (point.x - this.startPoints.x) * -1
   const deltaY = (point.y - this.startPoints.y) * -1
   if (this.keys.includes('space')) return handleWheel.call(this, { deltaX, deltaY } as WheelEvent)
-  const container = <ExtendContainer>this.container
+  const container = this.container as ExtendContainer
   const drawType = (container.customInfo as IExtendAttribute).drawType
   const methods: any = {
     rect: this.drawRect.bind(this),
@@ -78,18 +79,18 @@ function handlePointermove (this: Application, { x, y }: MouseEvent) {
 
 // 结束绘制
 function handleDrawEnd (this: Application) {
-  if (!this.container?.children.length) {
+  this.isDraw = false
+  if (!this.container) return
+  if (!this.container.children.length) {
     this.app.stage.removeChild(this.container as PIXI.DisplayObject)
-    this.container = undefined
+    return this.container = undefined
   }
   const disabledUDS = ['select', 'paintingBrush', 'text', 'image']
-  const container = <ExtendContainer>this.container
-  const drawType = (container.customInfo as IExtendAttribute).drawType
-  if (!disabledUDS.includes(drawType) && container) {
+  const drawType = (this.container.customInfo as IExtendAttribute).drawType
+  if (!disabledUDS.includes(drawType) && this.container) {
     this.drawSelected()
   }
   if (this.keys.includes('space')) document.body.style.cursor = 'default'
-  this.isDraw = false
   // this.styleConfig.drawType !=='paintingBrush' && (drawType.value = 'select')
 }
 

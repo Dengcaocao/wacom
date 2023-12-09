@@ -78,7 +78,10 @@ watch(() => configStore.drawType, type => {
     configStore.pixiApp.removeSelected()
   }
   tips.value = info[type]
-  configStore.pixiApp.styleConfig.drawType = type
+  configStore.pixiApp.graphicsConfig = {
+    ...configStore.pixiApp.graphicsConfig,
+    drawType: type
+  }
   document.body.style.cursor = type === 'select' ? 'default' : 'crosshair'
 })
 

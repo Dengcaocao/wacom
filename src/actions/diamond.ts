@@ -12,7 +12,7 @@ class Diamond extends Selected {
       w, h / 2, w * 3 / 4, h * 3 / 4, w / 2, h,
       w / 2, h, w / 4, h * 3 / 4, 0, h / 2
     ]
-    const diamondElm = this.createElement(vertex, 4)
+    const diamondElm = this.createElement(vertex)
     diamondElm.hitArea = new Polygon(vertex)
   }
 }

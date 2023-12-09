@@ -1,7 +1,7 @@
 import Mark from './mark'
 import * as PIXI from 'pixi.js'
 import installElmEvent from '@/event/elmEvent'
-import type { ExtendText } from './types'
+import type { ExtendContainer, IExtendAttribute } from './types'
 
 /**
  * 创建dom
@@ -39,6 +39,20 @@ const createElm = (
 
 class Text extends Mark {
   drawText (txt: string = '', position?: { x: number, y: number }) {
+    const container = <ExtendContainer>this.container
+    const { styleConfig: { color, alpha } } = <IExtendAttribute>container.customInfo
+    // PIXI.Text.defaultResolution = window.devicePixelRatio || 1
+    // PIXI.Text.defaultAutoResolution = false
+    const text = new PIXI.Text(txt, {
+      fontFamily: 'LongCang-Regular',
+      fontSize: fontSize,
+      lineHeight: fontSize,
+      fill: color,
+    })
+    text.name = 'main_text'
+    text.alpha = alpha
+    container.addChild(text)
+    installElmEvent.call(this as any, text)
     const elm = createElm(
       'textarea',
       {
@@ -46,26 +60,14 @@ class Text extends Mark {
         x: this.startPoints.x - Math.abs(this.app.stage.x) / this.scale,
         y: this.startPoints.y - Math.abs(this.app.stage.y) / this.scale
       },
-      this.styleConfig.color
+      color
     )
     position = position || { ...this.startPoints }
+    if (!txt) {
+      container.y -= fontSize / 2
+      position.y = fontSize / 2
+    }
     position.y -= txt ? 0 : fontSize / 2
-    this.container = new PIXI.Container()
-    this.container.position = position
-    this.app.stage.addChild(this.container)
-    // PIXI.Text.defaultResolution = window.devicePixelRatio || 1
-    // PIXI.Text.defaultAutoResolution = false
-    const text: ExtendText = new PIXI.Text(txt, {
-      fontFamily: 'LongCang-Regular',
-      fontSize: fontSize,
-      lineHeight: fontSize,
-      fill: this.styleConfig.color
-    })
-    text.name = 'main_text'
-    text.alpha = this.styleConfig.alpha
-    text.styleConfig = { ...this.styleConfig }
-    this.container.addChild(text)
-    installElmEvent.call(this as any, text)
     elm.oninput = (e: any) => {
       text.text = e.target.value
       elm.style.width = text.width + fontSize + 'px'

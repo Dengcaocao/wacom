@@ -1,10 +1,11 @@
 import * as PIXI from 'pixi.js'
 import Selected from '@/actions/selected'
 import { gapSize } from '@/actions/selected'
-import type { ExtendContainer, ExtendGraphics } from '@/actions/types'
+import type { ExtendContainer, IExtendAttribute } from '@/actions/types'
 
 // 记录点击时的数据
 let containerElm: ExtendContainer
+let customInfo: IExtendAttribute | undefined
 let main_graphics: PIXI.Graphics
 let selectedElm: PIXI.Graphics
 let pointsGap: number[]
@@ -19,8 +20,9 @@ function handlePointerdown (
   e.stopPropagation()
   // 获取父容器
   containerElm = this.parent.parent
-  containerElm.isMove = true
-  containerElm.startPoint = { x: e.x, y: e.y }
+  customInfo = containerElm.customInfo as IExtendAttribute
+  customInfo.isMove = true
+  customInfo.startPoint = { x: e.x, y: e.y }
   selectedElm = containerElm.getChildByName('selected') as PIXI.Graphics
   main_graphics = containerElm.getChildByName('main_graphics') as PIXI.Graphics
   const { width, height } = containerElm
@@ -36,7 +38,8 @@ function handleActionEnd (
   e: MouseEvent
 ) {
   e.stopPropagation()
-  containerElm.isMove = false
+  if (!customInfo) return
+  customInfo.isMove = false
 }
 
 function handlePointermove (
@@ -45,9 +48,9 @@ function handlePointermove (
   e: MouseEvent
 ) {
   e.stopPropagation()
-  if (!containerElm?.isMove) return
+  if (!customInfo?.isMove) return
   const { width, height } = initSize
-  const { x, y } = containerElm.startPoint || { x: 0, y: 0 }
+  const { x, y } = customInfo.startPoint || { x: 0, y: 0 }
   const mX = e.x - x
   const mY = e.y - y
   containerElm.scale.set(1 + mX/width, 1+mY/height)
@@ -70,10 +73,11 @@ function handlePointermove (
 
 function installControlElmEvent (
   this: Selected,
-  controlElm: ExtendGraphics,
+  controlElm: PIXI.Graphics,
   index: number
 ) {
   controlElm.on('pointerdown', e => {
+    console.log(999)
     handlePointerdown.call(controlElm, this, index, e)
   })
   controlElm.on('pointerup', e => {

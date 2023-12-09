@@ -1,19 +1,20 @@
 import Text from './text'
 import { Graphics } from 'pixi.js'
-import type { ExtendGraphics } from './types'
+import type { ExtendContainer } from './types'
 
 class Draw extends Text {
   paintingBrush (mX: number, mY: number) {
-    const elmContainer = this.container as ExtendGraphics
-    const main_graphics = elmContainer.getChildByName('main_graphics') as ExtendGraphics
-    const paintingBrushElm: ExtendGraphics = main_graphics || new Graphics()
-    elmContainer.addChild(paintingBrushElm)
-    paintingBrushElm.name = 'main_graphics'
-    paintingBrushElm.styleConfig = { ...this.styleConfig }
-    this.drawStroke(paintingBrushElm, 0)
+    const container = this.container as ExtendContainer
+    let main_graphics = container.getChildByName('main_graphics') as Graphics
+    if (!main_graphics) {
+      main_graphics = new Graphics()
+      main_graphics.name = 'main_graphics'
+      container.addChild(main_graphics)
+    }
+    this.drawStroke(main_graphics)
     const { x, y } = this.startPoints
-    paintingBrushElm.moveTo(x - elmContainer.x, y - elmContainer.y)
-    paintingBrushElm.lineTo(mX - elmContainer.x, mY - elmContainer.y)
+    main_graphics.moveTo(x - container.x, y - container.y)
+    main_graphics.lineTo(mX - container.x, mY - container.y)
     this.startPoints = { x: mX, y: mY }
   }
 }

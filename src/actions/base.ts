@@ -1,8 +1,7 @@
 import * as PIXI from 'pixi.js'
-import { createOffsetArr, getAngle } from '@/utils/utils'
+import { getAngle } from '@/utils/utils'
 import installElmEvent from '@/event/elmEvent'
-import type { IBaseParams, ExtendContainer, ExtendGraphics, IExtendAttribute, IGraphicsConfig } from './types'
-import type { IElementStyle } from '@/stores/types'
+import type { IBaseParams, ExtendContainer, IExtendAttribute, IGraphicsConfig } from './types'
 
 class Base {
   app: PIXI.Application
@@ -88,13 +87,11 @@ class Base {
   /**
    * 手绘描边
    * @param elm 描边元素
-   * @param index 控制点索引
    * @param vertex 顶点信息
    * @returns 
    */
   drawStroke (
-    elm: ExtendGraphics,
-    index: number,
+    elm: PIXI.Graphics,
     vertex: number[] = []
   ) {
     elm.beginFill(0, 0)
@@ -107,19 +104,20 @@ class Base {
     const customInfo = container.customInfo as IExtendAttribute
     const { drawType, styleConfig, randomOffset } = customInfo
     if (drawType === 'paintingBrush') return
-    if (drawType === 'arc' && styleConfig?.type === 'simple' ) return
+    if (drawType === 'arc' && styleConfig.type === 'simple' ) return
     // 记录点位消息
-    const currRandomOffset = randomOffset || []
-    const controlPoints = styleConfig.type === 'simple'
+    if (!randomOffset || drawType === 'mark') {
+      customInfo.randomOffset = vertex
+        .concat(vertex)
+        .map(() => Math.random() * (3 * 2) - 3)
+    }
+    customInfo.controlPoints = styleConfig.type === 'simple'
       ? vertex
-      : currRandomOffset
-        .map((item, index) => {
-          const vertexIndex = index % vertex.length
-          return item + vertex[vertexIndex]
-        })
-    customInfo.controlPoints = controlPoints.length
-      ? controlPoints
-      : customInfo.controlPoints as number[]
+      : (customInfo.randomOffset as number[])
+          .map((item, index) => {
+            const vertexIndex = index % vertex.length
+            return item + vertex[vertexIndex]
+          })
     for (let i = 0; i < customInfo.controlPoints.length; i+=6) {
       const [x, y, cpX, cpY, toX, toY] = customInfo.controlPoints.slice(i, i+6)
       elm.moveTo(x, y)
@@ -134,24 +132,14 @@ class Base {
    * @param maxNum 随机值的最大数
    * @returns 
    */
-  createElement (
-    vertex: number[] = [],
-    maxNum: number
-  ) {
-    const graphics = new PIXI.Graphics()
-    graphics.name = 'main_graphics'
-    installElmEvent(graphics)
+  createElement (vertex: number[] = []) {
     const container = this.container as ExtendContainer
     container.removeChildren()
+    const graphics = new PIXI.Graphics()
+    graphics.name = 'main_graphics'
     container.addChild(graphics)
-    // 获取图形在容器中位置，并设置随机偏移点
-    const index = container.getChildIndex(graphics)
-    if (!container.offsetPoints) {
-      container.offsetPoints = [createOffsetArr(maxNum)]
-    } else {
-      container.offsetPoints[index] = container.offsetPoints[index] || createOffsetArr(maxNum)
-    }
-    this.drawStroke(graphics, index, vertex)
+    installElmEvent.call(<any>this, graphics)
+    this.drawStroke(graphics, vertex)
     this.drawBackground(graphics, vertex)
     container.setChildIndex(graphics, container.children.length - 1)
     return graphics
@@ -163,21 +151,21 @@ class Base {
    * @param vertex 顶点信息
    * @returns 
    */
-  drawBackground (elm: ExtendGraphics, vertex: number[] = []) {
-    const { drawType ,alpha, type, fillColor, fillStyle } = elm.styleConfig as IElementStyle
+  drawBackground (elm: PIXI.Graphics, vertex: number[] = []) {
+    const container = this.container as ExtendContainer
+    const {
+      drawType,
+      randomOffset,
+      styleConfig: {
+        alpha, type, fillColor, fillStyle
+      }
+    } = container.customInfo as IExtendAttribute
     if (fillColor === 'transparent' || ['mark', 'straightLine'].includes(drawType)) return
-    const lineStyle = new PIXI.LineStyle()
-    lineStyle.width = 1
-    lineStyle.color = parseInt(fillColor.slice(1), 10)
-    lineStyle.alpha = alpha
-    lineStyle.cap = PIXI.LINE_CAP.ROUND
-    lineStyle.join = PIXI.LINE_JOIN.ROUND
     // 创建背景图形
     const backgroundElm_left = new PIXI.Graphics()
     backgroundElm_left.name = 'background_elm_left'
     backgroundElm_left.position.set(elm.x, elm.y)
     backgroundElm_left.lineStyle({
-      ...elm.styleConfig,
       width: 1,
       color: fillColor,
       cap: PIXI.LINE_CAP.ROUND,
@@ -224,19 +212,14 @@ class Base {
         p = [...p, ...graphicsData[i].points]
       }
     }
-    // 获取主图形的偏移量
-    const getOffset = () => {
-      const offsetPoints = (elm.parent as ExtendContainer).offsetPoints
-      return (offsetPoints as number[][])[0]
-        .sort(() => Math.random() - 0.5) // 打乱数组
-        .slice(-4)
-    }
     // 绘制背景曲线
     for (let i = 0; i < p.length/2; i+=2) {
       let [x, y] = p.slice(i, i + 2)
       let [toX, toY] = p.slice(p.length - 2 - i)
       for (let j = 0; j < 2; j++) {
-        const [o1, o2, o3, o4] = getOffset()
+        const [o1, o2, o3, o4] = <number[]>randomOffset
+          ?.sort(() => Math.random() - 0.5)
+          .slice(-4)
         x += o1, y+= o2
         toX += o3, toY+= o4
         const { width, height } = getAngle({x, y}, {x: toX, y: toY})
@@ -258,7 +241,7 @@ class Base {
     }
   }
 
-  copy (copyElm: ExtendGraphics) {}
+  copy (copyElm: PIXI.Graphics) {}
  
   /**
    * 删除元素或清空画布

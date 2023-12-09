@@ -23,7 +23,7 @@ export interface IExtendAttribute {
   isMove?: boolean
   startPoint?: IPoint
   styleConfig: IElementStyle
-  randomOffset?: []
+  randomOffset?: number[]
   controlPoints?: number[]
 }
 

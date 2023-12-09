@@ -11,7 +11,7 @@ class Rect extends Base {
       w, h, w / 2, h, 0, h,
       0, h, 0, h / 2, 0, 0
     ]
-    const rectElm = this.createElement(vertex, 4)
+    const rectElm = this.createElement(vertex)
     rectElm.hitArea = new Polygon(vertex)
   }
 }
