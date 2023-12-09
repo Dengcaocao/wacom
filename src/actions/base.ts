@@ -263,54 +263,27 @@ class Base {
   async canvas2Base64 (type: string = 'image/jpeg') {
     // 获取需要保存的元素
     const saveElms = this.container
-      ? [this.container]
+      ? this.container.children.filter(item => item.name !== 'selected')
       : this.app.stage.children.filter(item => item.name !== 'mesh')
-    // 获取每个容器的定位和宽高
-    const elmBounds = saveElms.map(container => ({
-      x: container.x,
-      y: container.y
-    }))
-    // 使用 position x,y 排序拿取 minX maxX
-    const rectangleMinX = elmBounds
-      .map(item => item.x)
-      .sort((a, b) => a - b)
-      .find((_, index) => index === 0)
-    const rectangleMinY = elmBounds
-      .map(item => item.y)
-      .sort((a, b) => a - b)
-      .find((_, index) => index === 0)
-    // 创建白色背景元素并添加到对应的容器中
-    const imgBgElm = new PIXI.Graphics();
-    (this as any).removeSelected()
-    if (type === 'image/jpeg') {
-      if (this.container) {
-        this.container.addChildAt(imgBgElm, 0)
-      } else {
-        saveElms.unshift(imgBgElm)
-        imgBgElm.position.set(rectangleMinX, rectangleMinY)
-        this.app.stage.addChildAt(imgBgElm, 1)
-      }
-    }
-    // 创建一个保存容器对象
+    if (!saveElms.length) return await this.app.renderer.extract.base64(this.app.stage, type)
+    // 创建一个保存容器对象,并将元素添加进去
     const saveDisplayObject = new PIXI.Container()
     saveDisplayObject.addChild(...saveElms)
-    const img = await this.app.renderer.extract.image(saveDisplayObject, type)
+    // 获取容器的大小信息
+    const { x, y, width, height } = saveDisplayObject.getBounds()
+    // 创建白色背景元素并添加到 saveDisplayObject
+    const imgBgElm = new PIXI.Graphics()
+    type === 'image/jpeg' && saveDisplayObject.addChildAt(imgBgElm, 0)
+    imgBgElm.position.set(x, y)
     imgBgElm.beginFill(0xffffff, 1)
     imgBgElm.drawRect(
-      -8, -8,
-      img.width + 8,
-      img.height + 8
+      0, 0, width, height
     )
     const base64 = await this.app.renderer.extract.base64(saveDisplayObject, type)
     // 将元素添加到另一个容器中后，导致stage中的图形消失，需再次添加stage中，并删除白色背景
-    if (this.container) {
-      this.container.removeChild(imgBgElm);
-      (this as any).drawSelected()
-    } else {
-      this.app.stage.removeChild(imgBgElm)
-      type === 'image/jpeg' && saveElms.shift()
-    }
-    this.app.stage.addChild(...saveElms)
+    this.container
+      ? this.container.addChild(...saveElms)
+      : this.app.stage.addChild(...saveElms)
     return base64
   }
 }
