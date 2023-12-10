@@ -24,7 +24,7 @@ export interface IExtendAttribute {
   startPoint?: IPoint
   styleConfig: IElementStyle
   randomOffset?: number[]
-  controlPoints?: number[]
+  vertexData: number[]
 }
 
 export type ExtendContainer = PIXI.Container & { customInfo?: IExtendAttribute }

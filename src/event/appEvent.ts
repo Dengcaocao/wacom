@@ -47,13 +47,13 @@ function handlePointerdown (this: Application, { x, y }: MouseEvent) {
   this.container = new PIXI.Container()
   this.container.customInfo = {
     drawType,
+    vertexData: [],
     styleConfig: { ...styleConfig }
   }
   this.container.position.set(this.startPoints.x, this.startPoints.y)
   this.app.stage.addChild(this.container)
   if (drawType === 'image') return
   if (drawType === 'text') return this.drawText()
-  if (this.keys.includes('space')) document.body.style.cursor = 'grabbing'
   this.isDraw = true
 }
 
@@ -90,7 +90,6 @@ function handleDrawEnd (this: Application) {
   if (!disabledUDS.includes(drawType) && this.container) {
     this.drawSelected()
   }
-  if (this.keys.includes('space')) document.body.style.cursor = 'default'
   // this.styleConfig.drawType !=='paintingBrush' && (drawType.value = 'select')
 }
 

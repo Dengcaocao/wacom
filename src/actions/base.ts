@@ -90,10 +90,7 @@ class Base {
    * @param vertex 顶点信息
    * @returns 
    */
-  drawStroke (
-    elm: PIXI.Graphics,
-    vertex: number[] = []
-  ) {
+  drawStroke (elm: PIXI.Graphics) {
     elm.beginFill(0, 0)
     elm.lineStyle({
       ...this.graphicsConfig.styleConfig,
@@ -102,24 +99,24 @@ class Base {
     })
     const container = this.container as ExtendContainer
     const customInfo = container.customInfo as IExtendAttribute
-    const { drawType, styleConfig, randomOffset } = customInfo
+    const { drawType, styleConfig, randomOffset, vertexData } = customInfo
     if (drawType === 'paintingBrush') return
     if (drawType === 'arc' && styleConfig.type === 'simple' ) return
-    // 记录点位消息
+    // 根据顶点数据创建随机偏移点
     if (!randomOffset || drawType === 'mark') {
-      customInfo.randomOffset = vertex
-        .concat(vertex)
+      customInfo.randomOffset = vertexData
+        .concat(vertexData)
         .map(() => Math.random() * (3 * 2) - 3)
     }
-    customInfo.controlPoints = styleConfig.type === 'simple'
-      ? vertex
+    const controlPoints = styleConfig.type === 'simple'
+      ? vertexData
       : (customInfo.randomOffset as number[])
           .map((item, index) => {
-            const vertexIndex = index % vertex.length
-            return item + vertex[vertexIndex]
+            const vertexIndex = index % vertexData.length
+            return item + vertexData[vertexIndex]
           })
-    for (let i = 0; i < customInfo.controlPoints.length; i+=6) {
-      const [x, y, cpX, cpY, toX, toY] = customInfo.controlPoints.slice(i, i+6)
+    for (let i = 0; i < controlPoints.length; i+=6) {
+      const [x, y, cpX, cpY, toX, toY] = controlPoints.slice(i, i+6)
       elm.moveTo(x, y)
       // 都使用贝塞尔曲线能拿到图形上每个点的信息
       elm.quadraticCurveTo(cpX, cpY, toX, toY)
@@ -128,19 +125,16 @@ class Base {
 
   /**
    * 创建一个主元素，并添加事件监听
-   * @param vertex 顶点信息
-   * @param maxNum 随机值的最大数
-   * @returns 
    */
-  createElement (vertex: number[] = []) {
+  createElement () {
     const container = this.container as ExtendContainer
     container.removeChildren()
     const graphics = new PIXI.Graphics()
     graphics.name = 'main_graphics'
     container.addChild(graphics)
     installElmEvent.call(<any>this, graphics)
-    this.drawStroke(graphics, vertex)
-    this.drawBackground(graphics, vertex)
+    this.drawStroke(graphics)
+    this.drawBackground(graphics)
     container.setChildIndex(graphics, container.children.length - 1)
     return graphics
   }
@@ -148,18 +142,18 @@ class Base {
   /**
    * 背景绘制
    * @param elm 绘制背景的元素
-   * @param vertex 顶点信息
    * @returns 
    */
-  drawBackground (elm: PIXI.Graphics, vertex: number[] = []) {
+  drawBackground (elm: PIXI.Graphics) {
     const container = this.container as ExtendContainer
     const {
       drawType,
       randomOffset,
+      vertexData,
       styleConfig: {
         alpha, type, fillColor, fillStyle
       }
-    } = container.customInfo as IExtendAttribute
+    } = <IExtendAttribute>container.customInfo
     if (fillColor === 'transparent' || ['mark', 'straightLine'].includes(drawType)) return
     // 创建背景图形
     const backgroundElm_left = new PIXI.Graphics()
@@ -175,7 +169,7 @@ class Base {
     this.container?.setChildIndex(backgroundElm_left, this.container.children.length - 2)
     if (fillStyle === 'simple') {
       backgroundElm_left.beginFill(fillColor, alpha)
-      drawType !== 'arc' && backgroundElm_left.drawPolygon(vertex)
+      drawType !== 'arc' && backgroundElm_left.drawPolygon(vertexData)
       return
     }
     // 获取图形上的每个点
