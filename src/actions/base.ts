@@ -101,12 +101,23 @@ class Base {
     const customInfo = container.customInfo as IExtendAttribute
     const { drawType, styleConfig, randomOffset, vertexData } = customInfo
     if (drawType === 'paintingBrush') return
-    if (drawType === 'arc' && styleConfig.type === 'simple' ) return
     // 根据顶点数据创建随机偏移点
-    if (!randomOffset || drawType === 'mark') {
+    if (
+      !randomOffset ||
+      randomOffset.length/vertexData.length !== 2 ||
+      drawType === 'mark'
+    ) {
       customInfo.randomOffset = vertexData
         .concat(vertexData)
-        .map(() => Math.random() * (3 * 2) - 3)
+        .map((_, index) => {
+          const max = 3
+          const random = Math.random() * (max * 2) - max
+          if (drawType !== 'arc') return random
+          // 只对原的控制点进行偏移
+          return drawType === 'arc' && [3, 4].includes(index % 6)
+            ? random
+            : 0
+        })
     }
     const controlPoints = styleConfig.type === 'simple'
       ? vertexData
@@ -115,8 +126,11 @@ class Base {
             const vertexIndex = index % vertexData.length
             return item + vertexData[vertexIndex]
           })
-    for (let i = 0; i < controlPoints.length; i+=6) {
-      const [x, y, cpX, cpY, toX, toY] = controlPoints.slice(i, i+6)
+    // 获取累加基数 [x, y, cpX, cpY, toX, toY] ==> [cpX, cpY, toX, toY, toX2, toY2]
+    const getAccrualBase = (i: number) => (drawType === 'arc' && i) ? 4 : 6
+    // 2 是让能取到最后一个点
+    for (let i = 0; i < controlPoints.length + 2; i+= getAccrualBase(i)) {
+      const [x, y, cpX, cpY, toX, toY] = controlPoints.slice(0, i || 6).slice(-6)
       elm.moveTo(x, y)
       // 都使用贝塞尔曲线能拿到图形上每个点的信息
       elm.quadraticCurveTo(cpX, cpY, toX, toY)
@@ -169,7 +183,7 @@ class Base {
     this.container?.setChildIndex(backgroundElm_left, this.container.children.length - 2)
     if (fillStyle === 'simple') {
       backgroundElm_left.beginFill(fillColor, alpha)
-      drawType !== 'arc' && backgroundElm_left.drawPolygon(vertexData)
+      backgroundElm_left.drawPolygon(vertexData)
       return
     }
     // 获取图形上的每个点

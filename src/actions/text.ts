@@ -41,8 +41,6 @@ class Text extends Mark {
   drawText (txt: string = '', position?: { x: number, y: number }) {
     const container = <ExtendContainer>this.container
     const { styleConfig: { color, alpha } } = <IExtendAttribute>container.customInfo
-    // PIXI.Text.defaultResolution = window.devicePixelRatio || 1
-    // PIXI.Text.defaultAutoResolution = false
     const text = new PIXI.Text(txt, {
       fontFamily: 'LongCang-Regular',
       fontSize: fontSize,
