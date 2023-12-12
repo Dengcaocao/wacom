@@ -129,8 +129,8 @@ class Base {
     // 获取累加基数 [x, y, cpX, cpY, toX, toY] ==> [cpX, cpY, toX, toY, toX2, toY2]
     const getAccrualBase = (i: number) => (drawType === 'arc' && i) ? 4 : 6
     // 2 是让能取到最后一个点
-    for (let i = 0; i < controlPoints.length + 2; i+= getAccrualBase(i)) {
-      const [x, y, cpX, cpY, toX, toY] = controlPoints.slice(0, i || 6).slice(-6)
+    for (let i = 0; i < controlPoints.length; i+= getAccrualBase(i)) {
+      const [x, y, cpX, cpY, toX, toY] = controlPoints.slice(i, i+6)
       elm.moveTo(x, y)
       // 都使用贝塞尔曲线能拿到图形上每个点的信息
       elm.quadraticCurveTo(cpX, cpY, toX, toY)
@@ -172,15 +172,14 @@ class Base {
     // 创建背景图形
     const backgroundElm_left = new PIXI.Graphics()
     backgroundElm_left.name = 'background_elm_left'
-    backgroundElm_left.position.set(elm.x, elm.y)
     backgroundElm_left.lineStyle({
       width: 1,
       color: fillColor,
       cap: PIXI.LINE_CAP.ROUND,
       join: PIXI.LINE_JOIN.ROUND
     })
-    this.container?.addChild(backgroundElm_left)
-    this.container?.setChildIndex(backgroundElm_left, this.container.children.length - 2)
+    container.addChild(backgroundElm_left)
+    container.setChildIndex(backgroundElm_left, container.children.length - 2)
     if (fillStyle === 'simple') {
       backgroundElm_left.beginFill(fillColor, alpha)
       backgroundElm_left.drawPolygon(vertexData)
@@ -192,29 +191,17 @@ class Base {
     let p: number[] = []
     const length = type === 'simple'
       ? graphicsData.length
-      : graphicsData.length / 2
+      : graphicsData.length / 2 // 绘制了2条曲线
     for (let i = 0; i < length; i++) {
       // 处理不同类型使绘制方向一样
       if (drawType === 'rect') {
         p = [...p, ...graphicsData[i].points]
       }
       if (drawType === 'arc') {
-        // 处理普通弧形的点
-        if (type === 'simple') {
-          p = graphicsData[i].points.filter((_, index) => index % 4 < 2)
-          let index = Math.floor(p.length / 8)
-          index % 2 === 1 && index++
-          const prefixP = p.slice(0, index)
-          p = p.slice(index).concat(prefixP)
-          continue
-        }
-        p = [...p, ...graphicsData[i].points]
-        if (i === length - 1) {
-          let index = graphicsData[0].points.length / 2
-          index % 2 === 1 && index++
-          const prefixP = p.slice(0, index)
-          p = p.slice(index).concat(prefixP)
-        }
+        // 每隔2个点取一个
+        const points = graphicsData[i].points
+          .filter((_, index) => [0, 1].includes(index % 6))
+        p = [...p, ...points]
       }
       if (drawType === 'diamond' && i % 2 === 1) {
         p = [...p, ...graphicsData[i].points]
@@ -236,16 +223,18 @@ class Base {
       }
     }
     if (fillStyle === 'grid') {
+      const { minX, maxX } = elm.geometry.bounds
+      const positionX = Math.abs(minX) < Math.abs(maxX) ? maxX : minX
       const backgroundElm_right = new PIXI.Graphics()
       backgroundElm_right.name = 'background_elm_right'
-      this.container?.addChild(backgroundElm_right)
-      this.container?.setChildIndex(backgroundElm_right, this.container.children.length - 2)
+      container.addChild(backgroundElm_right)
+      container.setChildIndex(backgroundElm_right, container.children.length - 2)
       backgroundElm_right.lineStyle(backgroundElm_left.line)
-      backgroundElm_right.position.set(elm.x + elm.geometry.bounds.maxX, elm.y)
+      backgroundElm_right.scale.set(-1, 1)
+      backgroundElm_right.position.set(positionX, elm.y)
       backgroundElm_left.geometry.graphicsData.forEach(item => {
         backgroundElm_right.drawShape(item.shape)
       })
-      backgroundElm_right.scale.set(-1, 1)
     }
   }
 
