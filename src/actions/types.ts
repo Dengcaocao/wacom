@@ -29,6 +29,8 @@ export interface IExtendAttribute {
 
 export type ExtendContainer = PIXI.Container & { customInfo?: IExtendAttribute }
 
+export type ExtendGraphics = PIXI.Graphics & { customVertexData?: number[] }
+
 export interface IExtremePoint {
   elm: PIXI.Graphics
   type: string

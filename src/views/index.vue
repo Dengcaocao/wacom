@@ -25,13 +25,7 @@ watch(configStore.styleConfig, styleConfig => {
     drawType: configStore.drawType,
     styleConfig
   }
-  if (app.container) {
-    app.container.customInfo = {
-      ...app.container.customInfo,
-      styleConfig
-    }
-    app.createElement()
-  }
+  if (app.container) app.reRender(styleConfig)
 })
  
 onMounted(() => {

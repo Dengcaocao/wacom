@@ -1,7 +1,7 @@
 import Arc from './arc'
 import * as PIXI from 'pixi.js'
 import { getAngle } from '@/utils/utils'
-import type { ExtendContainer, IExtendAttribute, IExtremePoint } from './types'
+import type { ExtendContainer, ExtendGraphics, IExtendAttribute, IExtremePoint } from './types'
 
 /**
  * 获取端点的大小
@@ -30,9 +30,7 @@ function drawExtremePoint (
     distance
   }: IExtremePoint
 ) {
-  const container = this.container as ExtendContainer
-  const customInfo = container.customInfo as IExtendAttribute
-  const graphics = new PIXI.Graphics()
+  const graphics = new PIXI.Graphics() as ExtendGraphics
   graphics.position.set(point.x, point.y)
   graphics.rotation = angle
   elm.addChild(graphics)
@@ -45,8 +43,8 @@ function drawExtremePoint (
     : [
         0, -y, 0, 0, 0, y
       ]
-  customInfo.vertexData = vertexData
-  this.drawStroke(graphics)
+  graphics.customVertexData = vertexData
+  this.drawStroke(graphics, vertexData)
 }
 
 class Mark extends Arc {

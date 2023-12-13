@@ -1,7 +1,8 @@
 import * as PIXI from 'pixi.js'
 import { getAngle } from '@/utils/utils'
 import installElmEvent from '@/event/elmEvent'
-import type { IBaseParams, ExtendContainer, IExtendAttribute, IGraphicsConfig } from './types'
+import type { IBaseParams, ExtendContainer, IExtendAttribute, IGraphicsConfig, ExtendGraphics } from './types'
+import type { IElementStyle } from '@/stores/types'
 
 class Base {
   app: PIXI.Application
@@ -87,10 +88,10 @@ class Base {
   /**
    * 手绘描边
    * @param elm 描边元素
-   * @param vertex 顶点信息
+   * @param vertexData 元素顶点数据
    * @returns 
    */
-  drawStroke (elm: PIXI.Graphics) {
+  drawStroke (elm: PIXI.Graphics, vertexData?: number[]) {
     elm.beginFill(0, 0)
     elm.lineStyle({
       ...this.graphicsConfig.styleConfig,
@@ -99,16 +100,26 @@ class Base {
     })
     const container = this.container as ExtendContainer
     const customInfo = container.customInfo as IExtendAttribute
-    const { drawType, styleConfig, randomOffset, vertexData } = customInfo
-    if (drawType === 'paintingBrush') return
+    const { drawType, styleConfig, randomOffset, vertexData: MainVertexData } = customInfo
+    if (drawType === 'paintingBrush') {
+      let [x, y] = MainVertexData.slice(0, 2)
+      const movePArr = MainVertexData.slice(2)
+      for (let i = 0; i < movePArr.length; i +=2) {
+        const [toX,  toY] = movePArr.slice(i, i+2)
+        elm.moveTo(x, y)
+        elm.lineTo(toX, toY)
+        x = toX, y = toY
+      }
+      return
+    }
+    const currVertexData = vertexData || MainVertexData
     // 根据顶点数据创建随机偏移点
     if (
       !randomOffset ||
-      randomOffset.length/vertexData.length !== 2 ||
-      drawType === 'mark'
+      randomOffset.length/currVertexData.length !== 2
     ) {
-      customInfo.randomOffset = vertexData
-        .concat(vertexData)
+      customInfo.randomOffset = currVertexData
+        .concat(currVertexData)
         .map((_, index) => {
           const max = 3
           const random = Math.random() * (max * 2) - max
@@ -120,11 +131,11 @@ class Base {
         })
     }
     const controlPoints = styleConfig.type === 'simple'
-      ? vertexData
+      ? currVertexData
       : (customInfo.randomOffset as number[])
           .map((item, index) => {
-            const vertexIndex = index % vertexData.length
-            return item + vertexData[vertexIndex]
+            const vertexIndex = index % currVertexData.length
+            return item + currVertexData[vertexIndex]
           })
     // 获取累加基数 [x, y, cpX, cpY, toX, toY] ==> [cpX, cpY, toX, toY, toX2, toY2]
     const getAccrualBase = (i: number) => (drawType === 'arc' && i) ? 4 : 6
@@ -149,7 +160,6 @@ class Base {
     installElmEvent.call(<any>this, graphics)
     this.drawStroke(graphics)
     this.drawBackground(graphics)
-    container.setChildIndex(graphics, container.children.length - 1)
     return graphics
   }
 
@@ -170,16 +180,19 @@ class Base {
     } = <IExtendAttribute>container.customInfo
     if (fillColor === 'transparent' || ['mark', 'straightLine'].includes(drawType)) return
     // 创建背景图形
-    const backgroundElm_left = new PIXI.Graphics()
-    backgroundElm_left.name = 'background_elm_left'
+    let backgroundElm_left = container.getChildByName('background_elm_left') as PIXI.Graphics
+    if (!backgroundElm_left) {
+      backgroundElm_left = new PIXI.Graphics()
+      backgroundElm_left.name = 'background_elm_left'
+      container.addChild(backgroundElm_left)
+      container.setChildIndex(backgroundElm_left, 0)
+    }
     backgroundElm_left.lineStyle({
       width: 1,
       color: fillColor,
       cap: PIXI.LINE_CAP.ROUND,
       join: PIXI.LINE_JOIN.ROUND
     })
-    container.addChild(backgroundElm_left)
-    container.setChildIndex(backgroundElm_left, container.children.length - 2)
     if (fillStyle === 'simple') {
       backgroundElm_left.beginFill(fillColor, alpha)
       backgroundElm_left.drawPolygon(vertexData)
@@ -223,12 +236,13 @@ class Base {
       }
     }
     if (fillStyle === 'grid') {
-      const { minX, maxX } = elm.geometry.bounds
-      const positionX = Math.abs(minX) < Math.abs(maxX) ? maxX : minX
-      const backgroundElm_right = new PIXI.Graphics()
+      let backgroundElm_right = container.getChildByName('background_elm_right') as PIXI.Graphics
+      backgroundElm_right = backgroundElm_right || new PIXI.Graphics()
       backgroundElm_right.name = 'background_elm_right'
       container.addChild(backgroundElm_right)
-      container.setChildIndex(backgroundElm_right, container.children.length - 2)
+      container.setChildIndex(backgroundElm_right, 0)
+      const { minX, maxX } = elm.geometry.bounds
+      const positionX = Math.abs(minX) < Math.abs(maxX) ? maxX : minX
       backgroundElm_right.lineStyle(backgroundElm_left.line)
       backgroundElm_right.scale.set(-1, 1)
       backgroundElm_right.position.set(positionX, elm.y)
@@ -236,6 +250,41 @@ class Base {
         backgroundElm_right.drawShape(item.shape)
       })
     }
+  }
+
+  reRender (styleConfig: IElementStyle) {
+    if (!this.container) return
+    const container = <ExtendContainer>this.container
+    container.customInfo = {
+      ...<IExtendAttribute>container.customInfo,
+      styleConfig
+    }
+    // 递归清楚样式
+    const clearStyle = (elm: PIXI.Graphics) => {
+      if (elm.children.length) {
+        elm.children.forEach(childElm => {
+          clearStyle(<PIXI.Graphics>childElm)
+        })
+      }
+      elm.clear()
+    }
+    // 递归设置样式
+    const setStyle = (elm: PIXI.Graphics, vertexData?: number[]) => {
+      if (elm.children.length) {
+        elm.children.forEach(childElm => {
+          setStyle(<PIXI.Graphics>childElm, (childElm as ExtendGraphics).customVertexData)
+        })
+      }
+      this.drawStroke(<PIXI.Graphics>elm, vertexData) // 默认使用container上的vertexData
+      this.drawBackground(<PIXI.Graphics>elm)
+    }
+    this.container.children
+      .filter(item => !['main_text', 'main_sprite', 'selected'].includes(<string>item.name))
+      .forEach(elm => {
+        clearStyle(<PIXI.Graphics>elm)
+        const isMainGraphics = /^main_graphics/.test(<string>elm.name)
+        isMainGraphics && setStyle(<PIXI.Graphics>elm)
+      })
   }
 
   copy (copyElm: PIXI.Graphics) {}
