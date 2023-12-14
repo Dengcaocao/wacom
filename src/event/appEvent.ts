@@ -14,27 +14,35 @@ function handleWheel (this: Application, { deltaX, deltaY }: WheelEvent) {
   const textareaList = document.querySelectorAll('textarea')
   if (textareaList.length) return
   const stage = this.app.stage
-  stage.x += deltaX * -1
-  stage.y += deltaY * -1
   const screenWidth = this.app.screen.width,
         screenHeight = this.app.screen.height
   // 过滤掉网格元素
   const elements = stage.children.filter(item => item.name !== 'mesh')
-  // 处理边界值
+  // 处理边界值.
   if (stage.x >= 0 || stage.x <= -screenWidth) {
+    const direction = deltaX < 0 ? 1 : -1
+    const offsetValue = (screenWidth / this.scale) / 2
+    stage.x = -(screenWidth / this.scale)
     elements
       .forEach(item => {
-        item.x = item.x + (screenWidth / this.scale) / 2 * (deltaX < 0 ? 1 : -1)
+        item.x = item.x + offsetValue * direction
       })
-    stage.x = -(screenWidth / this.scale)
+    this.startPoints.x += offsetValue * direction
+    return
   }
   if (stage.y >= 0 || stage.y <= -screenHeight) {
+    const direction = deltaY < 0 ? 1 : -1
+    const offsetValue = (screenHeight / this.scale) / 2
+    stage.y = -(screenHeight / this.scale)
     elements
       .forEach(item => {
-        item.y = item.y + (screenHeight / this.scale) / 2 * (deltaY < 0 ? 1 : -1)
+        item.y = item.y + offsetValue * direction
       })
-    stage.y = -(screenHeight / this.scale)
+    this.startPoints.y += offsetValue * direction
+    return
   }
+  stage.x += deltaX * -1
+  stage.y += deltaY * -1
 }
 
 function handlePointerdown (this: Application, { x, y }: MouseEvent) {
@@ -64,7 +72,9 @@ function handlePointermove (this: Application, { x, y }: MouseEvent) {
   const point = this.getMappingPoints(x, y)
   const deltaX = (point.x - this.startPoints.x) * -1
   const deltaY = (point.y - this.startPoints.y) * -1
-  if (this.keys.includes('space')) return handleWheel.call(this, { deltaX, deltaY } as WheelEvent)
+  if (this.keys.includes('space')) {
+    return handleWheel.call(this, { deltaX, deltaY } as WheelEvent)
+  }
   const container = this.container as ExtendContainer
   const drawType = (container.customInfo as IExtendAttribute).drawType
   const methods: any = {
