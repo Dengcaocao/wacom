@@ -16,9 +16,6 @@ class Draw extends Text {
     }
     customInfo.vertexData.push(mX - container.x, mY - container.y)
     this.drawStroke(main_graphics)
-    // main_graphics.moveTo(x - container.x, y - container.y)
-    // main_graphics.lineTo(mX - container.x, mY - container.y)
-    // this.startPoints = { x: mX, y: mY }
   }
 }
 

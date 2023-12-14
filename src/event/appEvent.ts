@@ -20,6 +20,7 @@ function handleWheel (this: Application, { deltaX, deltaY }: WheelEvent) {
         screenHeight = this.app.screen.height
   // 过滤掉网格元素
   const elements = stage.children.filter(item => item.name !== 'mesh')
+  // 处理边界值
   if (stage.x >= 0 || stage.x <= -screenWidth) {
     elements
       .forEach(item => {

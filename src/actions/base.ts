@@ -25,24 +25,23 @@ class Base {
     this.dom = dom
     this.scale = this.app.screen.width / width
     this.graphicsConfig = graphicsConfig
-    this.initCanvasSize(width, height)
-    this.createMesh()
+    this.initCanvas()
     dom.appendChild(this.app.view as HTMLCanvasElement)
   }
 
   /**
-   * 初始化画布大小
-   * @param width 原始宽度
-   * @param height 原始高度
+   * 初始化画布
    */
-  initCanvasSize (width: number, height: number) {
-    if (this.app.view.style) {
-      this.app.view.style.width = `${width}px`
-      this.app.view.style.height = `${height}px`
-    }
+  initCanvas () {
+    const { width, height } = this.app.screen
+    const innerWidth = width / this.scale
+    const innerHeight = height / this.scale
+    const canvasView = <HTMLCanvasElement>this.app.view
+    canvasView.setAttribute('style', `width: ${innerWidth}px;height: ${innerHeight}px`)
+    this.createMesh()
     // 放大2倍
     this.app.stage.scale.set(this.scale)
-    this.app.stage.position = { x: -width, y: -height }
+    this.app.stage.position = { x: -innerWidth, y: -innerHeight }
   }
 
   /**
