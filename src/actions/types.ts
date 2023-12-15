@@ -1,5 +1,5 @@
 import * as PIXI from 'pixi.js'
-import type { IElementStyle } from '@/stores/types'
+import type { IElementStyle, markType } from '@/stores/types'
 
 export interface IGraphicsConfig {
   drawType: string
@@ -29,15 +29,17 @@ export interface IExtendAttribute {
 
 export type ExtendContainer = PIXI.Container & { customInfo?: IExtendAttribute }
 
-export type ExtendGraphics = PIXI.Graphics & { customVertexData?: number[] }
+export interface ISize {
+  w: number,
+  h: number
+}
+
+export type ExtendGraphics = PIXI.Graphics & { customVertexData?: number[], customSize?: ISize }
 
 export interface IExtremePoint {
   elm: PIXI.Graphics
-  type: string
-  point: IPoint
-  direction: string
-  angle: number
-  distance: number
+  type: markType
+  direction: 'left' | 'right'
 }
 
 export type MainElm = PIXI.Graphics | PIXI.Text | PIXI.Sprite

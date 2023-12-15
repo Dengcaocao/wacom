@@ -1,8 +1,9 @@
 import * as PIXI from 'pixi.js'
-import { getAngle } from '@/utils/utils'
+import { getPoint2PointInfo } from '@/utils/utils'
 import installElmEvent from '@/event/elmEvent'
-import type { IBaseParams, ExtendContainer, IExtendAttribute, IGraphicsConfig, ExtendGraphics } from './types'
+import type { IBaseParams, ExtendContainer, IExtendAttribute, IGraphicsConfig, ExtendGraphics, ISize } from './types'
 import type { IElementStyle } from '@/stores/types'
+import { drawExtremePoint } from './mark'
 
 class Base {
   app: PIXI.Application
@@ -229,7 +230,7 @@ class Base {
           .slice(-4)
         x += o1, y+= o2
         toX += o3, toY+= o4
-        const { width, height } = getAngle({x, y}, {x: toX, y: toY})
+        const { width, height } = getPoint2PointInfo({x, y}, {x: toX, y: toY})
         backgroundElm_left.moveTo(x, y)
         backgroundElm_left.quadraticCurveTo(x + width/2, y + height/2, toX, toY)
       }
@@ -254,8 +255,17 @@ class Base {
   reRender (styleConfig: IElementStyle) {
     if (!this.container) return
     const container = <ExtendContainer>this.container
+    const customInfo = <IExtendAttribute>container.customInfo
+    // 查找改变的key
+    let key: string
+    for (const i in customInfo.styleConfig) {
+      if (customInfo.styleConfig[i] !== styleConfig[i]) {
+        key = i
+        break
+      }
+    }
     container.customInfo = {
-      ...<IExtendAttribute>container.customInfo,
+      ...customInfo,
       styleConfig
     }
     // 递归清楚样式
@@ -271,6 +281,17 @@ class Base {
     const setStyle = (elm: PIXI.Graphics, vertexData?: number[]) => {
       if (elm.children.length) {
         elm.children.forEach(childElm => {
+          if (/^extreme_point_elm/.test(<string>childElm.name)) {
+            const type = styleConfig[key]
+            let direction
+            if (key === 'extremePoint_left') {
+              type = styleConfig[key]
+              direction = 'left'
+            }
+            if (key === 'extremePoint_right')
+            elm.removeChild(childElm)
+            return drawExtremePoint.call(<any>this, { elm, type: 'arrow', direction: 'left' })
+          }
           setStyle(<PIXI.Graphics>childElm, (childElm as ExtendGraphics).customVertexData)
         })
       }
@@ -294,10 +315,14 @@ class Base {
    * @returns 
    */
   clear (isDelElm: boolean) {
-    if (isDelElm) return this.app.stage.removeChild(this.container as PIXI.DisplayObject)
-    this.app.stage.children
-      .filter(item => item.name !== 'mesh')
-      .forEach(item => this.app.stage.removeChild(item))
+    if (isDelElm) {
+      this.app.stage.removeChild(this.container as PIXI.DisplayObject)
+    } else {
+      this.app.stage.children
+        .filter(item => item.name !== 'mesh')
+        .forEach(item => this.app.stage.removeChild(item))
+    }
+    this.container = undefined
   }
 
   /**

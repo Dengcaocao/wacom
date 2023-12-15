@@ -23,9 +23,9 @@ watch(configStore.styleConfig, styleConfig => {
   const app = toRaw(configStore.pixiApp)
   app.graphicsConfig = {
     drawType: configStore.drawType,
-    styleConfig
+    styleConfig: { ...styleConfig }
   }
-  if (app.container) app.reRender(styleConfig)
+  if (app.container) app.reRender({ ...styleConfig })
 })
  
 onMounted(() => {

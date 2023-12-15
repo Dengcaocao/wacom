@@ -20,14 +20,14 @@ export const createOffsetArr = (num: number, maxOffset = 3) => {
  * @param p2 
  * @returns 
  */
-export const getAngle = (
+export const getPoint2PointInfo = (
   p1: { x: number, y: number },
   p2: { x: number, y: number }
 ) => {
   const width = p2.x - p1.x, height = p2.y - p1.y
-  // 箭头方向&旋转角度
+  const distance = Math.pow(width * width + height * height, 1/2)
+  // 旋转角度
   const direction = width < 0 ? -1 : 1
-  const distance = Math.pow(width * width + height * height, 1/2) * direction
   let angle = Math.atan2(height, width)
   if (direction === -1) {
     angle = height < 0 ? -Math.PI + angle : Math.PI + angle
