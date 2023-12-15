@@ -10,4 +10,7 @@
   font-family: "LongCang-Regular";
   src: url("@/assets/font/handwriting.ttf") format("truetype");
 }
+html,body {
+  touch-action: none;
+}
 </style>
