@@ -17,6 +17,7 @@ const createElm = (
   strokeColor: string
 ) => {
   const elm = document.createElement(tag)
+  elm.className = 'pixi-text'
   elm.style.cssText = `
     overflow: hidden;
     position: absolute;

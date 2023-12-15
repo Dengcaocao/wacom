@@ -11,7 +11,7 @@ import type { ExtendContainer, IExtendAttribute } from '@/actions/types'
  */
 function handleWheel (this: Application, { deltaX, deltaY }: WheelEvent) {
   // 输入时禁止滚动
-  const textareaList = document.querySelectorAll('textarea')
+  const textareaList = document.querySelectorAll('.pixi-text')
   if (textareaList.length) return
   const stage = this.app.stage
   const screenWidth = this.app.screen.width,
@@ -45,6 +45,18 @@ function handleWheel (this: Application, { deltaX, deltaY }: WheelEvent) {
   stage.y += deltaY * -1
 }
 
+function handleMobileWheel (this: Application, e: TouchEvent) {
+  e.preventDefault()
+  const length = e.targetTouches.length
+  if (length !== 2) return
+  this.isDraw = false
+  const { clientX, clientY } = e.targetTouches[length - 1]
+  const point = this.getMappingPoints(clientX, clientY)
+  const deltaX = (point.x - this.startPoints.x) * -1
+  const deltaY = (point.y - this.startPoints.y) * -1
+  handleWheel.call(this, <WheelEvent>{ deltaX, deltaY })
+}
+
 function handlePointerdown (this: Application, { x, y }: MouseEvent) {
   const { drawType, styleConfig } = this.graphicsConfig
   this.startPoints = this.getMappingPoints(x, y)
@@ -70,12 +82,12 @@ function handlePointerdown (this: Application, { x, y }: MouseEvent) {
 function handlePointermove (this: Application, { x, y }: MouseEvent) {
   if (!this.isDraw) return
   const point = this.getMappingPoints(x, y)
-  const deltaX = (point.x - this.startPoints.x) * -1
-  const deltaY = (point.y - this.startPoints.y) * -1
   if (this.keys.includes('space')) {
-    return handleWheel.call(this, { deltaX, deltaY } as WheelEvent)
+    const deltaX = (point.x - this.startPoints.x) * -1
+    const deltaY = (point.y - this.startPoints.y) * -1
+    return handleWheel.call(this, <WheelEvent>{ deltaX, deltaY })
   }
-  const container = this.container as ExtendContainer
+  const container = <ExtendContainer>this.container
   const drawType = (container.customInfo as IExtendAttribute).drawType
   const methods: any = {
     rect: this.drawRect.bind(this),
@@ -93,7 +105,7 @@ function handleDrawEnd (this: Application) {
   this.isDraw = false
   if (!this.container) return
   if (!this.container.children.length) {
-    this.app.stage.removeChild(this.container as PIXI.DisplayObject)
+    this.app.stage.removeChild(this.container)
     return this.container = undefined
   }
   const disabledUDS = ['select', 'paintingBrush', 'text', 'image']
@@ -115,6 +127,8 @@ function installAppEvent (this: Application) {
   stage.on('pointermove', handlePointermove.bind(this))
   stage.on('pointerup', handleDrawEnd.bind(this))
   stage.on('pointerleave', handleDrawEnd.bind(this))
+  // 处理移动端画布移动
+  document.addEventListener('touchmove', handleMobileWheel.bind(this), { passive: false })
 }
 
 export default installAppEvent

@@ -19,6 +19,7 @@ class spriteImage extends Draw {
       this.container.position.set(x, y)
       this.container.customInfo = {
         drawType,
+        vertexData: [],
         styleConfig: { ...styleConfig }
       }
       const sprite = Sprite.from(url)
