@@ -270,32 +270,33 @@ class Base {
     }
     // 递归清楚样式
     const clearStyle = (elm: PIXI.Graphics) => {
-      if (elm.children.length) {
-        elm.children.forEach(childElm => {
-          clearStyle(<PIXI.Graphics>childElm)
-        })
-      }
+      elm.children.forEach(childElm => {
+        clearStyle(<PIXI.Graphics>childElm)
+      })
       elm.clear()
     }
     // 递归设置样式
     const setStyle = (elm: PIXI.Graphics, vertexData?: number[]) => {
-      if (elm.children.length) {
-        elm.children.forEach(childElm => {
-          if (/^extreme_point_elm/.test(<string>childElm.name)) {
-            const type = styleConfig[key]
-            let direction
-            if (key === 'extremePoint_left') {
-              type = styleConfig[key]
-              direction = 'left'
-            }
-            if (key === 'extremePoint_right')
-            elm.removeChild(childElm)
-            return drawExtremePoint.call(<any>this, { elm, type: 'arrow', direction: 'left' })
-          }
-          setStyle(<PIXI.Graphics>childElm, (childElm as ExtendGraphics).customVertexData)
-        })
+      const isExtremePointKey = ['extremePoint_left', 'extremePoint_right'].includes(key)
+      !isExtremePointKey && elm.children.forEach(childElm => {
+        setStyle(
+          <PIXI.Graphics>childElm,
+          (childElm as ExtendGraphics).customVertexData
+        )
+      })
+      // 处理端点样式重新绘制
+      if (/^main/.test(<string>elm.name) && isExtremePointKey) {
+        const updateDirection = <'left'|'right'>key.split('_')[1]
+        elm.children
+          .filter(item => !item.name?.endsWith(updateDirection))
+          .map(item => {
+            const direction = item.name?.slice(18)
+            return { type: styleConfig[`extremePoint_${direction}`], direction }
+          })
+          .concat([{ type: styleConfig[key], direction: updateDirection }])
+          .forEach((item: any) => drawExtremePoint.call(<any>this, { elm, ...item }))
       }
-      this.drawStroke(<PIXI.Graphics>elm, vertexData) // 默认使用container上的vertexData
+      /^main/.test(<string>elm.name) && this.drawStroke(<PIXI.Graphics>elm, vertexData) // 默认使用container上的vertexData
       this.drawBackground(<PIXI.Graphics>elm)
     }
     this.container.children

@@ -16,7 +16,7 @@ const getSize = (
   direction: 'left' | 'right'
 ): ISize => {
   const length = distance < 100
-    ? distance / 10 * 4
+    ? distance / 10 * 3
     : 40
   const base = direction === 'right' ? -1 : 1
   return {
@@ -60,9 +60,6 @@ export function drawExtremePoint (
   }: IExtremePoint
 ) {
   if (type === 'none') return
-  const graphics = new PIXI.Graphics() as ExtendGraphics
-  graphics.name = `extreme_point_elm_${direction}`
-  elm.addChild(graphics)
   // 获取最后一次的控制点
   const [x, y, , , toX, toY] = customInfo.vertexData.slice(-6)
   const { width, distance, angle } = getPoint2PointInfo({ x, y }, { x: toX, y: toY })
@@ -72,13 +69,19 @@ export function drawExtremePoint (
   } else {
     position = width > 0 ? { x, y } : { x: toX, y: toY }
   }
-  graphics.position.set(position.x, position.y)
-  graphics.rotation = angle
+  const name = `extreme_point_elm_${direction}`
+  let extremePointElm = <ExtendGraphics>elm.getChildByName(name)
+  if (!extremePointElm) {
+    extremePointElm = new PIXI.Graphics()
+    extremePointElm.name = name
+    extremePointElm.position.set(position.x, position.y)
+    extremePointElm.rotation = angle
+    elm.addChild(extremePointElm)
+  }
   const size = getSize(distance, direction)
   const vertexData = getVertexData(type, size)
-  graphics.customVertexData = vertexData
-  // graphics.customSize = size
-  this.drawStroke(graphics, vertexData)
+  extremePointElm.customVertexData = vertexData
+  this.drawStroke(extremePointElm, vertexData)
 }
 
 class Mark extends Arc {
@@ -97,12 +100,12 @@ class Mark extends Arc {
       customInfo.styleConfig.extremePoint_left = 'none'
       customInfo.styleConfig.extremePoint_right = 'none'
     }
-    extremePoint_left !== 'none' && drawExtremePoint.call(this, {
+    drawExtremePoint.call(this, {
       elm: markElm,
       type: extremePoint_left,
       direction: 'left',
     })
-    extremePoint_right !== 'none' && drawExtremePoint.call(this, {
+    drawExtremePoint.call(this, {
       elm: markElm,
       type: extremePoint_right,
       direction: 'right'
