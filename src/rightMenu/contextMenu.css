@@ -1,0 +1,6 @@
+.context-menu-container {
+  @apply absolute w-36 rounded-lg py-2.5 shadow-xl bg-white;
+}
+.context-menu-container .menu-item {
+  @apply px-4 py-1.5 text-xs cursor-default hover:bg-zinc-100;
+}

@@ -1,4 +1,5 @@
 import './assets/main.css'
+import '@/rightMenu/contextMenu'
 
 import { createApp } from 'vue'
 import pinia from '@/stores'
