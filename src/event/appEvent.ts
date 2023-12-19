@@ -2,6 +2,11 @@ import * as PIXI from 'pixi.js'
 import Application from '@/actions/application'
 import type { ExtendContainer, IExtendAttribute } from '@/actions/types'
 
+// 时间戳
+let stamp: number = new Date().getTime()
+// 是否双击
+let isDoubleClick: boolean = false
+
 /**
  * 处理场景滚动
  * @param this 
@@ -58,6 +63,10 @@ function handleMobileWheel (this: Application, e: TouchEvent) {
 }
 
 function handlePointerdown (this: Application, { x, y }: MouseEvent) {
+  const nowTime = new Date().getTime()
+  const bool = nowTime - stamp < 500
+  bool && (isDoubleClick = !isDoubleClick)
+  stamp = nowTime
   const { drawType, styleConfig } = this.graphicsConfig
   this.startPoints = this.getMappingPoints(x, y)
   // 绘制之前删除选中效果
@@ -74,7 +83,13 @@ function handlePointerdown (this: Application, { x, y }: MouseEvent) {
   this.container.position.set(this.startPoints.x, this.startPoints.y)
   this.app.stage.addChild(this.container)
   if (drawType === 'image') return
-  if (drawType === 'text') return this.drawText()
+  if (
+    drawType === 'text' ||
+    (drawType === 'select' && isDoubleClick)
+  ) {
+    this.drawText()
+    return isDoubleClick = false
+  }
   this.isDraw = true
 }
 
@@ -102,6 +117,7 @@ function handlePointermove (this: Application, { x, y }: MouseEvent) {
 
 // 结束绘制
 function handleDrawEnd (this: Application) {
+  if (isDoubleClick) return
   this.isDraw = false
   if (!this.container) return
   if (!this.container.children.length) {
