@@ -4,12 +4,12 @@
       <h3 class="title mt-0">描边</h3>
       <input-color v-model="styleConfig.color" />
     </div>
-    <div class="item" v-if="['rect', 'diamond', 'arc'].includes(drawType)">
+    <div class="item" v-if="['rect', 'diamond', 'arc'].includes(currDrawType)">
       <h3 class="title">背景</h3>
       <input-color v-model="styleConfig.fillColor" />
     </div>
     <template v-for="item in configList" :key="item.model">
-      <div class="item" v-if="!item.display || item.display.includes(drawType)">
+      <div class="item" v-if="!item.display || item.display.includes(currDrawType)">
         <h3 class="title">{{item.title}}</h3>
         <div class="flex">
           <label
@@ -54,12 +54,14 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, toRaw, toRefs } from 'vue'
+import { reactive, toRaw, toRefs, onMounted, watch, ref, onUnmounted } from 'vue'
 import { useConfigStore } from '@/stores/config'
 import InputColor from '@/components/InputColor.vue'
 
 const config = useConfigStore()
 const { drawType, styleConfig } = toRefs(config)
+
+const currDrawType = ref<string>('')
 
 const configList = reactive([
   {
@@ -114,17 +116,17 @@ const configList = reactive([
         type: 'solid',
         classes: 'icon-xian3'
       },
-      {
-        title: '虚线',
-        type: 'dashed',
-        classes: 'icon-xuxian font-bold'
-      }
+      // {
+      //   title: '虚线',
+      //   type: 'dashed',
+      //   classes: 'icon-xuxian font-bold'
+      // }
     ]
   },
   {
     title: '线条风格',
     model: 'type',
-    display: ['rect', 'diamond', 'arc', 'arrow', 'line'],
+    display: ['rect', 'diamond', 'arc', 'mark', 'straightLine'],
     radioGroup: [
       {
         title: '朴素',
@@ -192,11 +194,11 @@ const configList = reactive([
         type: 'right',
         classes: 'icon-zhijiao'
       },
-      {
-        title: '圆角',
-        type: 'round',
-        classes: 'icon-yuanjiao'
-      }
+      // {
+      //   title: '圆角',
+      //   type: 'round',
+      //   classes: 'icon-yuanjiao'
+      // }
     ]
   }
 ])
@@ -210,6 +212,22 @@ const handleDel = () => {
   const pixiApp = toRaw(config.pixiApp)
   pixiApp.clear(true)
 }
+
+const handleCustomEvent = (e: CustomEventInit) => {
+  const { drawType, styleConfig: currStyleConfig } = e.detail
+  currDrawType.value = drawType
+  Object.assign(styleConfig.value, currStyleConfig)
+}
+
+watch(drawType, type => currDrawType.value = type)
+
+onMounted(() => {
+  document.addEventListener('getElmStyleConfig', handleCustomEvent)
+})
+
+onUnmounted(() => {
+  document.removeEventListener('getElmStyleConfig', handleCustomEvent)
+})
 </script>
 
 <style scoped>

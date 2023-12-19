@@ -31,7 +31,7 @@ const inputValue = computed({
   },
   set (value) {
     if (value.length < 6) return
-    emit('update:modelValue', `#${value}`)
+    emit('update:modelValue', `${value === 'transparent' ? value : `#${value}`}`)
   }
 })
 </script>

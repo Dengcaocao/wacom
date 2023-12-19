@@ -21,6 +21,13 @@ function handlePointerdown (
   if (drawType !== 'select') return
   e.stopPropagation()
   rootThis.container = container
+  const getElmStyleConfig = new CustomEvent('getElmStyleConfig', {
+    detail: {
+      drawType: customInfo.drawType,
+      styleConfig: customInfo.styleConfig
+    }
+  })
+  document.dispatchEvent(getElmStyleConfig)
   rootThis.drawSelected()
   rootThis.app.stage.setChildIndex(
     container,

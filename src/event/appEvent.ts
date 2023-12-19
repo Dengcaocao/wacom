@@ -117,7 +117,7 @@ function handlePointermove (this: Application, { x, y }: MouseEvent) {
 
 // 结束绘制
 function handleDrawEnd (this: Application) {
-  if (isDoubleClick) return
+  // if (isDoubleClick) return
   this.isDraw = false
   if (!this.container) return
   if (!this.container.children.length) {
