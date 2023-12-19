@@ -40,6 +40,8 @@ class Base {
     const canvasView = <HTMLCanvasElement>this.app.view
     canvasView.setAttribute('style', `width: ${innerWidth}px;height: ${innerHeight}px`)
     this.createMesh()
+    // 添加可交互区域
+    this.app.stage.hitArea = new PIXI.Rectangle(0, 0, width, height)
     // 放大2倍
     this.app.stage.scale.set(this.scale)
     this.app.stage.position = { x: -innerWidth, y: -innerHeight }
@@ -57,11 +59,8 @@ class Base {
     }
     const mesh = new PIXI.Graphics()
     this.app.stage.addChildAt(mesh, 0)
-    const width = this.app.screen.width
-    const height = this.app.screen.height
-    // 添加可交互区域
     mesh.name = 'mesh'
-    mesh.hitArea = new PIXI.Rectangle(0, 0, width, height)
+    const { width, height } = this.app.screen
     mesh.lineStyle(1, 0x000000, 0.1)
     // 垂直线条
     for (let i = 0; i < width; i += 20) {
