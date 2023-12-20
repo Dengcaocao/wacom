@@ -54,8 +54,7 @@ function handlePointermove (this: MainElm, e: MouseEvent) {
 function installElmEvent (this: Application, elm: MainElm) {
   elm.on('pointerenter', () => {
     const { drawType } = this.graphicsConfig
-    if (drawType !== 'select') return elm.cursor = 'crosshair'
-    elm.cursor = 'move'
+    elm.cursor = drawType === 'select' ? 'move' : 'crosshair'
   })
   elm.on('pointerdown', (e) => handlePointerdown.call(elm, this, e))
   elm.on('pointerup', handleActionEnd)

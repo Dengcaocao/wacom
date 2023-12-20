@@ -12,9 +12,9 @@ class Draw extends Text {
       main_graphics = new Graphics()
       main_graphics.name = 'main_graphics'
       container.addChild(main_graphics)
-      customInfo.vertexData.push(x - container.x, y - container.y)
+      customInfo.vertexData.push(0, 0)
     }
-    customInfo.vertexData.push(mX - container.x, mY - container.y)
+    customInfo.vertexData.push(mX - x, mY - y)
     this.drawStroke(main_graphics)
   }
 }

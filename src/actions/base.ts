@@ -85,6 +85,21 @@ class Base {
   }
 
   /**
+   * 创建一个主元素，并添加事件监听
+   */
+  createElement () {
+    const container = this.container as ExtendContainer
+    container.removeChildren()
+    const graphics = new PIXI.Graphics()
+    graphics.name = 'main_graphics'
+    container.addChild(graphics)
+    installElmEvent.call(<any>this, graphics)
+    this.drawStroke(graphics)
+    this.drawBackground(graphics)
+    return graphics
+  }
+
+  /**
    * 手绘描边
    * @param elm 描边元素
    * @param vertexData 元素顶点数据
@@ -145,21 +160,6 @@ class Base {
       // 都使用贝塞尔曲线能拿到图形上每个点的信息
       elm.quadraticCurveTo(cpX, cpY, toX, toY)
     }
-  }
-
-  /**
-   * 创建一个主元素，并添加事件监听
-   */
-  createElement () {
-    const container = this.container as ExtendContainer
-    container.removeChildren()
-    const graphics = new PIXI.Graphics()
-    graphics.name = 'main_graphics'
-    container.addChild(graphics)
-    installElmEvent.call(<any>this, graphics)
-    this.drawStroke(graphics)
-    this.drawBackground(graphics)
-    return graphics
   }
 
   /**
@@ -283,8 +283,9 @@ class Base {
           (childElm as ExtendGraphics).customVertexData
         )
       })
+      const isMainElm = /^main/.test(<string>elm.name)
       // 处理端点样式重新绘制
-      if (/^main/.test(<string>elm.name) && isExtremePointKey) {
+      if (isMainElm && isExtremePointKey) {
         const updateDirection = <'left'|'right'>key.split('_')[1]
         elm.children
           .filter(item => !item.name?.endsWith(updateDirection))
@@ -295,11 +296,11 @@ class Base {
           .concat([{ type: styleConfig[key], direction: updateDirection }])
           .forEach((item: any) => drawExtremePoint.call(<any>this, { elm, ...item }))
       }
-      /^main/.test(<string>elm.name) && this.drawStroke(<PIXI.Graphics>elm, vertexData) // 默认使用container上的vertexData
-      this.drawBackground(<PIXI.Graphics>elm)
+      isMainElm && this.drawStroke(<PIXI.Graphics>elm, vertexData); // 默认使用container上的vertexData
+      isMainElm && this.drawBackground(<PIXI.Graphics>elm)
     }
     this.container.children
-      .filter(item => !['main_text', 'main_sprite', 'selected'].includes(<string>item.name))
+      .filter(item => !['main_text', 'main_sprite', 'selected', 'hitArea_Container'].includes(<string>item.name))
       .forEach(elm => {
         clearStyle(<PIXI.Graphics>elm)
         const isMainGraphics = /^main_graphics/.test(<string>elm.name)
