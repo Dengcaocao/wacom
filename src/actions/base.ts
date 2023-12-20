@@ -1,6 +1,6 @@
 import * as PIXI from 'pixi.js'
 import { getPoint2PointInfo } from '@/utils/utils'
-import installElmEvent from '@/event/elmEvent'
+import installElmEvent, { equalContainer } from '@/event/elmEvent'
 import type { IBaseParams, ExtendContainer, IExtendAttribute, IGraphicsConfig, ExtendGraphics, ISize } from './types'
 import type { IElementStyle } from '@/stores/types'
 import { drawExtremePoint } from './mark'
@@ -271,33 +271,26 @@ class Base {
       .flat()
     // 创建一个装载交互区域的容器
     let hitAreaContainer = <PIXI.Container>container.getChildByName('hitArea_Container')
-    if (!hitAreaContainer) {
-      hitAreaContainer = new PIXI.Container()
-      hitAreaContainer.name = 'hitArea_Container'
-      container.addChild(hitAreaContainer)
-      // 设置层级为最低
-      container.setChildIndex(hitAreaContainer, 0)
-    }
+    if (hitAreaContainer) return
+    hitAreaContainer = new PIXI.Container()
+    hitAreaContainer.name = 'hitArea_Container'
+    container.addChild(hitAreaContainer)
+    // 设置层级为最低
+    container.setChildIndex(hitAreaContainer, 0)
     hitAreaContainer.removeChildren()
     for (let i = 0; i < points.length; i+=2) {
       const [x, y] = points.slice(i, i+2)
       const hitAreaElm = new PIXI.Graphics()
       hitAreaContainer.addChild(hitAreaElm)
       hitAreaElm.hitArea = new PIXI.Circle(x, y, 8)
-      // hitAreaElm.on('pointerenter', () => {
-      //   // 回调事件是保留之前的值，需再次获取
-      //   const isSelected = container.getChildByName('selected')
-      //   hitAreaElm.cursor = this.graphicsConfig.drawType === 'select'
-      //     ? 'move'
-      //     : 'crosshair'
-      //   if (drawType === 'paintingBrush') return
-      //   elm.hitArea = (isSelected || isFill)
-      //     ? elm.hitArea
-      //     : hitAreaElm.hitArea
-      // })
-      hitAreaElm.on('pointerdown', (e) => {
+      hitAreaElm.on('pointerenter', () => {
+        hitAreaElm.cursor = this.graphicsConfig.drawType === 'select'
+          ? 'move'
+          : 'crosshair'
+      })
+      hitAreaElm.on('pointerdown', e => {
         e.stopPropagation()
-        this.container = elm.parent;
+        equalContainer.call(<any>this, elm.parent);
         (this as any).drawSelected()
       })
     }

@@ -1,9 +1,26 @@
+import { Container, Graphics } from 'pixi.js'
 import Application from '@/actions/application'
 import type { ExtendContainer, IExtendAttribute, IPoint, MainElm } from '@/actions/types'
 
 // 保存容器元素和信息
 let container: ExtendContainer
 let customInfo: IExtendAttribute | undefined
+
+/**
+ * 比较两个容器是否相等，否：重置交互区域移除选中并将容器赋值给实例容器
+ * @param this 实例对象
+ * @param currContainer 当前点击的容器 
+ */
+export function equalContainer (this: Application, currContainer: Container) {
+  if (currContainer === this.container) return
+  const mainElm = this.container?.getChildByName('main_graphics')
+  if (mainElm) {
+    mainElm.hitArea = null
+    this.removeSelected()
+    this.setHitArea(<Graphics>mainElm)
+  }
+  this.container = currContainer
+}
 
 function handlePointerdown (
   this: MainElm,
@@ -14,13 +31,12 @@ function handlePointerdown (
    * 判断是否有元素被选中，如果当前点击的元素与选中元素不相等
    * 移出之前元素选中的效果，将点击的元素设置为选中元素
    */
-  const { drawType } = rootThis.graphicsConfig
   container = this.parent as ExtendContainer
   customInfo = container.customInfo as IExtendAttribute
-  if (container !== rootThis.container) rootThis.removeSelected()
+  const { drawType } = rootThis.graphicsConfig
   if (drawType !== 'select') return
   e.stopPropagation()
-  rootThis.container = container
+  equalContainer.call(rootThis, container)
   const getElmStyleConfig = new CustomEvent('getElmStyleConfig', {
     detail: {
       drawType: customInfo.drawType,

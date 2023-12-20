@@ -69,13 +69,13 @@ function handlePointerdown (this: Application, { x, y }: MouseEvent) {
   stamp = nowTime
   const { drawType, styleConfig } = this.graphicsConfig
   this.startPoints = this.getMappingPoints(x, y)
-  // 绘制之前删除选中效果
+  // 绘制之前删除选中效果并重置交互区域
   if (this.container) {
     this.removeSelected()
-    const fillColor = this.container.customInfo?.styleConfig.fillColor
-    if (fillColor && fillColor === 'transparent') {
-      const main_graphics = this.container.getChildByName('main_graphics')
-      main_graphics && (main_graphics.hitArea = null)
+    const main_graphics = this.container.getChildByName('main_graphics')
+    if (main_graphics) {
+      main_graphics.hitArea = null
+      this.setHitArea(<PIXI.Graphics>main_graphics)
     }
     this.container = undefined
   }
