@@ -1,4 +1,3 @@
-import { Polygon } from 'pixi.js'
 import Selected from './selected'
 import type { ExtendContainer, IExtendAttribute } from './types'
 
@@ -16,8 +15,7 @@ class Diamond extends Selected {
       w / 2, h, w / 4, h * 3 / 4, 0, h / 2
     ]
     customInfo.vertexData = vertexData
-    const diamondElm = this.createElement()
-    diamondElm.hitArea = new Polygon(vertexData)
+    this.createElement()
   }
 }
 

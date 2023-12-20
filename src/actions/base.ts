@@ -178,6 +178,7 @@ class Base {
       }
     } = <IExtendAttribute>container.customInfo
     if (fillColor === 'transparent' || ['mark', 'straightLine'].includes(drawType)) return
+    this.setHitArea(elm)
     // 创建背景图形
     let backgroundElm_left = container.getChildByName('background_elm_left') as PIXI.Graphics
     if (!backgroundElm_left) {
@@ -247,6 +248,57 @@ class Base {
       backgroundElm_right.position.set(positionX, elm.y)
       backgroundElm_left.geometry.graphicsData.forEach(item => {
         backgroundElm_right.drawShape(item.shape)
+      })
+    }
+  }
+
+  setHitArea (elm: PIXI.Graphics) {
+    const container = <ExtendContainer>elm.parent
+    const { drawType, vertexData, styleConfig: { fillColor } } = <IExtendAttribute>container.customInfo
+    // 如果选中将交互区域设置为选中范围
+    const selectedElm = <PIXI.Graphics>container.getChildByName('selected')
+    if (selectedElm) {
+      const { minX, minY, maxX, maxY } = elm.geometry.bounds
+      elm.hitArea = new PIXI.Rectangle(minX, minY, maxX - minX, maxY - minY)
+    }
+    // 如果图形被填充交互设置为整个图形
+    const isFill = ['rect', 'arc', 'diamond'].includes(drawType) && fillColor !== 'transparent'
+    if (isFill) elm.hitArea = new PIXI.Polygon(vertexData)
+    // 为图形上的每个点创建一个可交互的区域
+    elm.getBounds()
+    const points = elm.geometry.graphicsData
+      .map(item => item.points)
+      .flat()
+    // 创建一个装载交互区域的容器
+    let hitAreaContainer = <PIXI.Container>container.getChildByName('hitArea_Container')
+    if (!hitAreaContainer) {
+      hitAreaContainer = new PIXI.Container()
+      hitAreaContainer.name = 'hitArea_Container'
+      container.addChild(hitAreaContainer)
+      // 设置层级为最低
+      container.setChildIndex(hitAreaContainer, 0)
+    }
+    hitAreaContainer.removeChildren()
+    for (let i = 0; i < points.length; i+=2) {
+      const [x, y] = points.slice(i, i+2)
+      const hitAreaElm = new PIXI.Graphics()
+      hitAreaContainer.addChild(hitAreaElm)
+      hitAreaElm.hitArea = new PIXI.Circle(x, y, 8)
+      // hitAreaElm.on('pointerenter', () => {
+      //   // 回调事件是保留之前的值，需再次获取
+      //   const isSelected = container.getChildByName('selected')
+      //   hitAreaElm.cursor = this.graphicsConfig.drawType === 'select'
+      //     ? 'move'
+      //     : 'crosshair'
+      //   if (drawType === 'paintingBrush') return
+      //   elm.hitArea = (isSelected || isFill)
+      //     ? elm.hitArea
+      //     : hitAreaElm.hitArea
+      // })
+      hitAreaElm.on('pointerdown', (e) => {
+        e.stopPropagation()
+        this.container = elm.parent;
+        (this as any).drawSelected()
       })
     }
   }

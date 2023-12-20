@@ -1,4 +1,3 @@
-import { Polygon } from 'pixi.js'
 import Base from './base'
 import type { ExtendContainer, IExtendAttribute } from './types'
 
@@ -15,8 +14,7 @@ class Rect extends Base {
       0, h, 0, h / 2, 0, 0
     ]
     customInfo.vertexData = vertexData
-    const rectElm = this.createElement()
-    rectElm.hitArea = new Polygon(vertexData)
+    this.createElement()
   }
 }
 

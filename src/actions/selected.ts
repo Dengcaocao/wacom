@@ -160,6 +160,8 @@ class Selected extends Rect {
       -halfWidth, halfHeight
     ])
     controlPoint.call(this, selectedElm, halfWidth, halfHeight)
+    // 选中后扩大交互区域
+    mainElm.name === 'main_graphics' && this.setHitArea(<PIXI.Graphics>mainElm)
   }
 }
 

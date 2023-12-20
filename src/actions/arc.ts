@@ -1,4 +1,4 @@
-import { Ellipse, Graphics } from 'pixi.js'
+import { Graphics } from 'pixi.js'
 import Diamond from './diamond'
 import type { ExtendContainer, IExtendAttribute } from './types'
 
@@ -27,8 +27,7 @@ class Arc extends Diamond {
     }
     vertexData.push(...points.slice(-4), points[0], points[1])
     customInfo.vertexData = vertexData
-    const arcElm = this.createElement()
-    arcElm.hitArea = new Ellipse(...path)
+    this.createElement()
   }
 }
 

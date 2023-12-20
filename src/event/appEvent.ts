@@ -72,6 +72,11 @@ function handlePointerdown (this: Application, { x, y }: MouseEvent) {
   // 绘制之前删除选中效果
   if (this.container) {
     this.removeSelected()
+    const fillColor = this.container.customInfo?.styleConfig.fillColor
+    if (fillColor && fillColor === 'transparent') {
+      const main_graphics = this.container.getChildByName('main_graphics')
+      main_graphics && (main_graphics.hitArea = null)
+    }
     this.container = undefined
   }
   this.container = new PIXI.Container()
