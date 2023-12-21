@@ -1,25 +1,51 @@
-# Style palette
+<a href="https://github.com/Dengcaocao/style-palette" target="_blank" rel="noopener">
+  <img alt="Wacom" src="./src/assets/slogan.png" />
+</a>
 
-This template should help get you started developing with Vue 3 in Vite.
+<div align="center">
+  <h2>
+    使用Vue3 + Vite + Pixi搭建的一款在线手绘样式白板工具 <br >
+    A hand draw style whiteboard tool built using Vue3 + Vite + Pixi</br>
+  </h2>
+</div>
 
-## Recommended IDE Setup
+<div align="center">
+  <!-- view -->
+  <img alt="view" src="https://komarev.com/ghpvc/?username=Dengcaocao&style=flat" />
+  <!-- preview -->
+  <img alt="preview" src="" />
+</div>
 
-[VSCode](https://code.visualstudio.com/) + [Volar](https://marketplace.visualstudio.com/items?itemName=Vue.volar) (and disable Vetur) + [TypeScript Vue Plugin (Volar)](https://marketplace.visualstudio.com/items?itemName=Vue.vscode-typescript-vue-plugin).
+## Features
 
-## Type Support for `.vue` Imports in TS
+ - 📚 Use pixi graphics.
+ - ✍️ Hand draw.
+ - 🏞️ Export to PNG & JPEG.
+ - 🧰 In common use rectangle、circle,、diamond、arrow、 line、 free-draw.
+ - 🔨 Support arrow style modification.
+ - ⌨️ Support shortcuts.
 
-TypeScript cannot handle type information for `.vue` imports by default, so we replace the `tsc` CLI with `vue-tsc` for type checking. In editors, we need [TypeScript Vue Plugin (Volar)](https://marketplace.visualstudio.com/items?itemName=Vue.vscode-typescript-vue-plugin) to make the TypeScript language service aware of `.vue` types.
+**Shortcut keys**
 
-If the standalone TypeScript plugin doesn't feel fast enough to you, Volar has also implemented a [Take Over Mode](https://github.com/johnsoncodehk/volar/discussions/471#discussioncomment-1361669) that is more performant. You can enable it by the following steps:
+| keys | describe |
+|------|------|
+| `space` | space + left mouse button drag canvas. |
+| `backspace、delete` | delete selected element. |
+| `ctrl+c` | copy selected element. |
 
-1. Disable the built-in TypeScript Extension
-    1) Run `Extensions: Show Built-in Extensions` from VSCode's command palette
-    2) Find `TypeScript and JavaScript Language Features`, right click and select `Disable (Workspace)`
-2. Reload the VSCode window by running `Developer: Reload Window` from the command palette.
+## Wacom
 
-## Customize configuration
+The Appliaction host at [https://dengcaocao.github.io/style-palette](https://dengcaocao.github.io/style-palette/). You can use it to draw any shape.
 
-See [Vite Configuration Reference](https://vitejs.dev/config/).
+At present, the project is not yet complete, but it already supports the majority of functions.
+
+**Issues**
+
+   - Arrow only supports straight lines, unable to find a better way to draw curves.
+   - Cannot adjust elements.
+   -  ...
+
+Welcome everyone to share their valuable opinions or ideas on these issues and the appliaction.
 
 ## Project Setup
 
