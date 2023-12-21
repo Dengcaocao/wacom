@@ -1,11 +1,12 @@
 <a href="https://github.com/Dengcaocao/style-palette" target="_blank" rel="noopener">
-  <img alt="Wacom" src="./src/assets/slogan.png" />
+  <img alt="Wacom" src="https://dengcaocao.github.io/resources/images/slogan.png" />
 </a>
 
 <div align="center">
   <h2>
     使用Vue3 + Vite + Pixi搭建的一款在线手绘样式白板工具 <br >
-    A hand draw style whiteboard tool built using Vue3 + Vite + Pixi</br>
+    A hand draw style whiteboard tool built using Vue3 + Vite + Pixi<br>
+    <br>
   </h2>
 </div>
 
@@ -13,7 +14,7 @@
   <!-- view -->
   <img alt="view" src="https://komarev.com/ghpvc/?username=Dengcaocao&style=flat" />
   <!-- preview -->
-  <img alt="preview" src="" />
+  <img alt="Wacom preview" src="https://dengcaocao.github.io/resources/images/preview.png" />
 </div>
 
 ## Features
