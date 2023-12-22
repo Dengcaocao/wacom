@@ -1,7 +1,7 @@
 import * as PIXI from 'pixi.js'
 import { getPoint2PointInfo } from '@/utils/utils'
 import installElmEvent, { equalContainer } from '@/event/elmEvent'
-import type { IBaseParams, ExtendContainer, IExtendAttribute, IGraphicsConfig, ExtendGraphics, ISize } from './types'
+import type { IBaseParams, ExtendContainer, IExtendAttribute, IGraphicsConfig } from './types'
 import type { IElementStyle } from '@/stores/types'
 import { drawExtremePoint } from './mark'
 
@@ -106,15 +106,15 @@ class Base {
    * @returns 
    */
   drawStroke (elm: PIXI.Graphics, vertexData?: number[]) {
+    const container = this.container as ExtendContainer
+    const customInfo = container.customInfo as IExtendAttribute
+    const { drawType, styleConfig, randomOffset, vertexData: MainVertexData } = customInfo
     elm.beginFill(0, 0)
     elm.lineStyle({
       ...this.graphicsConfig.styleConfig,
       cap: PIXI.LINE_CAP.ROUND,
       join: PIXI.LINE_JOIN.ROUND
     })
-    const container = this.container as ExtendContainer
-    const customInfo = container.customInfo as IExtendAttribute
-    const { drawType, styleConfig, randomOffset, vertexData: MainVertexData } = customInfo
     if (drawType === 'paintingBrush') {
       let [x, y] = MainVertexData.slice(0, 2)
       const movePArr = MainVertexData.slice(2)
@@ -296,22 +296,19 @@ class Base {
     }
   }
 
-  reRender (styleConfig: IElementStyle) {
+  reRender (lastStyleConfig: IElementStyle) {
     if (!this.container) return
     const container = <ExtendContainer>this.container
-    const customInfo = <IExtendAttribute>container.customInfo
+    const { styleConfig } = <IExtendAttribute>container.customInfo
     // 查找改变的key
-    let key: string
-    for (const i in customInfo.styleConfig) {
-      if (customInfo.styleConfig[i] !== styleConfig[i]) {
-        key = i
+    let updateKey: string = ''
+    for (const i in styleConfig) {
+      if (styleConfig[i] !== lastStyleConfig[i]) {
+        updateKey = i
         break
       }
     }
-    container.customInfo = {
-      ...customInfo,
-      styleConfig
-    }
+    Object.assign(styleConfig, lastStyleConfig)
     // 递归清楚样式
     const clearStyle = (elm: PIXI.Graphics) => {
       elm.children.forEach(childElm => {
@@ -319,38 +316,57 @@ class Base {
       })
       elm.clear()
     }
-    // 递归设置样式
-    const setStyle = (elm: PIXI.Graphics, vertexData?: number[]) => {
-      const isExtremePointKey = ['extremePoint_left', 'extremePoint_right'].includes(key)
-      !isExtremePointKey && elm.children.forEach(childElm => {
-        setStyle(
-          <PIXI.Graphics>childElm,
-          (childElm as ExtendGraphics).customVertexData
-        )
-      })
-      const isMainElm = /^main/.test(<string>elm.name)
-      // 处理端点样式重新绘制
-      if (isMainElm && isExtremePointKey) {
-        const updateDirection = <'left'|'right'>key.split('_')[1]
-        elm.children
-          .filter(item => !item.name?.endsWith(updateDirection))
-          .map(item => {
-            const direction = item.name?.slice(18)
-            return { type: styleConfig[`extremePoint_${direction}`], direction }
-          })
-          .concat([{ type: styleConfig[key], direction: updateDirection }])
-          .forEach((item: any) => drawExtremePoint.call(<any>this, { elm, ...item }))
-      }
-      isMainElm && this.drawStroke(<PIXI.Graphics>elm, vertexData); // 默认使用container上的vertexData
-      isMainElm && this.drawBackground(<PIXI.Graphics>elm)
+    // 获取主元素，设置新的样式
+    const mainElm = container.children.find(elm => /^main/.test(<string>elm.name))
+    if (!mainElm) return
+    // 文本
+    if (/text$/.test(<string>mainElm.name)) {
+      (mainElm as PIXI.Text).style.fill = lastStyleConfig.color
+      return mainElm.alpha = lastStyleConfig.alpha
     }
-    this.container.children
-      .filter(item => !['main_text', 'main_sprite', 'selected', 'hitArea_Container'].includes(<string>item.name))
-      .forEach(elm => {
-        clearStyle(<PIXI.Graphics>elm)
-        const isMainGraphics = /^main_graphics/.test(<string>elm.name)
-        isMainGraphics && setStyle(<PIXI.Graphics>elm)
-      })
+    // 图片
+    if (/sprite$/.test(<string>mainElm.name)) return mainElm.alpha = lastStyleConfig.alpha
+    /**
+     * 更新端点
+     * @param mainElm 父元素
+     * @param isAll 将更新父元素下所有端点
+     */
+    const updateExtremePoint = (mainElm: PIXI.Graphics, isAll: boolean = false) => {
+      if (!isAll) {
+        const direction = <'left'|'right'>updateKey.split('_')[1]
+        const childElmName = `extreme_point_elm_${direction}`
+        const updateElm = mainElm.getChildByName(childElmName)
+        !updateElm && drawExtremePoint.call(<any>this, {
+          elm: mainElm,
+          type: styleConfig[`extremePoint_${direction}`],
+          direction
+        })
+      }
+      mainElm.children
+        .forEach(childElm => {
+          const direction = childElm.name?.slice(18)
+          const type = styleConfig[`extremePoint_${direction}`]
+          clearStyle(<PIXI.Graphics>childElm)
+          drawExtremePoint.call(<any>this, { elm: mainElm, type, direction: <'left'|'right'>direction })
+        })
+    }
+    const triggerReExtremePointProperty = ['extremePoint_left', 'extremePoint_right']
+    if (triggerReExtremePointProperty.includes(updateKey)) return updateExtremePoint(<PIXI.Graphics>mainElm)
+    // 描边
+    const triggerReStrokeProperty = ['width', 'color', 'type', 'style', 'horn', 'alpha']
+    if (triggerReStrokeProperty.includes(updateKey)) {
+      clearStyle(<PIXI.Graphics>mainElm)
+      this.drawStroke(<PIXI.Graphics>mainElm)
+      updateExtremePoint(<PIXI.Graphics>mainElm, true)
+    }
+    // 填充
+    const triggerReFillProperty = ['fillColor', 'fillStyle', 'alpha']
+    if (triggerReFillProperty.includes(updateKey)) {
+      container.children
+        .filter(elm => /^background_elm/.test(<string>elm.name))
+        .forEach(elm => clearStyle(<PIXI.Graphics>elm))
+      this.drawBackground(<PIXI.Graphics>mainElm)
+    }
   }
 
   copy (copyElm: PIXI.Graphics) {}
