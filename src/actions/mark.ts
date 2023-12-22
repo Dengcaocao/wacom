@@ -99,6 +99,8 @@ class Mark extends Arc {
     if (drawType === 'straightLine') {
       customInfo.styleConfig.extremePoint_left = 'none'
       customInfo.styleConfig.extremePoint_right = 'none'
+    } else {
+      customInfo.styleConfig.extremePoint_right = 'arrow'
     }
     drawExtremePoint.call(this, {
       elm: markElm,

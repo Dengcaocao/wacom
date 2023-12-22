@@ -13,10 +13,10 @@ let customInfo: IExtendAttribute | undefined
  */
 export function equalContainer (this: Application, currContainer: Container) {
   if (currContainer === this.container) return
+  this.removeSelected()
   const mainElm = this.container?.getChildByName('main_graphics')
   if (mainElm) {
     mainElm.hitArea = null
-    this.removeSelected()
     this.setHitArea(<Graphics>mainElm)
   }
   this.container = currContainer

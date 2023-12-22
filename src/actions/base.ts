@@ -289,6 +289,7 @@ class Base {
           : 'crosshair'
       })
       hitAreaElm.on('pointerdown', e => {
+        if (this.graphicsConfig.drawType !== 'select') return
         e.stopPropagation()
         equalContainer.call(<any>this, elm.parent);
         (this as any).drawSelected()
