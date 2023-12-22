@@ -1,6 +1,6 @@
 <template>
   <main class="w-full bg-white p-2 md:mt-4 shadow-design rounded">
-    <div class="item">
+    <div class="item" v-if="currDrawType !== 'image'">
       <h3 class="title mt-0">描边</h3>
       <input-color v-model="styleConfig.color" />
     </div>
@@ -89,6 +89,7 @@ const configList = reactive([
   {
     title: '描边宽度',
     model: 'width',
+    display: ['rect', 'diamond', 'arc', 'mark', 'straightLine', 'paintingBrush'],
     radioGroup: [
       {
         title: '细',
@@ -110,6 +111,7 @@ const configList = reactive([
   {
     title: '描边样式',
     model: 'style',
+    display: ['rect', 'diamond', 'arc', 'mark', 'straightLine'],
     radioGroup: [
       {
         title: '实线',
