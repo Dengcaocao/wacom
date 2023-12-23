@@ -8,7 +8,50 @@
     <title>Wacom</title>
   </head>
   <body>
-    <div id="app"></div>
+    <div id="app">
+      <svg
+        t="1703311360519"
+        class="icon"
+        viewBox="0 0 1024 1024"
+        version="1.1"
+        xmlns="http://www.w3.org/2000/svg"
+        p-id="1975"
+        xmlns:xlink="http://www.w3.org/1999/xlink"
+        width="200" height="200">
+        <path class="svg-path" d="M426.667 448l44.288-155.093a42.667 42.667 0 0 1 82.09 0L597.333 448v64h30.72a42.667 42.667 0 0 1 41.387 32.299l58.027 232.405c153.301-124.8 168.874-353.28 33.962-497.707s-363.946-144.426-498.858 0c-134.912 144.427-119.339 372.907 33.92 497.707l58.112-232.405A42.667 42.667 0 0 1 395.947 512h30.72v-64zM512 853.333a339.285 339.285 0 0 0 139.307-29.61l-56.619-226.39H429.312l-56.619 226.39A339.2 339.2 0 0 0 512 853.333z m0 85.334C276.352 938.667 85.333 747.648 85.333 512S276.352 85.333 512 85.333 938.667 276.352 938.667 512 747.648 938.667 512 938.667z" fill="#2c2c2c" p-id="1976"></path>
+      </svg>
+    </div>
+    <style>
+      .icon {
+        position: absolute;
+        top: 50%;
+        left: 50%;
+        transform: translate(-50%, -50%);
+        width: 3rem;
+      }
+      .svg-path {
+        fill: none;
+        stroke: #000;
+        stroke-width: 10;
+        stroke-linecap: round;
+        opacity: 0;
+        animation: run 2s ease-in-out infinite,
+                   stop 2s forwards;
+      }
+      @keyframes run {
+        0% {
+          stroke-dasharray: 0 600px;
+        }
+        100% {
+          stroke-dasharray: 600px 0;
+        }
+      }
+      @keyframes stop {
+        100% {
+          opacity: 1;
+        }
+      }
+    </style>
     <script type="module" src="/src/main.ts"></script>
     <script src="https://cdn.jsdelivr.net/npm/vconsole@latest/dist/vconsole.min.js"></script>
     <script>
