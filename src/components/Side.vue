@@ -17,17 +17,23 @@
 </template>
 
 <script setup lang="ts">
-import { ref, toRefs } from 'vue'
+import { ref, toRaw, toRefs, watch } from 'vue'
 import { useConfigStore } from '@/stores/config'
 import InputColor from '@/components/InputColor.vue'
 import Config from './Config.vue'
 import ClearPop from '@/views/components/ClearPop.vue'
 import ToImage from '@/views/components/toImagePop.vue'
 
-const { isCollapsed, bgColor } = toRefs(useConfigStore())
+const config = useConfigStore()
+const { isCollapsed, bgColor } = toRefs(config)
 
 const clearpop = ref()
 const toImagePop = ref()
+
+watch(bgColor, color => {
+  const app = toRaw(config.pixiApp)
+  app.updateCanvasBg(color)
+})
 </script>
 
 <style scoped>

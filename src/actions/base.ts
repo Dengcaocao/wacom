@@ -85,6 +85,18 @@ class Base {
   }
 
   /**
+   * 更新画布背景
+   * @param color 
+   */
+  updateCanvasBg (color: string) {
+    this.app.renderer.background.init({
+      backgroundColor: color,
+      backgroundAlpha: 1,
+      clearBeforeRender: true
+    })
+  }
+
+  /**
    * 创建一个主元素，并添加事件监听
    */
   createElement () {
