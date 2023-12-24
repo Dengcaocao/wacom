@@ -144,6 +144,9 @@ function installAppEvent (this: Application) {
    */
   const stage = this.app.stage
   stage.on('wheel', handleWheel.bind(this))
+  stage.on('pointerenter', () => {
+    stage.cursor = this.graphicsConfig.drawType === 'select' ? 'default' : 'crosshair'
+  })
   stage.on('pointerdown', handlePointerdown.bind(this))
   stage.on('pointermove', handlePointermove.bind(this))
   stage.on('pointerup', handleDrawEnd.bind(this))

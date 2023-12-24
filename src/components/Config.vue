@@ -59,7 +59,7 @@ import { useConfigStore } from '@/stores/config'
 import InputColor from '@/components/InputColor.vue'
 
 const config = useConfigStore()
-const { drawType, styleConfig } = toRefs(config)
+const { drawType, isCollapsed, styleConfig } = toRefs(config)
 
 const currDrawType = ref<string>('')
 
@@ -217,6 +217,7 @@ const handleDel = () => {
 
 const handleCustomEvent = (e: CustomEventInit) => {
   const { drawType, styleConfig: currStyleConfig } = e.detail
+  isCollapsed.value = false
   currDrawType.value = drawType
   Object.assign(styleConfig.value, currStyleConfig)
 }

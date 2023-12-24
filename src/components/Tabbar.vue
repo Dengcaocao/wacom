@@ -4,7 +4,7 @@
       v-for="icon in icons"
       :key="icon.name"
       class="item iconfont"
-      :class="[icon.name, icon.action === configStore.drawType && 'active']"
+      :class="[icon.name, icon.action === drawType && 'active']"
       :title="icon.title"
       @click="handleUpdateDrawType(icon.action as IDrawType)">
     </span>
@@ -13,7 +13,7 @@
 </template>
 
 <script setup lang="ts">
-import { reactive, ref, toRaw, watch } from 'vue'
+import { reactive, ref, toRaw, toRefs, watch } from 'vue'
 import type { IDrawType } from '@/stores/types'
 import { useConfigStore } from '@/stores/config'
 
@@ -21,7 +21,8 @@ const info: any = {
   select: '滚动或空格+鼠标左键移动画布',
 }
 
-const configStore = useConfigStore()
+const config = useConfigStore()
+const { pixiApp, drawType, isCollapsed } = toRefs(config)
 
 const tips = ref(info.select)
 const icons = reactive([
@@ -72,21 +73,19 @@ const icons = reactive([
   }
 ])
 
-watch(() => configStore.drawType, type => {
-  if (type !== 'select') {
-    configStore.isCollapsed = false
-    configStore.pixiApp.removeSelected()
-  }
+watch(drawType, type => {
+  const pApp = toRaw(pixiApp.value)
+  isCollapsed.value = type === 'select'
+  type !== 'select' && pApp.removeSelected()
   tips.value = info[type]
-  configStore.pixiApp.graphicsConfig = {
-    ...configStore.pixiApp.graphicsConfig,
+  pApp.graphicsConfig = {
+    ...pApp.graphicsConfig,
     drawType: type
   }
-  document.body.style.cursor = type === 'select' ? 'default' : 'crosshair'
 })
 
 const handleUpdateDrawType = (type: IDrawType) => {
-  configStore.drawType = type
+  drawType.value = type
   if (type === 'image') {
     const inputElm = document.createElement('input')
     inputElm.setAttribute('type', 'file')
@@ -94,9 +93,9 @@ const handleUpdateDrawType = (type: IDrawType) => {
     inputElm.onchange = () => {
       const file = (inputElm.files as FileList)[0]
       const url = URL.createObjectURL(file)
-      const pixiApp = toRaw(configStore.pixiApp)
-      pixiApp.drawImage(url)
-      configStore.drawType = 'select'
+      const pApp = toRaw(pixiApp.value)
+      pApp.drawImage(url)
+      drawType.value = 'select'
     }
     inputElm.click()
   }
