@@ -36,7 +36,7 @@
 
 ## Wacom
 
-The Appliaction host at [https://dengcaocao.github.io/style-palette](https://dengcaocao.github.io/style-palette/). You can use it to draw any shape.
+The Appliaction host at [https://dengcaocao.github.io/wacom](https://dengcaocao.github.io/wacom). You can use it to draw any shape.
 
 At present, the project is not yet complete, but it already supports the majority of functions.
 
