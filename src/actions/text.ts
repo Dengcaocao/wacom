@@ -73,6 +73,7 @@ class Text extends Mark {
       elm.style.height = text.height + 'px'
     }
     elm.onblur = () => {
+      if (!text.text) this.app.stage.removeChild(<ExtendContainer>this.container)
       this.container = undefined
       elm.parentNode?.removeChild(elm)
     }
