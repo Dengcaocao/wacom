@@ -1,9 +1,9 @@
 {
-  "name": "style-palette",
-  "version": "0.0.0",
+  "name": "wacom",
+  "version": "1.0.0",
   "private": true,
   "scripts": {
-    "dev": "vite",
+    "dev": "vite --host",
     "build": "run-p type-check build-only",
     "preview": "vite preview",
     "build-only": "vite build",
