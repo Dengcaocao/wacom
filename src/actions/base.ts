@@ -126,9 +126,11 @@ class Base {
       cap: PIXI.LINE_CAP.ROUND,
       join: PIXI.LINE_JOIN.ROUND
     })
+    const currVertexData = vertexData || MainVertexData
     if (drawType === 'paintingBrush') {
-      let [x, y] = MainVertexData.slice(0, 2)
-      const movePArr = MainVertexData.slice(2)
+      // 处理自由绘制
+      let [x, y] = currVertexData.slice(0, 2)
+      const movePArr = currVertexData.slice(2)
       for (let i = 0; i < movePArr.length; i +=2) {
         const [toX,  toY] = movePArr.slice(i, i+2)
         elm.moveTo(x, y)
@@ -137,7 +139,6 @@ class Base {
       }
       return
     }
-    const currVertexData = vertexData || MainVertexData
     // 根据顶点数据创建随机偏移点
     if (
       !randomOffset ||
@@ -188,7 +189,7 @@ class Base {
         alpha, type, fillColor, fillStyle
       }
     } = <IExtendAttribute>container.customInfo
-    if (fillColor === 'transparent' || ['mark', 'straightLine'].includes(drawType)) return
+    if (fillColor === 'transparent' || ['mark', 'straightLine', 'paintingBrush'].includes(drawType)) return
     this.setHitArea(elm)
     // 创建背景图形
     let backgroundElm_left = container.getChildByName('background_elm_left') as PIXI.Graphics
