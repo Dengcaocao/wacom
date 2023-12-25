@@ -264,6 +264,11 @@ class Base {
     }
   }
 
+  /**
+   * 设置元素可交互区域
+   * @param elm 
+   * @returns 
+   */
   setHitArea (elm: PIXI.Graphics) {
     const container = <ExtendContainer>elm.parent
     const { drawType, vertexData, styleConfig: { fillColor } } = <IExtendAttribute>container.customInfo
@@ -309,6 +314,11 @@ class Base {
     }
   }
 
+  /**
+   * 重写渲染元素
+   * @param lastStyleConfig 样式配置
+   * @returns 
+   */
   reRender (lastStyleConfig: IElementStyle) {
     if (!this.container) return
     const container = <ExtendContainer>this.container

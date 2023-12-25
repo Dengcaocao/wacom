@@ -21,8 +21,8 @@ function deepCloneGraphic (
   graphics.position = elm.position
   graphics.rotation = elm.rotation
   graphics.hitArea = elm.hitArea
-  graphics.scale = elm.scale
-  graphics.beginFill(
+  graphics.scale = elm.scale;
+  /^background_elm/.test(<string>elm.name) && graphics.beginFill(
     (<Graphics>elm).fill.color,
     (<Graphics>elm).fill.alpha
   )
