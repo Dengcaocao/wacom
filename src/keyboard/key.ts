@@ -2,14 +2,14 @@ import type Application from '@/actions/application'
 import type { ExtendContainer } from '@/actions/types'
 
 function handleKeydown (this: Application, e: KeyboardEvent) {
+  if ((<HTMLElement>e.target).tagName !== 'BODY') return
   const key = e.code === 'Space' ? e.code.toLowerCase() : e.key.toLowerCase()
   this.keys.push(key)
-  if (key === 'space') document.body.style.cursor = 'grabbing'
+  if (key === 'space') this.app.stage.cursor = 'grabbing'
   switch (true) {
     case ['backspace', 'delete'].includes(key): {
-      const textarea = document.querySelector('textarea')
-      if (textarea) return
-      return this.app.stage.removeChild(this.container as ExtendContainer)
+      this.app.stage.removeChild(<ExtendContainer>this.container)
+      return this.container = undefined
     }
     case e.ctrlKey && key === 'c': {
       return this.copy()
@@ -19,7 +19,7 @@ function handleKeydown (this: Application, e: KeyboardEvent) {
 
 function handleKeyup (this: Application, e: KeyboardEvent) {
   const key = e.code === 'Space' ? e.code.toLowerCase() : e.key.toLowerCase()
-  if (key === 'space') document.body.style.cursor = 'default'
+  if (key === 'space') this.app.stage.cursor = 'default'
   this.keys = this.keys.filter(itemKey => itemKey !== key)
 }
 
