@@ -10,6 +10,7 @@
     </span>
     <div class="tips">{{tips}}</div>
   </header>
+  <a title="仓库" href="https://github.com/Dengcaocao/wacom" target="_blank" class="iconfont icon-github"></a>
 </template>
 
 <script setup lang="ts">
@@ -19,6 +20,7 @@ import { useConfigStore } from '@/stores/config'
 
 const info: any = {
   select: '滚动或空格+鼠标左键移动画布',
+  text: '双击可快速进入文本编辑'
 }
 
 const config = useConfigStore()
@@ -115,6 +117,11 @@ const handleUpdateDrawType = (type: IDrawType) => {
   }
   .item {
     @apply text-base leading-none md:text-xl md:leading-none p-2 rounded cursor-pointer bg-theme-color hover:bg-theme-color-deep
+  }
+  .icon-github {
+    @apply absolute top-1.5 right-1.5 translate-y-1/4
+           text-3xl cursor-pointer text-slate-600 hover:text-slate-900
+           hidden md:block;
   }
   .active {
     background-color: theme('colors.theme-color-deep');

@@ -1,5 +1,5 @@
 <a href="https://github.com/Dengcaocao/style-palette" target="_blank" rel="noopener">
-  <img alt="Wacom" src="https://dengcaocao.github.io/resources/images/slogan.png" />
+  <img alt="Wacom" width="100%" src="https://dengcaocao.github.io/resources/images/slogan.png" />
 </a>
 
 <div align="center">
@@ -14,7 +14,7 @@
   <!-- view -->
   <img alt="view" src="https://komarev.com/ghpvc/?username=Dengcaocao&style=flat" />
   <!-- preview -->
-  <img alt="Wacom preview" src="https://dengcaocao.github.io/resources/images/preview.png" />
+  <img alt="Wacom preview" width="100%" src="https://dengcaocao.github.io/resources/images/preview.png" />
 </div>
 
 ## Features
@@ -47,6 +47,8 @@ At present, the project is not yet complete, but it already supports the majorit
    -  ...
 
 Welcome everyone to share their valuable opinions or ideas on these issues and the appliaction.
+
+<img alt="end" src="@/../src/assets/end.png" />
 
 ## Project Setup
 
