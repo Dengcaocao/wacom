@@ -46,9 +46,9 @@ At present, the project is not yet complete, but it already supports the majorit
    - Cannot adjust elements.
    -  ...
 
-Welcome everyone to share their valuable opinions or ideas on these issues and the appliaction.
+Welcome everyone to share their valuable opinions or ideas on these issues and the appliaction.<br />
 
-<img alt="end" src="@/../src/assets/end.png" />
+<img alt="end" width="100%" src="./src/assets/end.png" />
 
 ## Project Setup
 
