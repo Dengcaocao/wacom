@@ -52,6 +52,7 @@ const handleMenuClick = (e: Event) => {
 document.addEventListener('contextmenu', e => {
   e.preventDefault()
   handleCloseMenu()
+  if ((<HTMLElement>e.target).tagName !== 'CANVAS') return
   const menuContainer = document.createElement('div')
   menuContainer.setAttribute('class', 'context-menu-container')
   menuContainer.addEventListener('click', handleMenuClick)

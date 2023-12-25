@@ -86,11 +86,10 @@ class Base {
 
   /**
    * 更新画布背景
-   * @param color 
    */
-  updateCanvasBg (color: string) {
+  updateCanvasBg () {
     this.app.renderer.background.init({
-      backgroundColor: color,
+      backgroundColor: this.graphicsConfig.bgColor,
       backgroundAlpha: 1,
       clearBeforeRender: true
     })
@@ -420,7 +419,7 @@ class Base {
     const imgBgElm = new PIXI.Graphics()
     type === 'image/jpeg' && saveDisplayObject.addChildAt(imgBgElm, 0)
     imgBgElm.position.set(x, y)
-    imgBgElm.beginFill(0xffffff, 1)
+    imgBgElm.beginFill(this.graphicsConfig.bgColor, 1)
     imgBgElm.drawRect(
       0, 0, width, height
     )

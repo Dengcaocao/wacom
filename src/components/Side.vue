@@ -32,7 +32,11 @@ const toImagePop = ref()
 
 watch(bgColor, color => {
   const app = toRaw(config.pixiApp)
-  app.updateCanvasBg(color)
+  app.graphicsConfig = {
+    ...app.graphicsConfig,
+    bgColor: color
+  }
+  app.updateCanvasBg()
 })
 </script>
 

@@ -2,6 +2,7 @@ import * as PIXI from 'pixi.js'
 import type { IElementStyle, markType } from '@/stores/types'
 
 export interface IGraphicsConfig {
+  bgColor: string
   drawType: string
   styleConfig: IElementStyle
 }
