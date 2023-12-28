@@ -1,11 +1,28 @@
 import * as PIXI from 'pixi.js'
 import Application from '@/actions/application'
-import type { ExtendContainer, IExtendAttribute } from '@/actions/types'
+import { gapSize } from '@/actions/selected'
+import { elmInitWidth, elmInitHeight } from '@/event/controlElmEvent'
+import type { ExtendContainer, IExtendAttribute, IPoint } from '@/actions/types'
 
 // 时间戳
 let stamp: number = new Date().getTime()
 // 是否双击
 let isDoubleClick: boolean = false
+
+function adjustMovePoint (this: Application, { x, y }: IPoint, controlIndex: number) {
+  const container = <ExtendContainer>this.container
+  const mPObj: any = {
+    0: { x: x - gapSize, y: container.y + elmInitHeight },
+    1: { x: x - gapSize, y: y - gapSize },
+    2: { x: container.x + elmInitWidth, y: y - gapSize },
+    3: { x: x + gapSize, y: y - gapSize },
+    4: { x: x + gapSize, y: container.y - elmInitHeight },
+    5: { x: x + gapSize, y: y + gapSize },
+    6: { x: container.x - elmInitWidth, y: y + gapSize },
+    7: { x: x - gapSize, y: y + gapSize }
+  }
+  return mPObj[controlIndex]
+}
 
 /**
  * 处理场景滚动
@@ -85,7 +102,7 @@ function handlePointerdown (this: Application, { x, y }: MouseEvent) {
     vertexData: [],
     styleConfig: { ...styleConfig }
   }
-  this.container.position.set(this.startPoints.x, this.startPoints.y)
+  this.container.position = this.startPoints
   this.app.stage.addChild(this.container)
   if (drawType === 'image') return
   if (
@@ -101,14 +118,14 @@ function handlePointerdown (this: Application, { x, y }: MouseEvent) {
 // 开始绘制
 function handlePointermove (this: Application, { x, y }: MouseEvent) {
   if (!this.isDraw) return
-  const point = this.getMappingPoints(x, y)
+  let point = this.getMappingPoints(x, y)
   if (this.keys.includes('space')) {
     const deltaX = (point.x - this.startPoints.x) * -1
     const deltaY = (point.y - this.startPoints.y) * -1
     return handleWheel.call(this, <WheelEvent>{ deltaX, deltaY })
   }
   const container = <ExtendContainer>this.container
-  const drawType = (container.customInfo as IExtendAttribute).drawType
+  const { drawType, isReSize, controlIndex } = <IExtendAttribute>container.customInfo
   const methods: any = {
     rect: this.drawRect.bind(this),
     diamond: this.drawDiamond.bind(this),
@@ -117,7 +134,12 @@ function handlePointermove (this: Application, { x, y }: MouseEvent) {
     straightLine: this.drawMark.bind(this),
     paintingBrush: this.paintingBrush.bind(this)
   }
+  if (isReSize) {
+    container.position = this.startPoints
+    point = adjustMovePoint.call(this, point, <number>controlIndex)
+  }
   methods[drawType] && methods[drawType](point.x, point.y)
+  isReSize && this.drawSelected()
 }
 
 // 结束绘制
@@ -130,11 +152,11 @@ function handleDrawEnd (this: Application) {
     return this.container = undefined
   }
   const disabledUDS = ['select', 'paintingBrush', 'text', 'image']
-  const drawType = (this.container.customInfo as IExtendAttribute).drawType
-  if (!disabledUDS.includes(drawType) && this.container) {
+  const customInfo = <IExtendAttribute>this.container.customInfo
+  customInfo.isReSize = false
+  if (!disabledUDS.includes(customInfo.drawType)) {
     this.drawSelected()
   }
-  // this.styleConfig.drawType !=='paintingBrush' && (drawType.value = 'select')
 }
 
 function installAppEvent (this: Application) {

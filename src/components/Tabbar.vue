@@ -119,8 +119,9 @@ const handleUpdateDrawType = (type: IDrawType) => {
     @apply text-base leading-none md:text-xl md:leading-none p-2 rounded cursor-pointer bg-theme-color hover:bg-theme-color-deep
   }
   .icon-github {
-    @apply absolute top-1.5 right-1.5 translate-y-1/4
-           text-3xl cursor-pointer text-slate-600 hover:text-slate-900
+    transform: translate(-25%, 25%);
+    @apply absolute top-1.5 right-1.5
+           text-3xl leading-none cursor-pointer text-slate-600 hover:text-slate-900
            hidden md:block;
   }
   .active {

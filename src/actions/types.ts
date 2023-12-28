@@ -22,10 +22,12 @@ export interface IPoint {
 export interface IExtendAttribute {
   drawType: string
   isMove?: boolean
+  isReSize?: boolean,
   startPoint?: IPoint
   styleConfig: IElementStyle
   randomOffset?: number[]
-  vertexData: number[]
+  vertexData: number[],
+  controlIndex?: number
 }
 
 export type ExtendContainer = PIXI.Container & { customInfo?: IExtendAttribute }
