@@ -43,14 +43,11 @@ function handlePointerdown (
   // 获取父容器
   containerElm = this.parent.parent
   customInfo = <IExtendAttribute>containerElm.customInfo
-  if (customInfo.drawType === 'paintingBrush') {
-    return
-  }
   mainElm = <MainElm>containerElm.children.find(elm => /^main/.test(<string>elm.name))
   dp = rootThis.getMappingPoints(e.x, e.y)
   isTextOrSprite = /(text|sprite)$/.test(<string>mainElm.name)
   rootThis.startPoints = getPosition(index)
-  rootThis.isDraw = true
+  rootThis.isDraw = customInfo.drawType !== 'paintingBrush'
   customInfo.isReSize = true
   customInfo.controlIndex = index
   rootThis.app.stage.on('pointermove', ({x, y}) => {

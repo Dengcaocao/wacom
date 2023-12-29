@@ -16,6 +16,8 @@ const controlSize = 8
  * @returns 
  */
 const setCursor = (childElm: PIXI.Graphics, index: number) => {
+  const containerElm = <ExtendContainer>childElm.parent.parent
+  if (containerElm.customInfo?.drawType === 'paintingBrush') return childElm.cursor = 'not-allowed'
   switch (true) {
     case [0, 4].includes(index): {
       return childElm.cursor = 'ew-resize'
