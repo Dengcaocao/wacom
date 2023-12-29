@@ -202,6 +202,7 @@ class Base {
     backgroundElm_left.lineStyle({
       width: 1,
       color: fillColor,
+      alpha,
       cap: PIXI.LINE_CAP.ROUND,
       join: PIXI.LINE_JOIN.ROUND
     })
