@@ -1,5 +1,5 @@
 <template>
-  <main class="w-full bg-white p-2 md:mt-4 shadow-design rounded">
+  <main class="w-full overflow-y-auto p-2" style="height: 330px;">
     <div class="item" v-if="currDrawType !== 'image'">
       <h3 class="title mt-0">描边</h3>
       <input-color v-model="styleConfig.color" />
@@ -217,7 +217,7 @@ const handleDel = () => {
 
 const handleCustomEvent = (e: CustomEventInit) => {
   const { drawType, styleConfig: currStyleConfig } = e.detail
-  isCollapsed.value = false
+  if (window.innerWidth > 750) isCollapsed.value = false
   currDrawType.value = drawType
   Object.assign(styleConfig.value, currStyleConfig)
 }

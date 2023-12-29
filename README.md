@@ -43,12 +43,11 @@ At present, the project is not yet complete, but it already supports the majorit
 **Issues**
 
    - Arrow only supports straight lines, unable to find a better way to draw curves.
-   - Cannot adjust elements.
    -  ...
 
 Welcome everyone to share their valuable opinions or ideas on these issues and the appliaction.<br />
 
-<img alt="end" width="100%" src="./src/assets/end.png" />
+<img alt="end" width="100%" src="https://dengcaocao.github.io/resources/images/end.png" />
 
 ## Project Setup
 

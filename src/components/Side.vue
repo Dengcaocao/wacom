@@ -46,29 +46,31 @@ watch(bgColor, color => {
 @tailwind utilities;
 @layer components {
   .mobile {
-    max-height: 70%;
     @apply absolute right-1/2 translate-x-1/2 bottom-5 overflow-hidden
-           w-11/12 shadow-design rounded-md p-1 bg-white;
+           w-11/12 shadow-design rounded-md bg-white;
   }
   .mobile.active {
-    @apply overflow-visible
+    @apply overflow-visible shadow-none;
   }
   .pc {
     @apply overflow-visible top-1.5 left-1.5 translate-x-0
-           w-min h-min rounded-none p-0 bg-transparent;
+           w-min h-min rounded-none p-0;
   }
   .top {
     @apply relative z-10
-           grid items-center grid-flow-col auto-cols-min gap-1 p-1
-           w-full bg-white
-           md:z-0 md:shadow-design md:rounded;
+           grid items-center grid-flow-col auto-cols-min gap-1 p-2
+           w-full bg-white rounded-lg
+           md:z-0 md:p-1 md:rounded;
+  }
+  .active .top {
+    @apply shadow-design;
   }
   .middle {
-    @apply absolute bottom-0 z-0 w-full transition-all
-           md:right-80 md:bottom-auto;
+    @apply absolute bottom-0 z-0 w-full transition-all shadow-design
+         bg-white rounded-lg md:rounded md:mt-4 md:right-80 md:bottom-auto;
   }
   .middle.active {
-    @apply bottom-14 md:bottom-auto md:right-0;
+    @apply bottom-16 md:bottom-auto md:right-0;
   }
   .item {
     @apply p-2 rounded text-base leading-none md:text-xl md:leading-none cursor-pointer bg-theme-color hover:bg-theme-color-deep
