@@ -33,8 +33,8 @@ function adjustMovePoint (this: Application, { x, y }: IPoint, controlIndex: num
  */
 function handleWheel (this: Application, { deltaX, deltaY }: WheelEvent) {
   // 输入时禁止滚动
-  const textareaList = document.querySelectorAll('.pixi-text')
-  if (textareaList.length) return
+  const textarea = document.querySelector('.pixi-text')
+  if (textarea) return
   const stage = this.app.stage
   const screenWidth = this.app.screen.width,
         screenHeight = this.app.screen.height
@@ -67,11 +67,16 @@ function handleWheel (this: Application, { deltaX, deltaY }: WheelEvent) {
   stage.y += deltaY * -1
 }
 
+function handleTouchstart (this: Application, e: TouchEvent) {
+  if (e.targetTouches.length > 1) this.isDraw = false
+}
+
 function handleMobileWheel (this: Application, e: TouchEvent) {
   e.preventDefault()
   const length = e.targetTouches.length
   if (length !== 2) return
-  this.isDraw = false
+  const textarea = <HTMLTextAreaElement>document.querySelector('.pixi-text')
+  textarea && !textarea.value && textarea.parentNode?.removeChild(textarea)
   const { clientX, clientY } = e.targetTouches[length - 1]
   const point = this.getMappingPoints(clientX, clientY)
   const deltaX = (point.x - this.startPoints.x) * -1
@@ -109,8 +114,8 @@ function handlePointerdown (this: Application, { x, y }: MouseEvent) {
     drawType === 'text' ||
     (drawType === 'select' && isDoubleClick)
   ) {
-    this.drawText()
-    return isDoubleClick = false
+    isDoubleClick = false
+    return this.drawText() 
   }
   this.isDraw = true
 }
@@ -174,6 +179,7 @@ function installAppEvent (this: Application) {
   stage.on('pointerup', handleDrawEnd.bind(this))
   stage.on('pointerleave', handleDrawEnd.bind(this))
   // 处理移动端画布移动
+  document.addEventListener('touchstart', handleTouchstart.bind(this))
   document.addEventListener('touchmove', handleMobileWheel.bind(this), { passive: false })
 }
 
