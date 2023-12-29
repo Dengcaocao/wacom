@@ -39,8 +39,13 @@ const createElm = (
 }
 
 class Text extends Mark {
-  drawText (txt: string = '', position?: { x: number, y: number }) {
+  drawText (
+    txt: string = '',
+    position?: { x: number, y: number },
+    size = { width: 0, height: 0 }
+  ) {
     const container = <ExtendContainer>this.container
+    container.y -= position ? 0 : fontSize / 2
     const { styleConfig: { color, alpha } } = <IExtendAttribute>container.customInfo
     const text = new PIXI.Text(txt, {
       fontFamily: 'LongCang-Regular',
@@ -50,8 +55,12 @@ class Text extends Mark {
     })
     text.name = 'main_text'
     text.alpha = alpha
+    if (txt) {
+      text.width = size.width
+      text.height = size.height
+    }
     container.addChild(text)
-    installElmEvent.call(this as any, text)
+    installElmEvent.call(<any>this, text)
     const elm = createElm(
       'textarea',
       {
@@ -61,12 +70,6 @@ class Text extends Mark {
       },
       color
     )
-    position = position || { ...this.startPoints }
-    if (!txt) {
-      container.y -= fontSize / 2
-      position.y = fontSize / 2
-    }
-    position.y -= txt ? 0 : fontSize / 2
     elm.oninput = (e: any) => {
       text.text = e.target.value
       elm.style.width = text.width + fontSize + 'px'

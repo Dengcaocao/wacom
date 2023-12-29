@@ -44,8 +44,8 @@ class Copy extends SpriteImage {
     let { x, y } = this.container
     x += 10, y+= 10
     if (/sprite$/.test(mainElmName)) {
-      const url = (mainElm as Sprite).texture.baseTexture.cacheId
-      return this.drawImage(url, { x, y })
+      const url = (<Sprite>mainElm).texture.baseTexture.cacheId
+      return this.drawImage(url, { x, y }, { width: mainElm.width, height: mainElm.height })
     }
     const container: ExtendContainer = new Container()
     container.position.set(x, y)
@@ -56,7 +56,11 @@ class Copy extends SpriteImage {
     this.app.stage.addChild(container)
     if (/text$/.test(mainElmName)) {
       this.container = container
-      this.drawText((mainElm as Text).text, { x, y })
+      this.drawText(
+        (<Text>mainElm).text,
+        { x, y },
+        { width: mainElm.width, height: mainElm.height }
+      )
     } else {
       this.container.children
         .filter(elm => !['hitArea_Container', 'selected'].includes(<string>elm.name))
