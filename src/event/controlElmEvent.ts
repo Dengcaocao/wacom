@@ -55,9 +55,38 @@ function handlePointerdown (
     const { x: sx, y: sy } = rootThis.startPoints
     const { x: mx, y: my } = rootThis.getMappingPoints(x, y)
     const w = Math.abs(mx - sx), h = Math.abs(my - sy)
-    const position = { x: Math.min(sx, mx), y: Math.min(sy, my) }
-    containerElm.position = position
-    mainElm.width = w, mainElm.height = h
+    const pX = Math.min(sx, mx), pY = Math.min(sy, my)
+    switch (index) {
+      case 0: {
+        mainElm.width = w
+        mainElm.height = elmInitHeight
+        containerElm.position.set(pX, Math.min(sy, dp.y))
+        break
+      }
+      case 2: {
+        mainElm.width = elmInitWidth
+        mainElm.height = h
+        containerElm.position.set(Math.min(sx, dp.x), pY)
+        break
+      }
+      case 4: {
+        mainElm.width = w
+        mainElm.height = elmInitHeight
+        containerElm.position.set(pX, Math.min(sy, dp.y) - elmInitHeight/2)
+        break
+      }
+      case 6: {
+        mainElm.width = elmInitWidth
+        mainElm.height = h
+        containerElm.position.set(Math.min(sx, dp.x) - elmInitWidth/2, pY)
+        break
+      }
+      default: {
+        mainElm.width = w
+        mainElm.height = h
+        containerElm.position.set(pX, pY)
+      }
+    }
     rootThis.removeSelected()
     rootThis.drawSelected()
   })
