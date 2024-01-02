@@ -8,7 +8,7 @@
         <input-color v-model="bgColor" />
       </div>
     </section>
-    <section class="middle" :class="[!isCollapsed && 'active']">
+    <section class="config-container middle" :class="[!isCollapsed && 'active']">
       <config />
     </section>
     <clear-pop ref="clearpop" />
@@ -67,7 +67,7 @@ watch(bgColor, color => {
   }
   .middle {
     @apply absolute bottom-0 z-0 w-full transition-all shadow-design
-         bg-white rounded-lg md:rounded md:mt-4 md:right-80 md:bottom-auto;
+         bg-white rounded-lg md:rounded md:my-4 md:right-80 md:bottom-auto;
   }
   .middle.active {
     @apply bottom-16 md:bottom-auto md:right-0;

@@ -72,7 +72,8 @@ function handleTouchstart (this: Application, e: TouchEvent) {
 }
 
 function handleMobileWheel (this: Application, e: TouchEvent) {
-  e.preventDefault()
+  const a = document.querySelector('.config-container')
+  !a?.contains(<HTMLElement>e.target) && e.preventDefault()
   const length = e.targetTouches.length
   if (length !== 2) return
   const textarea = <HTMLTextAreaElement>document.querySelector('.pixi-text')

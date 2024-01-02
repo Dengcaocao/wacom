@@ -1,5 +1,5 @@
 <template>
-  <main class="w-full overflow-y-auto p-2" style="height: 330px;">
+  <main class="config-container md:config-container-max-h">
     <div class="item" v-if="currDrawType !== 'image'">
       <h3 class="title mt-0">描边</h3>
       <input-color v-model="styleConfig.color" />
@@ -238,20 +238,26 @@ onUnmounted(() => {
 @tailwind components;
 @tailwind utilities;
 @layer components {
+  .config-container {
+    @apply w-full max-h-96 overflow-y-auto p-2;
+  }
+  .config-container.config-container-max-h {
+    max-height: calc(100vh - 100px - 32px);
+  }
   .title {
-    @apply text-xs font-bold rounded my-1.5
+    @apply text-xs font-bold rounded my-1.5;
   }
   .label {
-    @apply block bg-theme-color rounded ml-1.5 first:ml-0 px-2 cursor-pointer text-neutral-600 hover:bg-theme-color-deep
+    @apply block bg-theme-color rounded ml-1.5 first:ml-0 px-2 cursor-pointer text-neutral-600 hover:bg-theme-color-deep;
   }
   .label.active {
-    @apply bg-theme-color-deep
+    @apply bg-theme-color-deep;
   }
   .iconfont {
-    @apply text-2xl leading-none
+    @apply text-2xl leading-none;
   }
   .action {
-    @apply text-base leading-none md:text-xl md:leading-none max-w-min bg-theme-color rounded ml-1.5 first:ml-0 p-2
+    @apply text-base leading-none md:text-xl md:leading-none max-w-min bg-theme-color rounded ml-1.5 first:ml-0 p-2;
   }
 }
 </style>
