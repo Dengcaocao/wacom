@@ -11,7 +11,6 @@ export interface IBaseParams {
   height: number,
   bgColor?: number,
   graphicsConfig: IGraphicsConfig
-  dom: HTMLElement
 }
 
 export interface IPoint {

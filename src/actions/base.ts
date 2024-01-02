@@ -7,14 +7,13 @@ import { drawExtremePoint } from './mark'
 
 class Base {
   app: PIXI.Application
-  dom: HTMLElement
   scale: number
   // 样式配置对象
   graphicsConfig: IGraphicsConfig
   container: ExtendContainer | undefined
   isDraw: boolean = false
   startPoints: { x: number, y: number } = { x: 0, y: 0 }
-  constructor ({ width, height, bgColor, graphicsConfig, dom }: IBaseParams) {
+  constructor ({ width, height, bgColor, graphicsConfig }: IBaseParams) {
     this.app = new PIXI.Application({
       width: width * 2,
       height: height * 2,
@@ -23,11 +22,9 @@ class Base {
       backgroundColor: bgColor || 0xffffff,
       resolution: window.devicePixelRatio || 1
     })
-    this.dom = dom
     this.scale = this.app.screen.width / width
     this.graphicsConfig = graphicsConfig
     this.initCanvas()
-    dom.appendChild(this.app.view as HTMLCanvasElement)
   }
 
   /**
@@ -40,7 +37,7 @@ class Base {
     const canvasView = <HTMLCanvasElement>this.app.view
     canvasView.setAttribute('style', `width: ${innerWidth}px;height: ${innerHeight}px`)
     this.createMesh()
-    // 添加可交互区域
+    // 设置可交互区域
     this.app.stage.hitArea = new PIXI.Rectangle(0, 0, width, height)
     // 放大2倍
     this.app.stage.scale.set(this.scale)

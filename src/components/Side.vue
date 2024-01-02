@@ -11,13 +11,22 @@
     <section class="config-container middle" :class="[!isCollapsed && 'active']">
       <config />
     </section>
+    <section class="bottom">
+      <button class="action">
+        <i class="iconfont icon-jian"></i>
+      </button>
+      <div class="scale">{{ scale }}</div>
+      <button class="action">
+        <i class="iconfont icon-jia"></i>
+      </button>
+    </section>
     <clear-pop ref="clearpop" />
     <to-image ref="toImagePop" />
   </aside>
 </template>
 
 <script setup lang="ts">
-import { ref, toRaw, toRefs, watch } from 'vue'
+import { computed, ref, toRaw, toRefs, watch } from 'vue'
 import { useConfigStore } from '@/stores/config'
 import InputColor from '@/components/InputColor.vue'
 import Config from './Config.vue'
@@ -25,7 +34,7 @@ import ClearPop from '@/views/components/ClearPop.vue'
 import ToImage from '@/views/components/toImagePop.vue'
 
 const config = useConfigStore()
-const { isCollapsed, bgColor } = toRefs(config)
+const { pixiApp, isCollapsed, bgColor } = toRefs(config)
 
 const clearpop = ref()
 const toImagePop = ref()
@@ -38,6 +47,8 @@ watch(bgColor, color => {
   }
   app.updateCanvasBg()
 })
+
+const scale = computed(() => pixiApp.value.scale / 2 * 100 + '%')
 </script>
 
 <style scoped>
@@ -74,6 +85,22 @@ watch(bgColor, color => {
   }
   .item {
     @apply p-2 rounded text-base leading-none md:text-xl md:leading-none cursor-pointer bg-theme-color hover:bg-theme-color-deep
+  }
+  .bottom {
+    @apply absolute w-full p-1
+           flex justify-between items-center
+           rounded-md bg-white shadow-design;
+    top: calc(100vh - 12px);
+    transform: translateY(-100%);
+  }
+  .bottom .scale {
+    @apply flex-1 text-center;
+  }
+  .bottom .action {
+    @apply flex p-1.5 rounded bg-theme-color-deep focus:outline-none focus:ring focus:ring-green-100;
+  }
+  .action .iconfont {
+    @apply text-xl leading-none;
   }
 }
 </style>

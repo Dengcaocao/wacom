@@ -19,6 +19,18 @@ const configStore = useConfigStore()
 
 const container = ref<HTMLElement>()
 
+// 初始化画布实例
+const canvasApp = new Application({
+  width: window.innerWidth,
+  height: window.innerHeight,
+  graphicsConfig: {
+    bgColor: configStore.bgColor,
+    drawType: configStore.drawType,
+    styleConfig: configStore.styleConfig
+  }
+})
+configStore.pixiApp = canvasApp
+
 watch(configStore.styleConfig, styleConfig => {
   const app = toRaw(configStore.pixiApp)
   app.graphicsConfig = {
@@ -29,17 +41,5 @@ watch(configStore.styleConfig, styleConfig => {
   if (app.container) app.reRender({ ...styleConfig })
 })
  
-onMounted(() => {
-  const app = new Application({
-    width: window.innerWidth,
-    height: window.innerHeight,
-    graphicsConfig: {
-      bgColor: configStore.bgColor,
-      drawType: configStore.drawType,
-      styleConfig: configStore.styleConfig
-    },
-    dom: container.value as HTMLElement
-  })
-  configStore.pixiApp = app
-})
+onMounted(() => container.value?.appendChild(canvasApp.app.view as HTMLCanvasElement))
 </script>

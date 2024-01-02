@@ -79,7 +79,7 @@ class Text extends Mark {
       this.container = undefined
       elm.parentNode?.removeChild(elm)
     }
-    !txt && this.dom.appendChild(elm)
+    !txt && document.body.appendChild(elm)
     setTimeout(() => elm.focus(), 88)
   }
 }
