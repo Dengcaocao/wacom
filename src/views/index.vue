@@ -21,8 +21,6 @@ const container = ref<HTMLElement>()
 
 // 初始化画布实例
 const canvasApp = new Application({
-  width: window.innerWidth,
-  height: window.innerHeight,
   graphicsConfig: {
     bgColor: configStore.bgColor,
     drawType: configStore.drawType,

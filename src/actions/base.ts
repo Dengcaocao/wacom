@@ -13,10 +13,10 @@ class Base {
   container: ExtendContainer | undefined
   isDraw: boolean = false
   startPoints: { x: number, y: number } = { x: 0, y: 0 }
-  constructor ({ width, height, bgColor, graphicsConfig }: IBaseParams) {
+  constructor ({ bgColor, graphicsConfig }: IBaseParams) {
     this.app = new PIXI.Application({
-      width: width * 2,
-      height: height * 2,
+      width: window.innerWidth,
+      height: window.innerHeight,
       antialias: true,
       eventMode: 'static',
       backgroundColor: bgColor || 0xffffff,
@@ -32,16 +32,12 @@ class Base {
    */
   initCanvas () {
     const { width, height } = this.app.screen
-    const innerWidth = width / this.scale
-    const innerHeight = height / this.scale
     const canvasView = <HTMLCanvasElement>this.app.view
-    canvasView.setAttribute('style', `width: ${innerWidth}px;height: ${innerHeight}px`)
+    canvasView.setAttribute('style', `width: ${width}px;height: ${height}px`)
     this.createMesh()
+    this.setCanvasScale()
     // 设置可交互区域
-    this.app.stage.hitArea = new PIXI.Rectangle(0, 0, width, height)
-    // 放大2倍
-    this.app.stage.scale.set(this.scale)
-    this.app.stage.position = { x: -innerWidth, y: -innerHeight }
+    this.app.stage.hitArea = new PIXI.Rectangle(0, 0, width * 2, height * 2)
   }
 
   /**

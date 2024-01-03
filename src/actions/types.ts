@@ -7,8 +7,6 @@ export interface IGraphicsConfig {
   styleConfig: IElementStyle
 }
 export interface IBaseParams {
-  width: number
-  height: number,
   bgColor?: number,
   graphicsConfig: IGraphicsConfig
 }
