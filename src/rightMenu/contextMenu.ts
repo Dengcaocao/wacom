@@ -3,13 +3,13 @@ import pinia from '@/stores'
 import { useConfigStore } from '@/stores/config'
 import { toRaw } from 'vue'
 
-const config = useConfigStore(pinia)
-
 interface IMenu {
   title: string
   value: string
   status: boolean
 }
+
+const config = useConfigStore(pinia)
 
 const menuList: IMenu[] = [
   {
@@ -49,19 +49,38 @@ const handleMenuClick = (e: Event) => {
   handleCloseMenu()
 }
 
-document.addEventListener('contextmenu', e => {
+const handContextmenu = (e: MouseEvent) => {
   e.preventDefault()
   handleCloseMenu()
   if ((<HTMLElement>e.target).tagName !== 'CANVAS') return
   const menuContainer = document.createElement('div')
   menuContainer.setAttribute('class', 'context-menu-container')
   menuContainer.addEventListener('click', handleMenuClick)
+  menuContainer.addEventListener('touchstart', handleMenuClick)
   menuContainer.innerHTML = getInnerText()
   document.body.appendChild(menuContainer)
   const { width, height } = getComputedStyle(menuContainer)
   const x = window.innerWidth - e.x < parseInt(width) ? e.x - parseInt(width) : e.x
   const y = window.innerHeight - e.y < parseInt(height) ? e.y - parseInt(height) : e.y
   menuContainer.setAttribute('style', `top: ${y}px; left: ${x}px;`)
-})
+}
 
+const handleLongpress = (e: TouchEvent & { x?: number, y?: number }) => {
+  handleCloseMenu()
+  return setTimeout(() => {
+    if (e.changedTouches.length > 1) return
+    const { clientX, clientY } = e.changedTouches[0]
+    e.x = clientX, e.y = clientY
+    handContextmenu(<any>e)
+  }, 800)
+}
+
+// pc
+document.addEventListener('contextmenu', handContextmenu)
 document.addEventListener('click', handleCloseMenu)
+
+// 移动
+let timer: number | undefined
+document.addEventListener('touchstart', e => timer = handleLongpress(e))
+document.addEventListener('touchmove', () => clearTimeout(timer))
+document.addEventListener('touchend', () => clearTimeout(timer))

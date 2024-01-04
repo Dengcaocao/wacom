@@ -1,6 +1,6 @@
 <template>
   <section>
-    <section>
+    <section style="user-select: none;">
       <Tabbar />
       <Side />
     </section>
