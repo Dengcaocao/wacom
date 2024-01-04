@@ -25,6 +25,7 @@
  - 🧰 In common use rectangle、circle,、diamond、arrow、 line、 free-draw.
  - 🔨 Support arrow style modification.
  - ⌨️ Support shortcuts.
+ - 📄 support rightMenu.
 
 **Shortcut keys**
 
