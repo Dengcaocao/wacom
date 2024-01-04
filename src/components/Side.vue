@@ -12,11 +12,11 @@
       <config />
     </section>
     <section class="bottom">
-      <button class="action">
+      <button class="action" @click="updateScale('sub')">
         <i class="iconfont icon-jian"></i>
       </button>
       <div class="scale">{{ scale }}</div>
-      <button class="action">
+      <button class="action" @click="updateScale('add')">
         <i class="iconfont icon-jia"></i>
       </button>
     </section>
@@ -26,7 +26,7 @@
 </template>
 
 <script setup lang="ts">
-import { computed, ref, toRaw, toRefs, watch } from 'vue'
+import { ref, toRaw, toRefs, watch } from 'vue'
 import { useConfigStore } from '@/stores/config'
 import InputColor from '@/components/InputColor.vue'
 import Config from './Config.vue'
@@ -48,7 +48,19 @@ watch(bgColor, color => {
   app.updateCanvasBg()
 })
 
-const scale = computed(() => pixiApp.value.scale / 2 * 100 + '%')
+const scale = ref<string>()
+watch(() => pixiApp.value.scale, newVal => {
+  let percenter = newVal * 100
+  if (newVal === 0.5) percenter = 10
+  if (newVal < 1 && newVal > 0.5) {
+    const diffValue = Math.round((1 - newVal) * 100).toFixed(1)
+    const count = parseInt(diffValue) / 5
+    percenter -= 5 * count
+  }
+  scale.value = `${percenter.toFixed(0)}%`
+}, { deep: true, immediate: true })
+
+const updateScale = (type: 'add'|'sub') => pixiApp.value.updateCanvasScale(type)
 </script>
 
 <style scoped>
@@ -97,7 +109,7 @@ const scale = computed(() => pixiApp.value.scale / 2 * 100 + '%')
     @apply flex-1 text-center;
   }
   .bottom .action {
-    @apply flex p-1.5 rounded bg-theme-color-deep focus:outline-none focus:ring focus:ring-green-100;
+    @apply flex p-1.5 rounded bg-theme-color hover:bg-theme-color-deep focus:outline-none focus:ring focus:ring-zinc-300;
   }
   .action .iconfont {
     @apply text-xl leading-none;

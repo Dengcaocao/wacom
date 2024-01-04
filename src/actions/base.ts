@@ -7,7 +7,7 @@ import { drawExtremePoint } from './mark'
 
 class Base {
   app: PIXI.Application
-  scale: number
+  scale: number = 1
   // 样式配置对象
   graphicsConfig: IGraphicsConfig
   container: ExtendContainer | undefined
@@ -22,7 +22,6 @@ class Base {
       backgroundColor: bgColor || 0xffffff,
       resolution: window.devicePixelRatio || 1
     })
-    this.scale = this.app.screen.width / width
     this.graphicsConfig = graphicsConfig
     this.initCanvas()
   }
@@ -53,7 +52,8 @@ class Base {
     const mesh = new PIXI.Graphics()
     this.app.stage.addChildAt(mesh, 0)
     mesh.name = 'mesh'
-    const { width, height } = this.app.screen
+    let { width, height } = this.app.screen
+    width *= 2, height *= 2
     mesh.lineStyle(1, 0x000000, 0.1)
     // 垂直线条
     for (let i = 0; i < width; i += 20) {
@@ -68,13 +68,36 @@ class Base {
   }
 
   /**
+   * 设置画布比例和位置
+   */
+  setCanvasScale () {
+    this.app.stage.scale.set(this.scale)
+    const { width: scWidth, height: scHeight } = this.app.screen
+    const { width: stWidth, height: stHeight } = this.app.stage
+    const diffWidth = stWidth - scWidth,
+          diffHeight = stHeight - scHeight
+    const x = diffWidth / 2 * -1
+    const y = diffHeight / 2 * -1
+    this.app.stage.position.set(x, y)
+  }
+
+  /**
    * 获取映射点
    */
   getMappingPoints (x: number, y: number) {
+    const { x: stageX, y: stageY } = this.app.stage
     return {
-      x: x + Math.abs(this.app.stage.x) / this.scale,
-      y: y + Math.abs(this.app.stage.y) / this.scale
+      x: (x + Math.abs(stageX)) / this.scale,
+      y: (y + Math.abs(stageY)) / this.scale
     }
+  }
+
+  updateCanvasScale (type: 'add'|'sub') {
+    const value = type === 'add'
+      ? this.scale >= 2 ? 0 : this.scale < 1 ? 0.05 : 0.1
+      : this.scale <= 0.5 ? 0 : this.scale > 1 ? -0.1 : -0.05
+    this.scale = parseFloat((this.scale + value).toFixed(2))
+    this.setCanvasScale()
   }
 
   /**
