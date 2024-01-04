@@ -77,7 +77,7 @@ const icons = reactive([
 
 watch(drawType, type => {
   const pApp = toRaw(pixiApp.value)
-  isCollapsed.value = type === 'select'
+  if (window.innerWidth > 750) isCollapsed.value = type === 'select'
   type !== 'select' && pApp.removeSelected()
   tips.value = info[type]
   pApp.graphicsConfig = {
