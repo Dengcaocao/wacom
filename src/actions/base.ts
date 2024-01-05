@@ -34,9 +34,9 @@ class Base {
     const canvasView = <HTMLCanvasElement>this.app.view
     canvasView.setAttribute('style', `width: ${width}px;height: ${height}px`)
     this.createMesh()
-    this.setCanvasScale()
+    this.updateCanvasScale()
     // 设置可交互区域
-    this.app.stage.hitArea = new PIXI.Rectangle(0, 0, width * 2, height * 2)
+    this.app.stage.hitArea = new PIXI.Rectangle(0, 0, width * 3, height * 3)
   }
 
   /**
@@ -53,7 +53,7 @@ class Base {
     this.app.stage.addChildAt(mesh, 0)
     mesh.name = 'mesh'
     let { width, height } = this.app.screen
-    width *= 2, height *= 2
+    width *= 3, height *= 3
     mesh.lineStyle(1, 0x000000, 0.1)
     // 垂直线条
     for (let i = 0; i < width; i += 20) {
@@ -68,36 +68,55 @@ class Base {
   }
 
   /**
-   * 设置画布比例和位置
-   */
-  setCanvasScale () {
-    this.app.stage.scale.set(this.scale)
-    const { width: scWidth, height: scHeight } = this.app.screen
-    const { width: stWidth, height: stHeight } = this.app.stage
-    const diffWidth = stWidth - scWidth,
-          diffHeight = stHeight - scHeight
-    const x = diffWidth / 2 * -1
-    const y = diffHeight / 2 * -1
-    this.app.stage.position.set(x, y)
-  }
-
-  /**
    * 获取映射点
    */
   getMappingPoints (x: number, y: number) {
-    const { x: stageX, y: stageY } = this.app.stage
+    const { width } = this.app.screen
+    const { x: stageX, y: stageY, width: stWidth } = this.app.stage
+    const scale = stWidth / (width * 3)
     return {
-      x: (x + Math.abs(stageX)) / this.scale,
-      y: (y + Math.abs(stageY)) / this.scale
+      x: (x + Math.abs(stageX)) / scale,
+      y: (y + Math.abs(stageY)) / scale
     }
   }
 
-  updateCanvasScale (type: 'add'|'sub') {
-    const value = type === 'add'
-      ? this.scale >= 2 ? 0 : this.scale < 1 ? 0.05 : 0.1
-      : this.scale <= 0.5 ? 0 : this.scale > 1 ? -0.1 : -0.05
+  /**
+   * 获取偏移值和缩放比例
+   */
+  getOS () {
+    const { width: scWidth, height: scHeight } = this.app.screen
+    const diffWidth = scWidth * this.scale - scWidth
+    // 3) 交互区域是屏幕的3倍，-1) 取反
+    const stageNeedScale = (scWidth * 3) / (scWidth * 3 + diffWidth * -1)
+    let offsetX = -scWidth * stageNeedScale
+    let offsetY = -scHeight * stageNeedScale
+    // 中间位置始终占据屏幕的宽高
+    offsetX += (scWidth + offsetX) / 2
+    offsetY += (scHeight + offsetY) / 2
+    return {
+      offsetX,
+      offsetY,
+      stageNeedScale
+    }
+  }
+
+  /**
+   * 更新画布比例和位置
+   * @param type 缩(sub)放(add)
+   * @returns 
+   */
+  updateCanvasScale (type?: 'add'|'sub') {
+    if (this.scale >= 2 && type === 'add') return
+    if (this.scale <= 0.1 && type === 'sub') return
+    const value = type 
+      ? type === 'add' ? 0.1 : -0.1
+      : 0
     this.scale = parseFloat((this.scale + value).toFixed(2))
-    this.setCanvasScale()
+    const { offsetX, offsetY, stageNeedScale } = this.getOS()
+    // 先重置比例再设置
+    this.app.stage.scale.set(1)
+    this.app.stage.scale.set(stageNeedScale)
+    this.app.stage.position.set(offsetX, offsetY)
   }
 
   /**

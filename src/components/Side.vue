@@ -50,13 +50,7 @@ watch(bgColor, color => {
 
 const scale = ref<string>()
 watch(() => pixiApp.value.scale, newVal => {
-  let percenter = newVal * 100
-  if (newVal === 0.5) percenter = 10
-  if (newVal < 1 && newVal > 0.5) {
-    const diffValue = Math.round((1 - newVal) * 100).toFixed(1)
-    const count = parseInt(diffValue) / 5
-    percenter -= 5 * count
-  }
+  const percenter = newVal * 100
   scale.value = `${percenter.toFixed(0)}%`
 }, { deep: true, immediate: true })
 
