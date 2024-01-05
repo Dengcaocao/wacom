@@ -36,32 +36,24 @@ function handleWheel (this: Application, { deltaX, deltaY }: WheelEvent) {
   const textarea = document.querySelector('.pixi-text')
   if (textarea) return
   const stage = this.app.stage
-  const screenWidth = this.app.screen.width,
-        screenHeight = this.app.screen.height
+  const { width, height } = this.app.screen
+  const { offsetX, offsetY, stageNeedScale } = this.getOS()
   // 过滤掉网格元素
   const elements = stage.children.filter(item => item.name !== 'mesh')
   // 处理边界值.
-  if (stage.x >= 0 || stage.x <= -screenWidth) {
+  if (stage.x >= 0 || stage.x <= offsetX * 2) {
     const direction = deltaX < 0 ? 1 : -1
-    const offsetValue = (screenWidth / this.scale) / 2
-    stage.x = -(screenWidth / this.scale)
-    elements
-      .forEach(item => {
-        item.x = item.x + offsetValue * direction
-      })
-    this.startPoints.x += offsetValue * direction
-    return
+    const translateX = width * stageNeedScale * direction
+    elements.forEach(item => item.x += translateX)
+    this.startPoints.x += translateX
+    return stage.x = offsetX
   }
-  if (stage.y >= 0 || stage.y <= -screenHeight) {
+  if (stage.y >= 0 || stage.y <= offsetY * 2) {
     const direction = deltaY < 0 ? 1 : -1
-    const offsetValue = (screenHeight / this.scale) / 2
-    stage.y = -(screenHeight / this.scale)
-    elements
-      .forEach(item => {
-        item.y = item.y + offsetValue * direction
-      })
-    this.startPoints.y += offsetValue * direction
-    return
+    const translateY = height * stageNeedScale * direction
+    elements.forEach(item => item.y += translateY)
+    this.startPoints.y += translateY
+    return stage.y = offsetY
   }
   stage.x += deltaX * -1
   stage.y += deltaY * -1
