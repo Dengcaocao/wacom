@@ -93,8 +93,8 @@ const updateScale = (type: 'add'|'sub') => pixiApp.value.updateCanvasScale(type)
     @apply p-2 rounded text-base leading-none md:text-xl md:leading-none cursor-pointer bg-theme-color hover:bg-theme-color-deep
   }
   .bottom {
-    @apply absolute w-full p-1
-           flex justify-between items-center
+    @apply absolute w-full p-1 hidden
+           md:flex justify-between items-center
            rounded-md bg-white shadow-design;
     top: calc(100vh - 12px);
     transform: translateY(-100%);
