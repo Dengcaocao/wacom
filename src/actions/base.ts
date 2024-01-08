@@ -72,8 +72,9 @@ class Base {
    */
   getMappingPoints (x: number, y: number) {
     const { width } = this.app.screen
-    const { x: stageX, y: stageY, width: stWidth } = this.app.stage
-    const scale = stWidth / (width * 3)
+    const { x: stageX, y: stageY } = this.app.stage
+    const { stageNeedScale } = this.getOS()
+    const scale = (width * 3 * stageNeedScale) / (width * 3)
     return {
       x: (x + Math.abs(stageX)) / scale,
       y: (y + Math.abs(stageY)) / scale
